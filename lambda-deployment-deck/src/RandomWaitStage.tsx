@@ -18,7 +18,7 @@ import {
 
 import './RandomWaitStage.less';
 
-export function RandomWaitStageExecutionDetails(props: IExecutionDetailsSectionProps) {
+export function LambdaDeploymentExecutionDetails(props: IExecutionDetailsSectionProps) {
   return (
     <ExecutionDetailsSection name={props.name} current={props.current}>
       <div>
@@ -35,9 +35,9 @@ export function RandomWaitStageExecutionDetails(props: IExecutionDetailsSectionP
 
   This method returns JSX (https://reactjs.org/docs/introducing-jsx.html) that gets displayed in the Spinnaker UI.
  */
-function RandomWaitStageConfig(props: IStageConfigProps) {
+function LambdaDeploymentConfig(props: IStageConfigProps) {
   return (
-    <div className="RandomWaitStageConfig">
+    <div className="LambdaDeploymentConfig">
       <FormikStageConfig
         {...props}
         validate={validate}
@@ -57,7 +57,7 @@ function RandomWaitStageConfig(props: IStageConfigProps) {
 
 /*
   This is a contrived example of how to use an `initialize` function to hook into arbitrary Deck services. 
-  This `initialize` function provides the help field text for the `RandomWaitStageConfig` stage form defined above.
+  This `initialize` function provides the help field text for the `LambdaDeploymentConfig` stage form defined above.
 
   You can hook into any service exported by the `@spinnaker/core` NPM module, e.g.:
    - CloudProviderRegistry
@@ -81,8 +81,8 @@ function validate(stageConfig: IStage) {
   return validator.validateForm();
 }
 
-export namespace RandomWaitStageExecutionDetails {
-  export const title = 'randomWait';
+export namespace LambdaDeploymentExecutionDetails {
+  export const title = 'lambdaDeploymentStage';
 }
 
 /*
@@ -95,10 +95,10 @@ export namespace RandomWaitStageExecutionDetails {
   - validateFn -> A validation function for the stage config form.
  */
 export const randomWaitStage: IStageTypeConfig = {
-  key: 'randomWait',
-  label: `Random Wait`,
-  description: 'Stage that waits a random amount of time up to the max input',
-  component: RandomWaitStageConfig, // stage config
-  executionDetailsSections: [RandomWaitStageExecutionDetails, ExecutionDetailsTasks],
+  key: 'lambdaDeploymentStage',
+  label: `Lambda Deployment`,
+  description: 'Stage that manages AWS Lambda function deployment: Creation, Update, Delete, Versioning',
+  component: LambdaDeploymentConfig, // stage config
+  executionDetailsSections: [LambdaDeploymentExecutionDetails, ExecutionDetailsTasks],
   validateFn: validate,
 };
