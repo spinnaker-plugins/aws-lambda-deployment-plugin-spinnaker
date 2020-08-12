@@ -1,0 +1,43 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+  }
+}
+
+plugins {
+  id("io.spinnaker.plugin.bundler").version("$spinnakerGradleVersion")
+  id("com.palantir.git-version").version("0.12.2")
+  id("org.jetbrains.kotlin.jvm").version("$kotlinVersion")
+  id("org.jetbrains.kotlin.kapt").version("$kotlinVersion")
+}
+
+repositories {
+  mavenCentral()
+}
+
+spinnakerBundle {
+  pluginId = "aws-lambda-deployment-plugin"
+  description = "Lambda Deployment Plugin"
+  provider = "https://aws.amazon.com"
+  version = rootProject.version
+}
+
+version = normalizedVersion()
+
+subprojects {
+  group = "com.amazon.aws.spinnaker.lambda"
+  version = rootProject.version
+}
+
+String normalizedVersion() {
+  String fullVersion = gitVersion()
+  String normalized = fullVersion.split("-").first()
+  if (fullVersion.contains("dirty")) {
+    return "$normalized-SNAPSHOT"
+  } else {
+    return normalized
+  }
+}
