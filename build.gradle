@@ -2,16 +2,11 @@ buildscript {
   repositories {
     mavenCentral()
   }
-  dependencies {
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
-  }
 }
 
 plugins {
   id("io.spinnaker.plugin.bundler").version("$spinnakerGradleVersion")
   id("com.palantir.git-version").version("0.12.2")
-  id("org.jetbrains.kotlin.jvm").version("$kotlinVersion")
-  id("org.jetbrains.kotlin.kapt").version("$kotlinVersion")
 }
 
 repositories {
@@ -19,8 +14,8 @@ repositories {
 }
 
 spinnakerBundle {
-  pluginId = "aws-lambda-deployment-plugin"
-  description = "Lambda Deployment Plugin"
+  pluginId = "Aws.LambdaDeploymentPlugin"
+  description = "AWS Lambda Deployment Plugin"
   provider = "https://aws.amazon.com"
   version = rootProject.version
 }
@@ -28,7 +23,7 @@ spinnakerBundle {
 version = normalizedVersion()
 
 subprojects {
-  group = "com.amazon.aws.spinnaker.lambda"
+  group = "com.amazon.aws.spinnaker.plugin.lambda"
   version = rootProject.version
 }
 
