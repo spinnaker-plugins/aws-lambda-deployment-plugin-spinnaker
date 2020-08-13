@@ -82,7 +82,7 @@ function validate(stageConfig: IStage) {
 }
 
 export namespace LambdaDeploymentExecutionDetails {
-  export const title = 'lambdaDeploymentStage';
+  export const title = 'Lambda Deployment Stage';
 }
 
 /*
@@ -95,8 +95,8 @@ export namespace LambdaDeploymentExecutionDetails {
   - validateFn -> A validation function for the stage config form.
  */
 export const lambdaDeploymentStage: IStageTypeConfig = {
-  key: 'lambdaDeploymentStage',
-  label: `Lambda Deployment`,
+  key: 'Aws.LambdaDeploymentStage',
+  label: `AWS Lambda Deployment`,
   description: 'Stage that manages AWS Lambda function deployment: Creation, Update, Delete, Versioning',
   component: LambdaDeploymentConfig, // stage config
   executionDetailsSections: [LambdaDeploymentExecutionDetails, ExecutionDetailsTasks],
