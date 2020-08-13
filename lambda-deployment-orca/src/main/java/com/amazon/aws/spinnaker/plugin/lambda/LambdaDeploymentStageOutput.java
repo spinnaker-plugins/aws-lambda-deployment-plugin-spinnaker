@@ -25,7 +25,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class LambdaDeploymentStageOutput extends SimpleStageOutput<String, Object> {
+public class LambdaDeploymentStageOutput<T, U> extends SimpleStageOutput<LambdaDeploymentContext, Object> {
+    private LambdaDeploymentContext lambdaDeploymentContext;
     private String resourceId;
     private String url;
     private List<String> errors;

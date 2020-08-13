@@ -27,6 +27,13 @@ import org.slf4j.LoggerFactory;
 @Extension
 public class LambdaDeploymentStage implements SimpleStage<LambdaDeploymentInput> {
     Logger logger = LoggerFactory.getLogger(LambdaDeploymentStage.class);
+    LambdaDeploymentContext context;
+
+    public LambdaDeploymentStage() {
+        logger.debug("Executing LambdaDeploymentStage");
+        logger.debug("Executing LambdaDeploymentStage");
+    }
+
     @Override
     public SimpleStageOutput execute(SimpleStageInput<LambdaDeploymentInput> simpleStageInput) {
         logger.debug("Executing LambdaDeploymentStage");
@@ -35,6 +42,7 @@ public class LambdaDeploymentStage implements SimpleStage<LambdaDeploymentInput>
     }
     @Override
     public String getName() {
+        logger.debug("Calling getName");
         return "Aws.LambdaDeploymentStage";
     }
 }

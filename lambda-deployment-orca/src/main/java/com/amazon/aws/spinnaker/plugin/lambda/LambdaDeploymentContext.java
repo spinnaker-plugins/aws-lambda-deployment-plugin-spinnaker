@@ -15,23 +15,9 @@
  */
 
 package com.amazon.aws.spinnaker.plugin.lambda;
-import lombok.extern.slf4j.Slf4j;
-import org.pf4j.Plugin;
-import org.pf4j.PluginWrapper;
 
-@Slf4j
-public class LambdaDeploymentPlugin extends Plugin {
-    public LambdaDeploymentPlugin(PluginWrapper wrapper) {
-        super(wrapper);
-        log.debug("Creating LambdaDeploymentPlugin");
-    }
+import com.netflix.spinnaker.kork.plugins.api.ExtensionConfiguration;
 
-    @Override
-    public void start() {
-        log.debug("LambdaDeploymentPlugin: Hello world. start plugin");
-    }
-
-    public void stop() {
-        log.debug("LambdaDeploymentPlugin: Hello world. stop plugin");
-    }
+@ExtensionConfiguration("Aws.LambdaDeploymentStage")
+public class LambdaDeploymentContext {
 }

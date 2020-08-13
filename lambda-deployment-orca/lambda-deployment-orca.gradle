@@ -35,7 +35,7 @@ dependencies {
   implementation("org.apache.httpcomponents:httpcore:4.4.11")
   implementation("com.squareup.okhttp3:okhttp:4.2.2")
   implementation("com.squareup.okhttp3:okhttp-apache:3.13.1")
-
+  annotationProcessor("org.pf4j:pf4j:3.2.0")
   testImplementation (group: 'com.netflix.spinnaker.orca', name: 'orca-api', version: "${orcaVersion}")
 
   testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.2"
