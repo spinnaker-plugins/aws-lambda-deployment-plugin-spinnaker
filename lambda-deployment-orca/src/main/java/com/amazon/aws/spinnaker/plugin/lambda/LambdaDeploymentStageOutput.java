@@ -23,4 +23,10 @@ public class LambdaDeploymentStageOutput extends SimpleStageOutput<String, Objec
     private String resourceId;
     private String url;
     private List<String> errors;
+
+    public LambdaDeploymentStageOutput() {
+        url = "https://aws.amazon.com";
+        resourceId = "1111";
+        errors = null;
+    }
 }

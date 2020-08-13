@@ -25,12 +25,12 @@ import org.pf4j.Extension;
 @Extension
 public class LambdaDeploymentStage implements SimpleStage<LambdaDeploymentInput> {
     @Override
-        public SimpleStageOutput execute(SimpleStageInput<LambdaDeploymentInput> simpleStageInput) {
+    public SimpleStageOutput execute(SimpleStageInput<LambdaDeploymentInput> simpleStageInput) {
         LambdaDeploymentStageOutput x  =  new LambdaDeploymentStageOutput();
         return x;
     }
     @Override
-        public String getName() {
-            return "lambdaDeploymentStage";
-        }
+    public String getName() {
+        return "lambdaDeploymentStage";
+    }
 }

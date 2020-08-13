@@ -1,7 +1,7 @@
 import { IDeckPlugin } from '@spinnaker/core';
-import { randomWaitStage, initialize } from './RandomWaitStage';
+import { lambdaDeploymentStage, initialize } from './LambdaDeploymentStage';
 
 export const plugin: IDeckPlugin = {
   initialize,
-  stages: [randomWaitStage],
+  stages: [lambdaDeploymentStage],
 };

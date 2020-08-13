@@ -16,7 +16,7 @@ import {
   Validators,
 } from '@spinnaker/core';
 
-import './RandomWaitStage.less';
+import './LambdaDeploymentStage.less';
 
 export function LambdaDeploymentExecutionDetails(props: IExecutionDetailsSectionProps) {
   return (
@@ -31,7 +31,7 @@ export function LambdaDeploymentExecutionDetails(props: IExecutionDetailsSection
 /*
   IStageConfigProps defines properties passed to all Spinnaker Stages.
   See IStageConfigProps.ts (https://github.com/spinnaker/deck/blob/master/app/scripts/modules/core/src/pipeline/config/stages/common/IStageConfigProps.ts) for a complete list of properties.
-  Pass a JSON object to the `updateStageField` method to add the `maxWaitTime` to the Stage.
+  Pass a JSON object to the `updateStageField` method to add the `account` to the Stage.
 
   This method returns JSX (https://reactjs.org/docs/introducing-jsx.html) that gets displayed in the Spinnaker UI.
  */
@@ -44,9 +44,9 @@ function LambdaDeploymentConfig(props: IStageConfigProps) {
         onChange={props.updateStage}
         render={(props) => (
           <FormikFormField
-            name="maxWaitTime"
-            label="Max Time To Wait"
-            help={<HelpField id="armory.randomWaitStage.maxWaitTime" />}
+            name="account"
+            label="Account Name"
+            help={<HelpField id="aws.lambdaDeploymentStage.account" />}
             input={(props) => <NumberInput {...props} />}
           />
         )}
@@ -67,14 +67,14 @@ function LambdaDeploymentConfig(props: IStageConfigProps) {
   These registries and their methods may change without warning.
 */
 export const initialize = () => {
-  HelpContentsRegistry.register('armory.randomWaitStage.maxWaitTime', 'The maximum time, in seconds, that this stage should wait before continuing.');
+  HelpContentsRegistry.register('aws.lambdaDeploymentStage.account', 'Account Name');
 };
 
 function validate(stageConfig: IStage) {
   const validator = new FormValidator(stageConfig);
 
   validator
-    .field('maxWaitTime')
+    .field('account')
     .required()
     .withValidators((value, label) => (value < 0 ? `${label} must be non-negative` : undefined));
 
@@ -94,7 +94,7 @@ export namespace LambdaDeploymentExecutionDetails {
   - component -> The rendered React component
   - validateFn -> A validation function for the stage config form.
  */
-export const randomWaitStage: IStageTypeConfig = {
+export const lambdaDeploymentStage: IStageTypeConfig = {
   key: 'lambdaDeploymentStage',
   label: `Lambda Deployment`,
   description: 'Stage that manages AWS Lambda function deployment: Creation, Update, Delete, Versioning',

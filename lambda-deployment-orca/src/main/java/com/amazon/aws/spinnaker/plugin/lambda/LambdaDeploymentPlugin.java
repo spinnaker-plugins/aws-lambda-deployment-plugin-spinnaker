@@ -26,10 +26,10 @@ public class LambdaDeploymentPlugin extends Plugin {
 
     @Override
     public void start() {
-        System.out.println("Hello world. start plugin");
+        System.out.println("LambdaDeploymentPlugin: Hello world. start plugin");
     }
 
     public void stop() {
-        System.out.println("Hello world. stop plugin");
+        System.out.println("LambdaDeploymentPlugin: Hello world. stop plugin");
     }
 }
