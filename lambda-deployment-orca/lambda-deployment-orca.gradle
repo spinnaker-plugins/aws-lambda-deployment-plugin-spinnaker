@@ -19,7 +19,7 @@ repositories {
 
 spinnakerPlugin {
   serviceName = "orca"
-  pluginClass = "com.amazon.aws.spinnaker.plugin.lambda.LambdaDeploymentStage"
+  pluginClass = "com.amazon.aws.spinnaker.plugin.lambda.LambdaDeploymentPlugin"
   requires="orca>=0.0.0"
 }
 

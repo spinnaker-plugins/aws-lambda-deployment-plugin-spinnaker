@@ -31,6 +31,6 @@ public class LambdaDeploymentStage implements SimpleStage<LambdaDeploymentInput>
     }
     @Override
     public String getName() {
-        return "lambdaDeploymentStage";
+        return "lambdaDeploymentStageSeparate";
     }
 }
