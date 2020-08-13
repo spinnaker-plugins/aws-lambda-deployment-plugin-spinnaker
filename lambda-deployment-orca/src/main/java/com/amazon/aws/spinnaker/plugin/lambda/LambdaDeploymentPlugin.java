@@ -15,26 +15,24 @@
  */
 
 package com.amazon.aws.spinnaker.plugin.lambda;
-import com.netflix.spinnaker.orca.api.simplestage.SimpleStage;
-import com.netflix.spinnaker.orca.api.simplestage.SimpleStageInput;
-import com.netflix.spinnaker.orca.api.simplestage.SimpleStageOutput;
-import org.pf4j.Extension;
 import org.pf4j.Plugin;
 import org.pf4j.PluginWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LambdaDeploymentPlugin extends Plugin {
-
+    Logger logger = LoggerFactory.getLogger(LambdaDeploymentPlugin.class);
     public LambdaDeploymentPlugin(PluginWrapper wrapper) {
-
         super(wrapper);
+        logger.debug("Creating LambdaDeploymentPlugin");
     }
 
     @Override
     public void start() {
-        System.out.println("LambdaDeploymentPlugin: Hello world. start plugin");
+        logger.debug("LambdaDeploymentPlugin: Hello world. start plugin");
     }
 
     public void stop() {
-        System.out.println("LambdaDeploymentPlugin: Hello world. stop plugin");
+        logger.debug("LambdaDeploymentPlugin: Hello world. stop plugin");
     }
 }

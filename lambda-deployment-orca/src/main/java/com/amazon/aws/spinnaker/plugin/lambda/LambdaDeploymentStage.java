@@ -21,11 +21,15 @@ import com.netflix.spinnaker.orca.api.simplestage.SimpleStage;
 import com.netflix.spinnaker.orca.api.simplestage.SimpleStageInput;
 import com.netflix.spinnaker.orca.api.simplestage.SimpleStageOutput;
 import org.pf4j.Extension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Extension
 public class LambdaDeploymentStage implements SimpleStage<LambdaDeploymentInput> {
+    Logger logger = LoggerFactory.getLogger(LambdaDeploymentStage.class);
     @Override
     public SimpleStageOutput execute(SimpleStageInput<LambdaDeploymentInput> simpleStageInput) {
+        logger.debug("Executing LambdaDeploymentStage");
         LambdaDeploymentStageOutput x  =  new LambdaDeploymentStageOutput();
         return x;
     }
