@@ -19,6 +19,12 @@ package com.amazon.aws.spinnaker.plugin.lambda;
 import com.netflix.spinnaker.orca.api.simplestage.SimpleStageOutput;
 import java.util.List;
 
+
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
 public class LambdaDeploymentStageOutput extends SimpleStageOutput<String, Object> {
     private String resourceId;
     private String url;

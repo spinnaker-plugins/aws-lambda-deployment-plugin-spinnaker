@@ -26,6 +26,15 @@ spinnakerPlugin {
 dependencies {
   compileOnly(group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}")
   compileOnly (group: 'com.netflix.spinnaker.orca', name: 'orca-api', version: "${orcaVersion}")
+  compileOnly ("org.projectlombok:lombok:1.18.12")
+  implementation("com.amazonaws:aws-java-sdk:1.11.237")
+  implementation("org.apache.commons:commons-lang3:3.8.1")
+  implementation("com.github.ben-manes.caffeine:guava:2.8.5")
+  implementation("com.netflix.awsobjectmapper:awsobjectmapper:1.11.534")
+  implementation("org.apache.httpcomponents:httpclient:4.5.9")
+  implementation("org.apache.httpcomponents:httpcore:4.4.11")
+  implementation("com.squareup.okhttp3:okhttp:4.2.2")
+  implementation("com.squareup.okhttp3:okhttp-apache:3.13.1")
 
   testImplementation (group: 'com.netflix.spinnaker.orca', name: 'orca-api', version: "${orcaVersion}")
 
