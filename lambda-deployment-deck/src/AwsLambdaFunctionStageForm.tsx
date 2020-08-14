@@ -8,9 +8,11 @@ import {
   HelpField,
   IArtifact,
   IAccount,
+  IAccountDetails,
   IExpectedArtifact,
   IFormInputProps,
   IFormikStageConfigInjectedProps,
+  IRegion,
   IgorService,
   MapEditorInput,
   NumberInput,
@@ -57,8 +59,8 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
     well: true,
     'alert-danger': !!errors.functionName,
     'alert-info': !errors.functionName,
-  });
-
+  }); 
+  
   return (
     <div className="form-horizontal">
       {values.isNew && (
@@ -84,6 +86,22 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
           />
         )}
       />
+      <FormikFormField
+        label="Region"
+        name="region"
+        input={(inputProps: IFormInputProps) => (
+          <ReactSelectInput
+            {...inputProps}
+            clearable={false}
+            isLoading={fetchAccountsStatus === 'PENDING'}
+            stringOptions={fetchAccountsResult
+              .filter((acc: IAccountDetails) => acc.name === values.account)
+              .flatMap((acc: IAccountDetails) => acc.regions)
+              .map((reg: IRegion) => reg.name)  
+            }
+          />
+        )}
+      /> 
       <FormikFormField
         name="functionName"
         label="Function Name"
