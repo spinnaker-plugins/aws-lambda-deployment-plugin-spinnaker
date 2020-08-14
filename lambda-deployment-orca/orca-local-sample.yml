@@ -3,7 +3,7 @@ spinnaker:
     plugins:
       Aws.LambdaDeploymentPlugin:
         enabled: true
-        version: 1.1.14
+        version: 1.0.1
         extensions:
           lambdaDeploymentStage:
             enabled: true

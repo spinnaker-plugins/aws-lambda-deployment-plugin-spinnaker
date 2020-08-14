@@ -79,7 +79,6 @@ function validate(stageConfig: IStage) {
     .field('role', 'Role ARN')
     .required()
     .withValidators(iamRoleValidator);
-
   return validator.validateForm();
 }
 

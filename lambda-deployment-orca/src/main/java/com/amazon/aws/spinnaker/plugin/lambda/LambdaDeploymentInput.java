@@ -16,6 +16,11 @@
  */
 package com.amazon.aws.spinnaker.plugin.lambda;
 
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
 public class LambdaDeploymentInput {
     private String account, region, functionName, runTime, s3Bucket, s3Key, handler, roleArn;
     private boolean shouldPublish;
