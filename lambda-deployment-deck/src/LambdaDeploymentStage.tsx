@@ -9,6 +9,7 @@ import {
   HelpContentsRegistry,
   HelpField,
   IExecutionDetailsSectionProps,
+  IFormikStageConfigInjectedProps,
   IStage,
   IStageConfigProps,
   IStageTypeConfig,
@@ -18,6 +19,9 @@ import {
 } from '@spinnaker/core';
 
 import './LambdaDeploymentStage.less';
+import { s3BucketNameValidator, iamRoleValidator } from './aws.validators';
+import { AwsLambdaFunctionStageForm } from './AwsLambdaFunctionStageForm';
+
 
 export function LambdaDeploymentExecutionDetails(props: IExecutionDetailsSectionProps) {
   return (
@@ -43,14 +47,7 @@ function LambdaDeploymentConfig(props: IStageConfigProps) {
         {...props}
         validate={validate}
         onChange={props.updateStage}
-        render={(props) => (
-          <FormikFormField
-            name="lambda"
-            label="Lambda Name"
-            help={<HelpField id="aws.lambdaDeploymentStage.lambda" />}
-            input={(props) => <TextInput {...props} />}
-          />
-        )}
+        render={(props: IFormikStageConfigInjectedProps) => <AwsLambdaFunctionStageForm {...props} />} 
       />
     </div>
   );
@@ -73,6 +70,15 @@ export const initialize = () => {
 
 function validate(stageConfig: IStage) {
   const validator = new FormValidator(stageConfig);
+  validator
+    .field('s3bucket', 'S3 Bucket Name')
+    .optional()
+    .withValidators(s3BucketNameValidator);
+  
+  validator
+    .field('role', 'Role ARN')
+    .required()
+    .withValidators(iamRoleValidator);
   return validator.validateForm();
 }
 
