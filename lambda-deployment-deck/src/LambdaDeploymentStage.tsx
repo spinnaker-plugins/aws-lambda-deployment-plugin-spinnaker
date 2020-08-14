@@ -47,7 +47,7 @@ function LambdaDeploymentConfig(props: IStageConfigProps) {
         {...props}
         validate={validate}
         onChange={props.updateStage}
-        render={(props: IFormikStageConfigInjectedProps) => <AwsLambdaFunctionStageForm {...props} />} 
+        render={(props: IFormikStageConfigInjectedProps) => <AwsLambdaFunctionStageForm {...props} />}  
       />
     </div>
   );
