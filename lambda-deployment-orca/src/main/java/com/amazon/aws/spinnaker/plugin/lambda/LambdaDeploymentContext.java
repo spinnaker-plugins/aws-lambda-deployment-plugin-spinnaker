@@ -16,8 +16,14 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda;
 
-import com.netflix.spinnaker.kork.plugins.api.ExtensionConfiguration;
+import lombok.Builder;
+import lombok.Data;
 
+import com.netflix.spinnaker.kork.plugins.api.ExtensionConfiguration;
+@Data
+@Builder
 @ExtensionConfiguration("Aws.LambdaDeploymentStage")
 public class LambdaDeploymentContext {
+    private String account, region, functionName, runTime, s3Bucket, s3Key, handler, roleArn;
+    private boolean shouldPublish;
 }

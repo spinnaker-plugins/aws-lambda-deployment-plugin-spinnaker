@@ -18,6 +18,7 @@ package com.amazon.aws.spinnaker.plugin.lambda;
 
 import com.netflix.spinnaker.orca.api.simplestage.SimpleStageOutput;
 import java.util.List;
+import java.util.Map;
 
 
 import lombok.Builder;
@@ -25,15 +26,12 @@ import lombok.Data;
 
 @Data
 @Builder
-public class LambdaDeploymentStageOutput<T, U> extends SimpleStageOutput<LambdaDeploymentContext, Object> {
-    private LambdaDeploymentContext lambdaDeploymentContext;
+public class LambdaDeploymentStageOutput extends SimpleStageOutput<Map<?, ?>, Object> {
     private String resourceId;
     private String url;
-    private List<String> errors;
 
     public LambdaDeploymentStageOutput() {
         url = "https://aws.amazon.com";
         resourceId = "1111";
-        errors = null;
     }
 }
