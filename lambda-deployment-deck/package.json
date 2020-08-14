@@ -10,11 +10,16 @@
     "postinstall": "check-plugin && check-peer-dependencies || true"
   },
   "dependencies": {
+    "@spinnaker/amazon": "0.0.262",
     "@spinnaker/core": "0.0.471",
     "@spinnaker/pluginsdk": "0.0.10",
+    "@types/classnames": "^2.2.10",
+    "@types/lodash": "^4.14.159",
     "@uirouter/core": "6.0.4",
     "@uirouter/react": "1.0.2",
+    "classnames": "^2.2.6",
     "husky": "4.2.5",
+    "lodash": "^4.17.20",
     "lodash-es": "4.17.15",
     "pretty-quick": "2.0.1",
     "prop-types": "15.6.1",
