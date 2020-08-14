@@ -13,6 +13,7 @@ import {
   IStageConfigProps,
   IStageTypeConfig,
   NumberInput,
+  TextInput,
   Validators,
 } from '@spinnaker/core';
 
@@ -44,10 +45,10 @@ function LambdaDeploymentConfig(props: IStageConfigProps) {
         onChange={props.updateStage}
         render={(props) => (
           <FormikFormField
-            name="account"
-            label="Account Name"
-            help={<HelpField id="aws.lambdaDeploymentStage.account" />}
-            input={(props) => <NumberInput {...props} />}
+            name="lambda"
+            label="Lambda Name"
+            help={<HelpField id="aws.lambdaDeploymentStage.lambda" />}
+            input={(props) => <TextInput {...props} />}
           />
         )}
       />
@@ -67,17 +68,11 @@ function LambdaDeploymentConfig(props: IStageConfigProps) {
   These registries and their methods may change without warning.
 */
 export const initialize = () => {
-  HelpContentsRegistry.register('aws.lambdaDeploymentStage.account', 'Account Name');
+  HelpContentsRegistry.register('aws.lambdaDeploymentStage.lambda', 'Lambda Name');
 };
 
 function validate(stageConfig: IStage) {
   const validator = new FormValidator(stageConfig);
-
-  validator
-    .field('account')
-    .required()
-    .withValidators((value, label) => (value < 0 ? `${label} must be non-negative` : undefined));
-
   return validator.validateForm();
 }
 
@@ -97,7 +92,7 @@ export namespace LambdaDeploymentExecutionDetails {
 export const lambdaDeploymentStage: IStageTypeConfig = {
   key: 'Aws.LambdaDeploymentStage',
   label: `AWS Lambda Deployment`,
-  description: 'Stage that manages AWS Lambda function deployment: Creation, Update, Delete, Versioning',
+  description: 'Manage AWS Lambda deployments: Creation, Update, Delete, Versioning and more',
   component: LambdaDeploymentConfig, // stage config
   executionDetailsSections: [LambdaDeploymentExecutionDetails, ExecutionDetailsTasks],
   validateFn: validate,
