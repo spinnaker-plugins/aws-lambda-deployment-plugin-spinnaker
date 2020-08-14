@@ -16,12 +16,17 @@
  */
 package com.amazon.aws.spinnaker.plugin.lambda;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Data
 @Builder
+@JsonIgnoreProperties
 public class LambdaDeploymentInput {
-    private String account, region, functionName, runTime, s3Bucket, s3Key, handler, roleArn;
-    private boolean shouldPublish;
+    private static Logger logger = LoggerFactory.getLogger(LambdaDeploymentInput.class);
+    private String account, region, functionName, runtime, s3bucket, s3key, handler, role, credentials, description, publish;
+    int memory, timeout;
 }

@@ -16,12 +16,15 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.netflix.spinnaker.kork.plugins.api.ExtensionConfiguration;
 @Data
 @Builder
-@ExtensionConfiguration("Aws.LambdaDeploymentStage")
-public class LambdaDeploymentContext {
+@JsonIgnoreProperties
+public class LambdaCloudDriverResponse {
+    String id, resourceUri;
 }

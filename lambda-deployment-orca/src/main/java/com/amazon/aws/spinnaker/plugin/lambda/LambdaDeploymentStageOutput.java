@@ -29,9 +29,4 @@ import lombok.Data;
 public class LambdaDeploymentStageOutput extends SimpleStageOutput<Map<?, ?>, Object> {
     private String resourceId;
     private String url;
-
-    public LambdaDeploymentStageOutput() {
-        url = "https://aws.amazon.com";
-        resourceId = "1111";
-    }
 }
