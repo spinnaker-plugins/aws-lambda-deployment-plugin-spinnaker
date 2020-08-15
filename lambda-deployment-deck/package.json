@@ -1,0 +1,47 @@
+{
+  "name": "lambda-deployment-deck",
+  "version": "1.0.0",
+  "private": true,
+  "module": "build/dist/index.js",
+  "scripts": {
+    "clean": "npx shx rm -rf build",
+    "build": "rollup -c",
+    "watch": "rollup -c -w",
+    "postinstall": "check-plugin && check-peer-dependencies || true"
+  },
+  "dependencies": {
+    "@spinnaker/core": "0.0.471",
+    "@spinnaker/pluginsdk": "0.0.10",
+    "@uirouter/core": "6.0.4",
+    "@uirouter/react": "1.0.2",
+    "husky": "4.2.5",
+    "lodash-es": "4.17.15",
+    "pretty-quick": "2.0.1",
+    "prop-types": "15.6.1",
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
+    "rxjs": "5.4.2"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "11.0.2",
+    "@rollup/plugin-node-resolve": "7.1.1",
+    "@rollup/plugin-typescript": "4.0.0",
+    "@spinnaker/eslint-plugin": "1.0.7",
+    "@types/react": "16.8.25",
+    "@typescript-eslint/eslint-plugin": "2.26.0",
+    "@typescript-eslint/parser": "2.26.0",
+    "eslint": "6.8.0",
+    "eslint-config-prettier": "6.10.1",
+    "eslint-plugin-react-hooks": "3.0.0",
+    "prettier": "2.0.2",
+    "rollup": "1.32.1",
+    "rollup-plugin-external-globals": "0.5.0",
+    "rollup-plugin-less": "1.1.2",
+    "rollup-plugin-postcss": "2.5.0",
+    "shx": "0.3.2",
+    "typescript": "3.8.3"
+  },
+  "files": [
+    "build/dist"
+  ]
+}

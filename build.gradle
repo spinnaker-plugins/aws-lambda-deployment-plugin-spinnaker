@@ -1,0 +1,38 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+}
+
+plugins {
+  id("io.spinnaker.plugin.bundler").version("$spinnakerGradleVersion")
+  id("com.palantir.git-version").version("0.12.2")
+}
+
+repositories {
+  mavenCentral()
+}
+
+spinnakerBundle {
+  pluginId = "Aws.LambdaDeploymentPlugin"
+  description = "AWS Lambda Deployment Plugin"
+  provider = "https://aws.amazon.com"
+  version = rootProject.version
+}
+
+version = normalizedVersion()
+
+subprojects {
+  group = "com.amazon.aws.spinnaker.plugin.lambda"
+  version = rootProject.version
+}
+
+String normalizedVersion() {
+  String fullVersion = gitVersion()
+  String normalized = fullVersion.split("-").first()
+  if (fullVersion.contains("dirty")) {
+    return "$normalized-SNAPSHOT"
+  } else {
+    return normalized
+  }
+}

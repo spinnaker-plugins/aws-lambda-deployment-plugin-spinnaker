@@ -1,0 +1,13 @@
+build
+.gradle
+.idea
+node_modules
+.idea/
+.classpath
+.project
+.settings/
+.DS_Store
+/plugins/
+*.class
+.gradle/
+bin/
