@@ -8,8 +8,8 @@ apply plugin: "io.spinnaker.plugin.service-extension"
 apply plugin: "maven-publish"
 apply plugin: "java"
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.11
+targetCompatibility = 1.11
 
 repositories {
   mavenCentral()
@@ -36,6 +36,7 @@ dependencies {
   implementation("com.squareup.okhttp3:okhttp:4.2.2")
   implementation("com.squareup.okhttp3:okhttp-apache:3.13.1")
   annotationProcessor("org.pf4j:pf4j:3.2.0")
+  annotationProcessor ("org.projectlombok:lombok:1.18.12")
   testImplementation (group: 'com.netflix.spinnaker.orca', name: 'orca-api', version: "${orcaVersion}")
 
   testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.2"
