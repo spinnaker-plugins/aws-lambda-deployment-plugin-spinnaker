@@ -45,8 +45,9 @@ const availableRuntimes = [
 ];
 
 export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProps) {
-  const { values, errors } = props.formik; 
-  console.log(values);  
+
+  const { values, errors } = props.formik;
+  
   const { result: fetchAccountsResult, status: fetchAccountsStatus } = useData(
     () => AccountService.listAccounts('aws'),
     [],
@@ -176,6 +177,7 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
       <FormikFormField name="targetGroups" label="Target Group Name" input={props => <TextInput {...props} />} />
       <h4> Network </h4>
       < NetworkForm {...props} />
+      
       <h4> Debugging and Error Handling </h4>
       Dead Letter Config
       <FormikFormField
