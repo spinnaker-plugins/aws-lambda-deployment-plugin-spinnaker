@@ -13,6 +13,7 @@ import {
   IFormInputProps,
   IFormikStageConfigInjectedProps,
   IRegion,
+  IVpc,
   IgorService,
   MapEditorInput,
   NumberInput,
@@ -23,7 +24,8 @@ import {
   YamlEditor,
 } from '@spinnaker/core';
 
-import NetworkForm from './NetworkForm';
+import { NetworkForm } from './components';
+import { VpcReader } from '@spinnaker/amazon';
 
 const availableRuntimes = [
   'nodejs10.x',
@@ -43,8 +45,8 @@ const availableRuntimes = [
 ];
 
 export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProps) {
-  const { values, errors } = props.formik;
-  
+  const { values, errors } = props.formik; 
+  console.log(values);  
   const { result: fetchAccountsResult, status: fetchAccountsStatus } = useData(
     () => AccountService.listAccounts('aws'),
     [],
@@ -173,7 +175,7 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
       />
       <FormikFormField name="targetGroups" label="Target Group Name" input={props => <TextInput {...props} />} />
       <h4> Network </h4>
-      
+      < NetworkForm {...props} />
       <h4> Debugging and Error Handling </h4>
       Dead Letter Config
       <FormikFormField
