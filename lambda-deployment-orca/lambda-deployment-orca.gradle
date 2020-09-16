@@ -1,0 +1,56 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+}
+
+apply plugin: "io.spinnaker.plugin.service-extension"
+apply plugin: "maven-publish"
+apply plugin: "java"
+
+sourceCompatibility = 1.11
+targetCompatibility = 1.11
+
+repositories {
+  mavenCentral()
+  jcenter()
+  maven { url "http://dl.bintray.com/spinnaker/spinnaker/" }
+}
+
+spinnakerPlugin {
+  serviceName = "orca"
+  pluginClass = "com.amazon.aws.spinnaker.plugin.lambda.LambdaSpringLoaderPlugin"
+  requires="orca>=0.0.0"
+}
+
+dependencies {
+  compileOnly(group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}")
+  compileOnly (group: 'com.netflix.spinnaker.orca', name: 'orca-api', version: "${orcaVersion}")
+  compileOnly (group: 'com.netflix.spinnaker.orca', name: 'orca-clouddriver', version: "${orcaVersion}")
+  compileOnly ("org.projectlombok:lombok:1.18.12")
+  compileOnly (group: 'com.netflix.spinnaker.kork', name: 'kork-plugins-spring-api', version: "${korkVersion}")
+  implementation("com.amazonaws:aws-java-sdk:1.11.237")
+  implementation("org.apache.commons:commons-lang3:3.8.1")
+  implementation("com.github.ben-manes.caffeine:guava:2.8.5")
+  implementation("com.netflix.awsobjectmapper:awsobjectmapper:1.11.534")
+  implementation("org.apache.httpcomponents:httpclient:4.5.9")
+  implementation("org.apache.httpcomponents:httpcore:4.4.11")
+  implementation("com.squareup.okhttp3:okhttp:4.2.2")
+  implementation("com.squareup.okhttp3:okhttp-apache:3.13.1")
+  annotationProcessor("org.pf4j:pf4j:3.2.0")
+  annotationProcessor ("org.projectlombok:lombok:1.18.12")
+  testImplementation (group: 'com.netflix.spinnaker.orca', name: 'orca-api', version: "${orcaVersion}")
+
+  testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.2"
+  testImplementation group: 'io.strikt', name: 'strikt-core', version: '0.22.1'
+  testImplementation group: 'dev.minutest', name: 'minutest', version: '1.10.0'
+  testImplementation group: 'io.mockk', name: 'mockk', version: '1.9.3'
+
+  testRuntime "org.junit.jupiter:junit-jupiter-engine:5.4.0"
+  testRuntime "org.junit.platform:junit-platform-launcher:1.4.0"
+  testRuntime "org.junit.platform:junit-platform-commons:1.5.2"
+}
+
+tasks.withType(Test) {
+  useJUnitPlatform()
+}
