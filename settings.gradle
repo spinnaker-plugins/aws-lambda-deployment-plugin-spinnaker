@@ -5,9 +5,9 @@ pluginManagement {
     gradlePluginPortal()
   }
 }
-rootProject.name="spinnaker-aws-lambda-deployment"
+rootProject.name="aws-lambda-deployment-plugin-spinnaker"
 
-include "lambda-deployment-orca" 
+include "lambda-deployment-deck" , "lambda-deployment-orca" 
 
 def setBuildFile(project) {
   project.buildFileName = "${project.name}.gradle"

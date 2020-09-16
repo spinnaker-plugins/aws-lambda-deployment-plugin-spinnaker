@@ -1,0 +1,107 @@
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+  
+#  Licensed under the Apache License, Version 2.0 (the "License").
+#  You may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+  
+#      http://www.apache.org/licenses/LICENSE-2.0
+  
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+name: Release
+
+on:
+  push:
+    tags:
+    - '*.*.*'
+
+jobs:
+  build:
+    name: Release Plugin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11.0.5'
+          java-package: jdk 
+      - name: download jq
+        run: sudo apt-get install jq
+
+      - name: checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: 'master'
+
+      - name: run tests
+        run: ./gradlew test
+
+      - name: build
+        run: ./gradlew releaseBundle
+
+      - name: get project info
+        id: get_project_info
+        run: |
+          echo ::set-output name=PROJECT::$(basename `pwd`)
+          echo ::set-output name=PROJECT_KEBAB::$(basename `pwd` | sed 's/\([a-z0-9]\)\([A-Z]\)/\1_\L\2/g')
+          echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+          echo ::set-output name=REPO::${GITHUB_REPOSITORY}
+ 
+      - name: create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: upload release asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: ./build/distributions/${{ steps.get_project_info.outputs.PROJECT }}-${{ steps.get_project_info.outputs.VERSION }}.zip
+          asset_name: ${{ steps.get_project_info.outputs.PROJECT }}-${{ steps.get_project_info.outputs.VERSION }}.zip
+          asset_content_type: application/zip 
+
+      - name: mutate plugin-info.json
+        id: mutate-package-info
+        env:
+          ARTIFACT_URL: https://github.com/${{ steps.get_project_info.outputs.REPO }}/releases/download/${{ steps.get_project_info.outputs.VERSION }}/${{ steps.get_project_info.outputs.PROJECT }}-${{ steps.get_project_info.outputs.VERSION }}.zip
+          VERSION: ${{ steps.get_project_info.outputs.VERSION }}
+        run: cat ./build/distributions/plugin-info.json | jq -r --arg VERSION "$VERSION" '.releases |= map(if .version == $VERSION then . + '{\"url\":\"$ARTIFACT_URL\"}' else . end)' > ./plugins-temp.json 
+
+      - name: merge plugins.json
+        id: merge-plugin-repository
+        env:
+          PLUGIN_FILE: './plugins.json'
+          PLUGIN_TEMP: './plugins-temp.json'
+          TEMP_FILE: './tmp.json'
+        run: |
+          if !  [[ -f "$PLUGIN_FILE" ]]; then 
+            touch "$PLUGIN_FILE"; 
+            echo [] >> "$PLUGIN_FILE";
+            jq 'reduce inputs as $i (.; .[0] = $i)' "$PLUGIN_FILE" "$PLUGIN_TEMP" > "$TEMP_FILE";
+          else
+            jq 'reduce inputs as $i (.; .[0].releases += $i.releases)' "$PLUGIN_FILE" "$PLUGIN_TEMP" > "$TEMP_FILE";
+          fi
+          rm $PLUGIN_FILE
+          rm $PLUGIN_TEMP 
+          mv $TEMP_FILE $PLUGIN_FILE
+      - name: create pull request
+        uses: peter-evans/create-pull-request@v3
+        with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            commit-message: Update plugin repository file
+            title: 'Update Plugin Repository with Latest Release'
+            body: |
+              - Updating plugins.json release definition file 
+            branch: 'release-${{ steps.get_project_info.outputs.VERSION }}' 
