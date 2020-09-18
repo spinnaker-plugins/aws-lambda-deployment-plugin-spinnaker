@@ -78,9 +78,6 @@ public class LambdaPublishVersionTask implements LambdaStageBaseTask {
         String origRevisionId = (String)stage.getContext().get(LambdaStageConstants.originalRevisionIdKey);
         stage.getContext().put(LambdaStageConstants.newRevisionIdKey, newRevisionId);
         return !newRevisionId.equals(origRevisionId);
-        //Boolean configUpdated = (Boolean)stage.getContext().getOrDefault(LambdaStageConstants.lambaConfigurationUpdatedKey, Boolean.FALSE);
-        //Boolean codeUpdated = (Boolean)stage.getContext().getOrDefault(LambdaStageConstants.lambaCodeUpdatedKey, Boolean.FALSE);
-        //return  (!justCreated); //  && !codeUpdated || configUpdated);
     }
 
     private LambdaCloudOperationOutput publishVersion(StageExecution stage) {

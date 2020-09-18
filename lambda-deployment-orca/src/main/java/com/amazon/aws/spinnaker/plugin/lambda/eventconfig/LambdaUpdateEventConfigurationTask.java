@@ -60,31 +60,42 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
         ldi.setAppName(stage.getExecution().getApplication());
         Boolean justCreated = (Boolean)stage.getContext().get(LambdaStageConstants.lambaCreatedKey);
         LambdaGetOutput lf = null;
+
+        //TODO: Remove this after refresh cache works correctly.
         if (justCreated) {
             utils.await(stage);
         }
+
         lf = utils.findLambda(stage, true);
         if (lf == null) {
             List<String> errorMessages = new ArrayList<String>();
             errorMessages.add(String.format("Could not find lambda to update event config for"));
-            logger.error("Could not find lambda to update event for. ");
             return utils.formErrorTaskResult(stage, errorMessages);
         }
 
         if (ldi.getTriggerArns() == null || ldi.getTriggerArns().size() == 0) {
             deleteAllExistingEvents(ldi, lf);
-            Map<String, Object> context = new HashMap<>();// buildContextOutput(ldso);
+            Map<String, Object> context = new HashMap<>();
             return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
         }
 
-        // TODO: Make sure lambda exists - in the case that it was just created.
-        deleteExistingEvents(ldi, lf);
+        deleteRemovedAndChangedEvents(ldi, lf);
         LambdaUpdateEventConfigurationTaskOutput ldso = updateEventConfiguration(ldi);
         Map<String, Object> context = buildContextOutput(ldso);
         return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
     }
+
+    /**
+     * New configuration has zero events. So find all existing events in the lambda cache and delete them all.
+     * @param ldi
+     * @param lf
+     */
     private void deleteAllExistingEvents(LambdaUpdateEventConfigurationTaskInput ldi, LambdaGetOutput lf) {
+<<<<<<< HEAD
         List<String> eventArnList = getExistingEvents(lf, ldi.getBatchsize());
+=======
+        List<String> eventArnList = getExistingEventsToDelete(lf);
+>>>>>>> Fix some event config bugs. More pending
         eventArnList.stream().forEach( eventArn -> {
                 deleteEvent(eventArn, ldi, lf);
         });
@@ -98,37 +109,35 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
      * @param lf
      * @return
      */
-    private LambdaUpdateEventConfigurationTaskOutput deleteExistingEvents(LambdaUpdateEventConfigurationTaskInput taskInput, LambdaGetOutput lf) {
+    private LambdaUpdateEventConfigurationTaskOutput deleteRemovedAndChangedEvents(LambdaUpdateEventConfigurationTaskInput taskInput, LambdaGetOutput lf) {
         LambdaUpdateEventConfigurationTaskOutput ans = LambdaUpdateEventConfigurationTaskOutput.builder().build();
         if (lf == null) {
             return ans;
         }
         ans.setEventOutputs(new ArrayList<LambdaCloudOperationOutput>());
         String endPoint = cloudDriverUrl + CLOUDDRIVER_UPDATE_EVENT_CONFIGURATION_LAMBDA_PATH;
-        int oldBatchsize = taskInput.getBatchsize();
-        List<String> eventArnList = getExistingEvents(lf, oldBatchsize);
-        eventArnList.stream().forEach( eventArn -> {
-            if (taskInput.getTriggerArns().contains(eventArn)) {
-                taskInput.getTriggerArns().remove(eventArn);
-            }
-            else {
-                deleteEvent(eventArn, taskInput, lf);
-            }
-        });
+        int newBatchsize = taskInput.getBatchsize();
+        List<String> eventArnList = getExistingEventsToDelete(lf);
+        eventArnList.stream().filter( x-> { return StringUtils.isNotNullOrEmpty(x); } )
+                             .forEach( eventArn -> {
+                                  if (taskInput.getTriggerArns().contains(eventArn)) {
+                                    taskInput.getTriggerArns().remove(eventArn);
+                                  }
+                                  else {
+                                      //No longer in the config, so delete.
+                                   deleteEvent(eventArn, taskInput, lf);
+                                  }
+                              });
         return ans;
     }
 
-    List<String> getExistingEvents(LambdaGetOutput lf, int oldBatchSize) {
+    List<String> getExistingEventsToDelete(LambdaGetOutput lf) {
         List<EventSourceMappingConfiguration> esmList = lf.getEventSourceMappings();
         if (esmList == null) {
-            return null;
+            return new ArrayList<String>();
         }
-        List<String> allEventArns = esmList.stream().map(x -> {
-            if (oldBatchSize != x.getBatchSize())
-                return x.getEventSourceArn();
-            else
-                return "";
-        }).collect(Collectors.toList());
+        List<String> allEventArns = esmList.stream().map(x -> { return x.getEventSourceArn(); })
+                                                    .collect(Collectors.toList());
         return allEventArns;
     }
 
