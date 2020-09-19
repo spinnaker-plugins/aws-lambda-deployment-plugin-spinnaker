@@ -17,6 +17,7 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
+import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
 import com.netflix.spinnaker.orca.api.pipeline.Task;
@@ -33,7 +34,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
-public class LambdaTrafficUpdateVerificationTask implements Task {
+public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask {
 
     private static final Logger logger = LoggerFactory.getLogger(LambdaTrafficUpdateVerificationTask.class);
 
@@ -47,12 +48,8 @@ public class LambdaTrafficUpdateVerificationTask implements Task {
     public TaskResult execute(@NotNull StageExecution stage) {
         Map<String, Object> stageContext = stage.getContext();
         String url = (String)stageContext.get("url");
-
         if (url == null) {
-            logger.error("No url to verify...");
-            List<String> errorMessages = new ArrayList<String>();
-            errorMessages.add(String.format("No task url to verify"));
-            return utils.formErrorTaskResult(stage, errorMessages);
+            return formErrorTaskResult(stage, String.format("No task url to verify"));
         }
 
         LambdaCloudDriverTaskResults op = utils.verifyStatus(url);
@@ -63,7 +60,7 @@ public class LambdaTrafficUpdateVerificationTask implements Task {
         if (op.getStatus().isFailed()) {
             ExecutionStatus status = ExecutionStatus.TERMINAL;
             List<String> allMessages = Arrays.asList(op.getErrors().getMessage());
-            return utils.formErrorTaskResult(stage, allMessages);
+            return formErrorListTaskResult(stage, allMessages);
         }
 
         final Map<String, Object> outputMap = new HashMap<String, Object>();

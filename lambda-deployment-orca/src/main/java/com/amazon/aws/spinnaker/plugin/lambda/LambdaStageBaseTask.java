@@ -16,8 +16,14 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda;
 import com.netflix.spinnaker.orca.api.pipeline.Task;
+import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
+import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
+import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public interface LambdaStageBaseTask extends Task {
@@ -33,5 +39,44 @@ public interface LambdaStageBaseTask extends Task {
     default Map<String, Object> buildContextOutput() {
         Map<String, Object> context = new HashMap<String, Object>();
         return context;
+    }
+
+
+    /**
+     * Fill up with values required for next task
+     * @param ldso
+     * @return
+     */
+    default Map<String, Object> buildContextOutput(LambdaCloudOperationOutput ldso) {
+        String url = ldso.getUrl();
+        Map<String, Object> context = new HashMap<>();
+        context.put("url", url);
+        return context;
+    }
+
+
+    default TaskResult formTaskResult(LambdaCloudOperationOutput ldso) {
+        Map<String, Object> context = buildContextOutput(ldso);
+        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
+    }
+
+
+    default TaskResult formSuccessTaskResult(StageExecution stage, String successMessage) {
+        Map<String, Object> outputMap = new HashMap<>();
+        outputMap.put("status", successMessage);
+        stage.setOutputs(outputMap);
+        return TaskResult.builder(ExecutionStatus.SUCCEEDED).outputs(outputMap).build();
+    }
+    default TaskResult formErrorTaskResult(StageExecution stage, String errorMessage) {
+        Map<String, Object> outputMap = new HashMap<String, Object>();
+        outputMap.put("failureMessage", errorMessage);
+        stage.getOutputs().putAll(outputMap);
+        return TaskResult.builder(ExecutionStatus.TERMINAL).outputs(outputMap).build();
+    }
+
+    default TaskResult formErrorListTaskResult(StageExecution stage, List<String> errorMessages) {
+        errorMessages.removeAll(Collections.singleton(null));
+        String errorMessage = StringUtils.join(errorMessages, "\n");
+        return formErrorTaskResult(stage, errorMessage);
     }
 }

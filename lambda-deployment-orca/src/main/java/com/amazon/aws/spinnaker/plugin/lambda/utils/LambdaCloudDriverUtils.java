@@ -98,21 +98,6 @@ public class LambdaCloudDriverUtils {
         }
     }
 
-    public TaskResult formSuccessTaskResult(StageExecution stage, String successMessage) {
-        Map<String, Object> outputMap = new HashMap<>();
-        outputMap.put("status", successMessage);
-        stage.setOutputs(outputMap);
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).outputs(outputMap).build();
-    }
-
-    public TaskResult formErrorTaskResult(StageExecution stage, List<String> errorMessages) {
-        errorMessages.removeAll(Collections.singleton(null));
-        String errorMessage = StringUtils.join(errorMessages, "\n");
-        Map<String, Object> outputMap = new HashMap<String, Object>();
-        outputMap.put("failureMessage", errorMessage);
-        stage.getOutputs().putAll(outputMap);
-        return TaskResult.builder(ExecutionStatus.TERMINAL).outputs(outputMap).build();
-    }
 
     public String getFromCloudDriver(String endPoint) {
         Request request = new Request.Builder()

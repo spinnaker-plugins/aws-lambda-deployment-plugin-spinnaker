@@ -16,6 +16,7 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.delete;
 
+import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
 import com.netflix.spinnaker.orca.api.pipeline.Task;
@@ -32,7 +33,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
-public class LambdaDeleteVerificationTask implements Task {
+public class LambdaDeleteVerificationTask implements LambdaStageBaseTask {
 
     private static final Logger logger = LoggerFactory.getLogger(LambdaDeleteVerificationTask.class);
 
@@ -53,8 +54,7 @@ public class LambdaDeleteVerificationTask implements Task {
         }
         if (op.getStatus().isFailed()) {
             List<String> allMessages = Arrays.asList(op.getErrors().getMessage());
-            //Terminal
-            return utils.formErrorTaskResult(stage, allMessages);
+            return formErrorListTaskResult(stage, allMessages);
         }
         Map<String, Object> outputMap = new HashMap<>();
         outputMap.put("message", "Lambda (Version) Deletion succeeded");

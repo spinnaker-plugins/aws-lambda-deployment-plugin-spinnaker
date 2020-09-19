@@ -16,6 +16,7 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.verify;
 
+import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaStageConstants;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
@@ -35,7 +36,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class LambdaVerificationTask implements Task {
+public class LambdaVerificationTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaVerificationTask.class);
 
     @Autowired
@@ -96,7 +97,7 @@ public class LambdaVerificationTask implements Task {
         List<String> statusMessages = listOfTaskResults.stream().map(op -> {
             return op.getErrors().getMessage();
         }).collect(Collectors.toList());
-        return utils.formErrorTaskResult(stage, statusMessages);
+        return formErrorListTaskResult(stage, statusMessages);
     }
 
     @Nullable

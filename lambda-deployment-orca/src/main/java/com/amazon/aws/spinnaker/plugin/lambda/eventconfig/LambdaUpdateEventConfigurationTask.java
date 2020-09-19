@@ -61,17 +61,9 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
         ldi.setAppName(stage.getExecution().getApplication());
         Boolean justCreated = (Boolean)stage.getContext().get(LambdaStageConstants.lambaCreatedKey);
         LambdaGetOutput lf = null;
-
-        //TODO: Remove this after refresh cache works correctly.
-        if (justCreated) {
-            utils.await(stage);
-        }
-
-        lf = utils.findLambda(stage, true);
+        lf = utils.findLambda(stage, justCreated);
         if (lf == null) {
-            List<String> errorMessages = new ArrayList<String>();
-            errorMessages.add(String.format("Could not find lambda to update event config for"));
-            return utils.formErrorTaskResult(stage, errorMessages);
+            return formErrorTaskResult(stage, String.format("Could not find lambda to update event config for"));
         }
 
         if (ldi.getTriggerArns() == null || ldi.getTriggerArns().size() == 0) {
@@ -81,7 +73,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
         }
 
         deleteRemovedAndChangedEvents(ldi, lf);
-        LambdaUpdateEventConfigurationTaskOutput ldso = updateEventConfiguration(ldi);
+        LambdaUpdateEventConfigurationTaskOutput ldso = updateEventConfiguration(ldi, lf);
         Map<String, Object> context = buildContextOutput(ldso);
         return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
     }
@@ -92,10 +84,8 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
      * @param lf
      */
     private void deleteAllExistingEvents(LambdaUpdateEventConfigurationTaskInput ldi, LambdaGetOutput lf) {
-        List<String> eventArnList = getExistingEventsToDelete(lf);
-        eventArnList.stream().forEach( eventArn -> {
-                deleteEvent(eventArn, ldi, lf);
-        });
+        List<String> eventArnList = getExistingEvents(lf);
+        eventArnList.stream().forEach( eventArn -> { deleteEvent(eventArn, ldi, lf); });
     }
 
     /**
@@ -108,27 +98,23 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
      */
     private LambdaUpdateEventConfigurationTaskOutput deleteRemovedAndChangedEvents(LambdaUpdateEventConfigurationTaskInput taskInput, LambdaGetOutput lf) {
         LambdaUpdateEventConfigurationTaskOutput ans = LambdaUpdateEventConfigurationTaskOutput.builder().build();
+        ans.setEventOutputs(new ArrayList<LambdaCloudOperationOutput>());
         if (lf == null) {
             return ans;
         }
-        ans.setEventOutputs(new ArrayList<LambdaCloudOperationOutput>());
         String endPoint = cloudDriverUrl + CLOUDDRIVER_UPDATE_EVENT_CONFIGURATION_LAMBDA_PATH;
         int newBatchsize = taskInput.getBatchsize();
-        List<String> eventArnList = getExistingEventsToDelete(lf);
-        eventArnList.stream().filter( x-> { return StringUtils.isNotNullOrEmpty(x); } )
-                             .forEach( eventArn -> {
-                                  if (taskInput.getTriggerArns().contains(eventArn)) {
-                                    taskInput.getTriggerArns().remove(eventArn);
-                                  }
-                                  else {
-                                      //No longer in the config, so delete.
-                                   deleteEvent(eventArn, taskInput, lf);
-                                  }
-                              });
+        List<String> eventArnList = getExistingEvents(lf);
+        eventArnList.stream()
+                    .filter( x-> { return StringUtils.isNotNullOrEmpty(x); } )
+                    .filter( x-> { return taskInput.getTriggerArns().contains(x); } )
+                    .forEach( eventArn -> {
+                        deleteEvent(eventArn, taskInput, lf);
+                    });
         return ans;
     }
 
-    List<String> getExistingEventsToDelete(LambdaGetOutput lf) {
+    List<String> getExistingEvents(LambdaGetOutput lf) {
         List<EventSourceMappingConfiguration> esmList = lf.getEventSourceMappings();
         if (esmList == null) {
             return new ArrayList<String>();
@@ -159,27 +145,32 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
         deleteLambdaEventConfig(inp);
     }
 
-    private LambdaUpdateEventConfigurationTaskOutput updateEventConfiguration(LambdaUpdateEventConfigurationTaskInput taskInput) {
+    private LambdaUpdateEventConfigurationTaskOutput updateEventConfiguration(LambdaUpdateEventConfigurationTaskInput taskInput, LambdaGetOutput lf) {
         LambdaUpdateEventConfigurationTaskOutput ans = LambdaUpdateEventConfigurationTaskOutput.builder().build();
         ans.setEventOutputs(new ArrayList<LambdaCloudOperationOutput>());
         taskInput.setCredentials(taskInput.getAccount());
         String endPoint = cloudDriverUrl + CLOUDDRIVER_UPDATE_EVENT_CONFIGURATION_LAMBDA_PATH;
-        final List<String> urlList = new ArrayList<String>();
-        taskInput.getTriggerArns().forEach( curr -> {
-            logger.debug("Now processing: " + curr);
-            boolean enabled = true;
-            LambdaEventConfigurationDescription singleEvent = LambdaEventConfigurationDescription.builder().eventSourceArn(curr).batchsize(taskInput.getBatchsize()).enabled(true)
-                    .account(taskInput.getAccount()).credentials(taskInput.getCredentials()).appName(taskInput.getAppName())
-                    .region(taskInput.getRegion()).functionName(taskInput.getFunctionName()).build();
-            String rawString = utils.asString(singleEvent);
-            LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
-            String url = cloudDriverUrl + respObj.getResourceUri();
-            LambdaCloudOperationOutput z = LambdaCloudOperationOutput.builder().url(url).resourceId(respObj.getResourceUri()).build();
-            ans.getEventOutputs().add(z);
-            urlList.add(url);
-        });
+        List<String> existingEvents = getExistingEvents(lf);
+        taskInput.getTriggerArns().stream()
+               .filter(curr -> { return !existingEvents.contains(curr); })
+               .forEach( curr -> {
+                   LambdaEventConfigurationDescription singleEvent = formEventObject(curr, taskInput);
+                   String rawString = utils.asString(singleEvent);
+                   LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
+                   String url = cloudDriverUrl + respObj.getResourceUri();
+                   LambdaCloudOperationOutput z = LambdaCloudOperationOutput.builder().url(url).resourceId(respObj.getResourceUri()).build();
+                   ans.getEventOutputs().add(z);
+               });
 
         return ans;
+    }
+
+    private LambdaEventConfigurationDescription formEventObject(String curr, LambdaUpdateEventConfigurationTaskInput taskInput) {
+        LambdaEventConfigurationDescription singleEvent = LambdaEventConfigurationDescription.builder().eventSourceArn(curr).batchsize(taskInput.getBatchsize()).enabled(true)
+                .account(taskInput.getAccount()).credentials(taskInput.getCredentials()).appName(taskInput.getAppName())
+                .region(taskInput.getRegion()).functionName(taskInput.getFunctionName()).build();
+        return singleEvent;
+
     }
 
     private LambdaCloudOperationOutput deleteLambdaEventConfig(LambdaDeleteEventTaskInput inp) {

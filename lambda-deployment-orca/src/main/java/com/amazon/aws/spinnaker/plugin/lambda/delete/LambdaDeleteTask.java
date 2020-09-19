@@ -62,8 +62,7 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
 
         String actualVersion = getVersion(stage, ldi);
         if (actualVersion == null) {
-                logger.error("Found no version of function to delete");
-                return utils.formSuccessTaskResult(stage, "Found no version of function to delete");
+            return formSuccessTaskResult(stage, "Found no version of function to delete");
         }
 
         if (!actualVersion.contains(",")) {
@@ -89,11 +88,6 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
     private LambdaCloudOperationOutput deleteLambdaVersion(LambdaDeleteStageInput ldi) {
         LambdaCloudOperationOutput ldso = deleteLambda(ldi);
         return ldso;
-    }
-
-    private TaskResult formTaskResult(LambdaCloudOperationOutput ldso) {
-        Map<String, Object> context = buildContextOutput(ldso);
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
     }
 
 
@@ -124,16 +118,7 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
         return resp;
     }
 
-    /**
-     * Fill up with values required for next task
-     * @param ldso
-     * @return
-     */
-    private Map<String, Object> buildContextOutput(LambdaCloudOperationOutput ldso) {
-        String url = ldso.getUrl();
-        Map<String, Object> context = new HashMap<>();
-        context.put("url", url);
-        return context;
-    }
+
+
 }
 
