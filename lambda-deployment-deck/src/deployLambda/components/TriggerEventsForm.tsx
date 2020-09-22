@@ -55,7 +55,9 @@ export function TriggerEventsForm( props: IFormikStageConfigInjectedProps ) {
         help={<HelpField content="" />}
         input={(inputProps: IFormInputProps) => (
           < NumberInput
-            {...inputProps} 
+            {...inputProps}
+            min={1}
+            max={10} 
           />
         )}
         required={false}

@@ -30,7 +30,7 @@ export const initialize = () => {
 export const lambdaDeploymentStage: IStageTypeConfig = {
   key: 'Aws.LambdaDeploymentStage',
   label: `AWS Lambda Deployment`,
-  description: 'Manage AWS Lambda deployments: Creation, Update, Delete, Versioning and more',
+  description: 'Create a Single AWS Lambda Function',
   component: LambdaDeploymentConfig, // stage config
   executionDetailsSections: [LambdaDeploymentExecutionDetails, ExecutionDetailsTasks],
   validateFn: validate,

@@ -1,21 +1,62 @@
-## AWS Spinnaker plugin for AWS Lambda Deployment
+## Spinnaker Plugin for AWS Lambda Deployment
 
-This plugin provides support for AWS Lambda Deployment in Spinnaker
+This plugin provides support for AWS Lambda Deployment via Pipelines in Spinnaker
 
+## Version Compatibility
+| Plugin  | Spinnaker Platform |
+|:----------- | :--------- |
+| 1.0.x  |  1.23.x |
+
+This plugin is currently only compatible with Spinnaker platform 1.23.x and up. It is possible to run the plugin in an environment running an earlier release by making the following changes to your environment:
+1. Checkout `master` branch for `spinnaker/orca`
+2. Checkout `master` branch for `spinnaker/deck`
+3. Checkout `master` branch for `spinnaker/clouddriver`
+4. Install the plugin
+
+## Requirements
+1. This plugin requires Java 11
+2. AWS Lambda functions must be enabled in your spinnaker environment [more info](https://aws.amazon.com/blogs/opensource/how-to-integrate-aws-lambda-with-spinnaker/)
+ 
 ## Plugin Users Guide
 
-Use of this plugin is similar to use of all other spinnaker plugins.  Typical Deployment steps for a plugin:
-
-[Deployment of a simple plugin](https://spinnaker.io/guides/user/plugins/deploy-example/)
-
-
+### Usage
+1. Add the following to the Halyard config (typically found at `~/.hal/config`) to load the Orca backend
 ```
-TODO: Add details here on how to deploy THIS plugin instead of linking above.
-
+spinnaker:
+  extensibility:
+    plugins:
+      Aws.LambdaDeploymentPlugin:
+        enabled: true
+        version: <<VERSION NUMBER>> 
+        extensions:
+          Aws.LambdaDeploymentStage:
+            enabled: true
+       repositories:
+         awsLambdaDeploymentPluginRepo:
+           id: awsLambdaDeploymentPluginRepo
+           url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.1/plugins.json
 ```
+2. Add the following to `gate-local.yml` in the necessary [profile](https://spinnaker.io/reference/halyard/custom/#custom-profiles) to load the Deck frontend
+```
+spinnaker:
+   extensibility:
+     deck-proxy:
+       enabled: true
+       plugins:
+         Aws.LambdaDeploymentPlugin:
+           enabled: true
+           version: <<VERSION NUMBER>>
+       repositories:
+         awsLambdaDeploymentPluginRepo:
+           url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.1/plugins.json 
+```
+3. Execute `hal deploy apply` to deploy the changes
 
 
 ## Plugin Developers Guide
+
+<details>
+  <summary> Developing in 1.20.x Environment </summary>
 
 ### Overview
 
@@ -90,7 +131,8 @@ spinnaker:
          "url": "./plugins/index.js",
          "version": "1.1.14"
      }
- ]```
+ ]
+```
 
 * Create a deck/plugins directory 
 * Symlink `lambda-deployment-deck/build/dist/index.js` to deck/plugins/index.js like so:
@@ -104,7 +146,7 @@ ln -s <full_path_to_this_plugin>/lambda-deployment-deck/build/dist/index.js plug
 
 * Use this command:
 
-```yarn run```
+`yarn run`
 
 ### Restart Orca
 
@@ -116,6 +158,8 @@ ln -s <full_path_to_this_plugin>/lambda-deployment-deck/build/dist/index.js plug
 Load your deck UI typically `http://localhost:9000` and make sure your stage is available.   
 The stage will typically show up with the name `AWS Lambda Deployment`
 
+</details>
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
@@ -123,6 +167,7 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 ## License
 
 This project is licensed under the Apache-2.0 License.
+
 
 
 
