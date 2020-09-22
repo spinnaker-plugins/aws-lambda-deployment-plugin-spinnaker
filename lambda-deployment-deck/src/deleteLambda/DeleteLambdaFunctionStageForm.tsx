@@ -30,7 +30,7 @@ import {
 } from './constants';
 
 
-export function DestroyLambdaFunctionStageForm(props: IFormikStageConfigInjectedProps) {
+export function DeleteLambdaFunctionStageForm(props: IFormikStageConfigInjectedProps) {
   const { values, errors } = props.formik; 
   const { functions } = props.application;
 

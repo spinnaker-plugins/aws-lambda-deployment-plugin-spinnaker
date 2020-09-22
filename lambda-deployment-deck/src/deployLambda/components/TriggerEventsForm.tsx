@@ -50,7 +50,7 @@ export function TriggerEventsForm( props: IFormikStageConfigInjectedProps ) {
       />
       
       <FormikFormField
-        name="batchSize"
+        name="batchsize"
         label="Event Batch Size"
         help={<HelpField content="" />}
         input={(inputProps: IFormInputProps) => (

@@ -22,7 +22,7 @@ import {
 
 import './LambdaDeleteStage.less';
 
-import { DestroyLambdaFunctionStageForm } from './DestroyLambdaFunctionStageForm';
+import { DeleteLambdaFunctionStageForm } from './DeleteLambdaFunctionStageForm';
 
 export function DestroyLambdaExecutionDetails(props: IExecutionDetailsSectionProps) {
   const { stage, name, current } = props;
@@ -50,7 +50,7 @@ function DestroyLambdaConfig(props: IStageConfigProps) {
         {...props}
         validate={validate}
         onChange={props.updateStage}
-        render={(props: IFormikStageConfigInjectedProps) => <DestroyLambdaFunctionStageForm {...props} />}  
+        render={(props: IFormikStageConfigInjectedProps) => <DeleteLambdaFunctionStageForm {...props} />}  
       />
     </div>
   );
@@ -107,7 +107,7 @@ export namespace DestroyLambdaExecutionDetails {
  */
 export const lambdaDeleteStage: IStageTypeConfig = {
   key: 'Aws.LambdaDeleteStage',
-  label: `AWS Lambda Destroy`,
+  label: `AWS Lambda Delete`,
   description: 'Delete an AWS Lambda Function',
   component: DestroyLambdaConfig, // stage config
   executionDetailsSections: [DestroyLambdaExecutionDetails, ExecutionDetailsTasks],
