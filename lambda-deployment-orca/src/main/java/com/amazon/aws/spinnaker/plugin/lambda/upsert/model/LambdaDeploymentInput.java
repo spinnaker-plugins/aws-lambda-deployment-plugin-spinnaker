@@ -32,7 +32,7 @@ import java.util.List;
 public class LambdaDeploymentInput {
     private static Logger logger = LoggerFactory.getLogger(LambdaDeploymentInput.class);
     private String account, region, functionName, runtime, s3bucket, s3key, handler, role, credentials, description, appName;
-    int memory;
+    int memorySize;
     int timeout;
     Boolean publish;
 

@@ -29,7 +29,7 @@ import java.util.List;
 public class LambdaUpdateConfigInput {
     private String credentials,functionName, description, handler, runtime, role, region;
     private String appName, account;
-    private int memory, timeout;
+    private int memorySize, timeout;
     private boolean publish;
 
     private HashMap<String, String> envVariables;
