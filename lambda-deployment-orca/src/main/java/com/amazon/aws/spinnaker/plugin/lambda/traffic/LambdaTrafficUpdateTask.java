@@ -57,6 +57,9 @@ public class LambdaTrafficUpdateTask implements LambdaStageBaseTask {
         if (shouldUpdateAlias(stage)) {
             LambdaBaseStrategyInput xx = strat.setupInput(stage);
             result = strat.deploy(xx);
+            if (result == null) {
+                return this.formErrorTaskResult(stage, "Deployment failed");
+            }
         }
         else {
             result = LambdaCloudOperationOutput.builder().build();

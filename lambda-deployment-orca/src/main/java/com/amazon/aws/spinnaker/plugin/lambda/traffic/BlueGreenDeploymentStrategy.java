@@ -23,12 +23,17 @@ import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaSimpleStrategy
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaGetOutput;
+import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
+import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
+import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBlueGreenStrategyInput> {
@@ -44,15 +49,39 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
     @Override
     public LambdaCloudOperationOutput deploy(LambdaBlueGreenStrategyInput inp) {
         LambdaInvokeFunctionOutput out = invokeLambdaFunction(inp);
-        boolean results = verifyResults(out);
+        boolean results = verifyResults(inp, out);
         if (results) {
             return updateLambdaToLatest(inp);
         }
-        return LambdaCloudOperationOutput.builder().build();
+        return null;
     }
 
-    private boolean verifyResults(LambdaInvokeFunctionOutput output) {
-        // TODO: Compare results
+    private boolean verifyResults(LambdaBlueGreenStrategyInput inp, LambdaInvokeFunctionOutput output) {
+        int timeout = inp.getTimeout() * 1000;
+        String url = output.getUrl();
+        int sleepTime = 10000;
+        int count = 0;
+        LambdaCloudDriverTaskResults taskResult = null;
+        boolean done = false;
+        while (timeout > 0) {
+            taskResult = utils.verifyStatus(url);
+            if (taskResult.getStatus().isCompleted()) {
+                done = true;
+                break;
+            }
+            try {
+                Thread.sleep(sleepTime);
+                timeout -= sleepTime;
+            }
+            catch (Exception e) {
+                continue;
+            }
+        }
+        if (!done)
+            return false;
+        if (taskResult.getStatus().isFailed()) {
+            return  false;
+        }
         return true;
     }
 
