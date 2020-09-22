@@ -46,7 +46,7 @@ public class SimpleDeploymentStrategy extends BaseDeploymentStrategy<LambdaSimpl
         aliasInp.setCredentials(aliasInp.getAccount());
         aliasInp.setAppName(stage.getExecution().getApplication());
         aliasInp.setWeightToMinorFunctionVersion(0.0);
-        aliasInp.setMajorFunctionVersion(getVersion(stage, aliasInp.getVersionNameA()));
+        aliasInp.setMajorFunctionVersion(getVersion(stage, aliasInp.getVersionNameA(), aliasInp.getVersionNumberA()));
         aliasInp.setMinorFunctionVersion(null);
         return aliasInp;
     }

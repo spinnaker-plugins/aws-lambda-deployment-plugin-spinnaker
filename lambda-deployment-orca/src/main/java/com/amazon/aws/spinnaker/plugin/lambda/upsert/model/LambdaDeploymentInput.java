@@ -44,5 +44,5 @@ public class LambdaDeploymentInput {
     List<String> securityGroupIds;
 
     String targetGroups;
-    String encryptionKMSKeyArn;
+    String kmskeyArn;
 }

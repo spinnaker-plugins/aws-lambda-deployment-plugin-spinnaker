@@ -35,6 +35,8 @@ public class LambdaWeightedStrategyInput  extends LambdaBaseStrategyInput {
 
     private String versionNameA;
     private String versionNameB;
+    private String versionNumberA;
+    private String versionNumberB;
     private int trafficPercentA;
     private int trafficPercentB;
 

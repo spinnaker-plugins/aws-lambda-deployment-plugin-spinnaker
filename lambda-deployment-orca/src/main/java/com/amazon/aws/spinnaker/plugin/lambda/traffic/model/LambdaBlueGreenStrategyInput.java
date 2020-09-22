@@ -37,6 +37,13 @@ public class LambdaBlueGreenStrategyInput extends LambdaBaseStrategyInput {
     String aliasName;
     String aliasDescription;
 
+    private String versionNameA;
+    private String versionNameB;
+    private String versionNumberA;
+    private String versionNumberB;
+    private int trafficPercentA;
+    private int trafficPercentB;
+
     private String majorFunctionVersion;
     private String minorFunctionVersion;
     private double weightToMinorFunctionVersion;

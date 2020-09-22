@@ -104,7 +104,7 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
         }
 
         LambdaGetOutput lf = utils.findLambda(stage);
-        return utils.getCanonicalVersion(lf, ldi.getVersion(), ldi.getRetentionNumber());
+        return utils.getCanonicalVersion(lf, ldi.getVersion(), ldi.getVersionNumber(), ldi.getRetentionNumber());
     }
 
     private LambdaCloudOperationOutput deleteLambda(LambdaDeleteStageInput inp) {

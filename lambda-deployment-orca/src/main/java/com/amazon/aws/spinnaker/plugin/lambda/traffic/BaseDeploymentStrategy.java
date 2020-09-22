@@ -53,16 +53,16 @@ public class BaseDeploymentStrategy<T extends LambdaBaseStrategyInput> {
         throw new RuntimeException("Should be overridden. This class needs to be extract");
     }
 
-    public String getVersion(StageExecution stage, String version) {
+    public String getVersion(StageExecution stage, String version, String versionNumberProvided) {
         if (version == null) {
             return null;
         }
 
-        if (!version.startsWith("$")) { // actual version number
-            return version;
+        if (version.startsWith("$PROVIDED")) { // actual version number
+            return versionNumberProvided;
         }
 
         LambdaGetOutput lf = utils.findLambda(stage);
-        return getUtils().getCanonicalVersion(lf, version, 0);
+        return getUtils().getCanonicalVersion(lf, version, versionNumberProvided, 0);
     }
 }

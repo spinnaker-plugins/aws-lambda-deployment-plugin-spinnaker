@@ -209,36 +209,36 @@ public class LambdaCloudDriverUtils {
         }
     }
 
-    public String getCanonicalVersion(LambdaGetOutput lf, String canonicalVersion, int retentionNumber) {
+    public String getCanonicalVersion(LambdaGetOutput lf, String inputVersion, String versionNumber, int retentionNumber) {
         List<String> revisions = getSortedRevisions(lf);
 
-        if (!canonicalVersion.startsWith("$")) {  // actual version
-            return canonicalVersion;
+        if (inputVersion.startsWith("$PROVIDED")) {  // actual version
+            return versionNumber;
         }
 
-        if (canonicalVersion.startsWith("$LATEST")) { // latest version number
+        if (inputVersion.startsWith("$LATEST")) { // latest version number
             return revisions.get(0);
         }
 
-        if (canonicalVersion.startsWith("$OLDEST")) { // oldest version number
+        if (inputVersion.startsWith("$OLDEST")) { // oldest version number
             return revisions.get(revisions.size() - 1);
         }
 
-        if (canonicalVersion.startsWith("$PREVIOUS")) { // latest - 1 version number
+        if (inputVersion.startsWith("$PREVIOUS")) { // latest - 1 version number
             if (revisions.size() >= 2)
                 return revisions.get(1);
             else
                 return null;
         }
 
-        if (canonicalVersion.startsWith("$MOVING")) { // list of versions
+        if (inputVersion.startsWith("$MOVING")) { // list of versions
             if (revisions.size() > retentionNumber) {
                 List<String> toRemoveList = revisions.subList(retentionNumber, revisions.size());
                 return String.join(",", toRemoveList);
             }
         }
         // Couldnt find it.
-        logger.error(String.format("Found invalid version string %s", canonicalVersion));
+        logger.error(String.format("Found invalid version string %s", inputVersion));
         return null;
     }
 

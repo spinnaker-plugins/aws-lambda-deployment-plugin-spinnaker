@@ -73,9 +73,9 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
         System.out.println(aliasInp.getLambdaPayload());
         LambdaGetOutput lf = null;
         lf = utils.findLambda(stage, true);
-        String qual = utils.getCanonicalVersion(lf, "$LATEST", 1);
+        String qual = utils.getCanonicalVersion(lf, "$LATEST", "", 1);
         aliasInp.setQualifier(qual);
-        String latestVersion = this.getVersion(stage, "$LATEST");
+        String latestVersion = this.getVersion(stage, "$LATEST", "");
         aliasInp.setLatestVersionQualifier(latestVersion);
         return aliasInp;
     }

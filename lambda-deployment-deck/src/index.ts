@@ -3,7 +3,7 @@
 
 import { IDeckPlugin } from '@spinnaker/core';
 import { lambdaDeploymentStage, initialize } from './deployLambda';
-import { lambdaDeleteStage } from './destroyLambda';
+import { lambdaDeleteStage } from './deleteLambda';
 import { lambdaRouteStage} from './routeLambda';
 
 export const plugin: IDeckPlugin = {
