@@ -32,6 +32,7 @@ import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,8 +151,8 @@ public class LambdaCloudDriverUtils {
             }
             logger.debug("Found a function");
             String respString = response.body().string();
-            LambdaGetOutput allItem = this.asObjectFromList(respString, LambdaGetOutput.class);
-            return allItem;
+            LambdaGetOutput lambdaDef = this.asObjectFromList(respString, LambdaGetOutput.class);
+            return lambdaDef;
         }
         catch (Exception e) {
             logger.error("Error calling clouddriver to find lambda.", e);
@@ -244,12 +245,16 @@ public class LambdaCloudDriverUtils {
 
     public List<String> getSortedRevisions(LambdaGetOutput lf) {
         List<String> revisions =  lf.getRevisions().values().stream().collect(Collectors.toList());
-        revisions = revisions.stream().filter(x -> {
-            return !x.equals("$LATEST");
-        }).collect(Collectors.toList());
-        revisions = revisions.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
-        return revisions;
+        List<Integer> revInt = revisions.stream()
+                                        .filter(x -> { return NumberUtils.isCreatable(x); })
+                                        .map(x -> { return Integer.valueOf(x); })
+                                        .collect(Collectors.toList());
+        revInt = revInt.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+        List<String> answers = revInt.stream().map( x -> {
+            return Integer.toString(x);}).collect(Collectors.toList());
+        return answers;
     }
+
     public LambdaGetOutput findLambda(StageExecution stage) {
         return findLambda(stage, false);
     }
@@ -263,17 +268,17 @@ public class LambdaCloudDriverUtils {
         while (lf == null && count < 5 && shouldRetry == true) {
             count++;
             lf = this.retrieveLambda((lgi));
-            this.await(stage);
+            this.await();
         }
         return lf;
     }
 
-    public void await(StageExecution stage) {
+    public void await() {
         try {
-            Thread.sleep(25000);
+            Thread.sleep(20000);
         }
         catch (Throwable e) {
-            logger.error("Error awaiting lambda creation", e);
+            logger.error("Error during await of lambda ", e);
         }
     }
 }

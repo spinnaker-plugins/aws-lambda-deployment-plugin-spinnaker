@@ -17,6 +17,8 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
+import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaPublishVersionTask;
+import com.amazon.aws.spinnaker.plugin.lambda.verify.LambdaVerificationTask;
 import com.netflix.spinnaker.orca.api.pipeline.graph.StageDefinitionBuilder;
 import com.netflix.spinnaker.orca.api.pipeline.graph.TaskNode;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
@@ -38,6 +40,8 @@ public class LambdaTrafficUpdaterStage implements StageDefinitionBuilder {
     @Override
     public void taskGraph(@Nonnull StageExecution stage, @Nonnull TaskNode.Builder builder) {
         logger.debug("taskGraph for Aws.LambdaTrafficUpdateStage");
+        builder.withTask("lambdapublisVersionTask", LambdaPublishVersionTask.class);
+        builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
         builder.withTask("lambdaTrafficUpdateTask", LambdaTrafficUpdateTask.class);
         builder.withTask("lambdaTrafficUpdateVerificationTask", LambdaTrafficUpdateVerificationTask.class);
     }

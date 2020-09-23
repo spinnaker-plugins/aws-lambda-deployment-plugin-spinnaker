@@ -59,11 +59,9 @@ public class LambdaPublishVersionTask implements LambdaStageBaseTask {
             return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(stage.getContext()).build();
         }
 
-        // TODO: Commented out until cloud-driver is merged with the new atomic operation.
-        // LambdaCloudOperationOutput output = this.publishVersion(stage);
-        // Map<String, Object> context = buildContextOutput(output,  LambdaStageConstants.publishVersionUrlKey);
-        // context.put(LambdaStageConstants.lambaVersionPublishedKey, Boolean.TRUE);
-        Map<String, Object> context = new HashMap<>();
+        LambdaCloudOperationOutput output = this.publishVersion(stage);
+        Map<String, Object> context = buildContextOutput(output,  LambdaStageConstants.publishVersionUrlKey);
+        context.put(LambdaStageConstants.lambaVersionPublishedKey, Boolean.TRUE);
         return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
     }
 

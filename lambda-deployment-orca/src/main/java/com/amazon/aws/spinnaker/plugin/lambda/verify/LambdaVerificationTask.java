@@ -50,18 +50,18 @@ public class LambdaVerificationTask implements LambdaStageBaseTask {
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
         logger.debug("Executing lambdaVerificationTask...");
-        Map<String, Object> newContext = stage.getContext();
+        Map<String, Object> stageContext = stage.getContext();
 
         List<String> urlKeyList = LambdaStageConstants.allUrlKeys;
 
         List<String> urlList = urlKeyList.stream().filter(x -> {
-            return (String)newContext.get(x) != null ;
+            return (String)stageContext.get(x) != null ;
         }).map(singleUrlKey ->  {
-            return (String)newContext.get(singleUrlKey);
+            return (String)stageContext.get(singleUrlKey);
         }).collect(Collectors.toList());
 
-        if (null != newContext.get(LambdaStageConstants.eventTaskKey))
-            urlList.addAll((List<String>)newContext.get(LambdaStageConstants.eventTaskKey));
+        if (null != stageContext.get(LambdaStageConstants.eventTaskKey))
+            urlList.addAll((List<String>)stageContext.get(LambdaStageConstants.eventTaskKey));
 
         List<LambdaCloudDriverTaskResults> listOfTaskResults = urlList.stream().map(url -> {
             return utils.verifyStatus(url);

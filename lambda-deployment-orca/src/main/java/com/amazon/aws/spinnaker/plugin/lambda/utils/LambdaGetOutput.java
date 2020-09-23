@@ -36,6 +36,7 @@ public class LambdaGetOutput  extends FunctionConfiguration {
     private String region;
 
     private Map<String, String> revisions;
+    // private List revisions;
     private List<AliasConfiguration> aliasConfigurations;
     private List<EventSourceMappingConfiguration> eventSourceMappings;
     private FunctionCodeLocation code;

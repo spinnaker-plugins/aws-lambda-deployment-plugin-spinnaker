@@ -18,6 +18,7 @@
 package com.amazon.aws.spinnaker.plugin.lambda.verify;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
+import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.netflix.spinnaker.orca.api.pipeline.Task;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
@@ -26,6 +27,7 @@ import com.netflix.spinnaker.orca.clouddriver.CloudDriverCacheService;
 import com.netflix.spinnaker.orca.clouddriver.tasks.AbstractCloudProviderAwareTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import retrofit.client.Response;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -42,6 +44,9 @@ public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
     @Autowired
     private CloudDriverCacheService cacheService;
 
+    @Autowired
+    private LambdaCloudDriverUtils utils;
+
     @Nonnull
     @Override
     public TaskResult execute(@Nonnull StageExecution stage) {
@@ -49,7 +54,9 @@ public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
         Map<String, Object> task = new HashMap<>(stage.getContext());
         task.put("appName", stage.getExecution().getApplication());
 
-        cacheService.forceCacheUpdate("aws", REFRESH_TYPE, task);
+        Response rs = cacheService.forceCacheUpdate("aws", REFRESH_TYPE, task);
+
+        utils.await();
 
         return TaskResult.ofStatus(ExecutionStatus.SUCCEEDED);
     }
