@@ -31,6 +31,7 @@ import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationPro
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -90,8 +91,16 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
         inp.setMajorFunctionVersion(inp.getLatestVersionQualifier());
         inp.setMinorFunctionVersion(null);
         String cloudDriverUrl = props.getCloudDriverBaseUrl();
+        Map<String, Object> outputMap  = new HashMap<String, Object>();
+        outputMap.put("majorVersionDeployed", inp.getMajorFunctionVersion());
+        outputMap.put("aliasDeployed", inp.getAliasName());
+        outputMap.put("minorVersionDeployed", "");
+        outputMap.put("strategyUsed", "BlueGreenDeploymentStrategy");
+
         // TODO: Form a new inputobject such as SimpleStrategyInput and just have the
-        return postToCloudDriver(inp, cloudDriverUrl, utils);
+        LambdaCloudOperationOutput out = postToCloudDriver(inp, cloudDriverUrl, utils);
+        out.setOutputMap(outputMap);
+        return out;
     }
 
     @Override

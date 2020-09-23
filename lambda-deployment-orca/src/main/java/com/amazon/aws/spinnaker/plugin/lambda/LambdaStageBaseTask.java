@@ -28,7 +28,6 @@ import java.util.Map;
 
 public interface LambdaStageBaseTask extends Task {
 
-
     default Map<String, Object> buildContextOutput(LambdaCloudOperationOutput ldso, String urlKey) {
         String url = ldso.getUrl() != null ? ldso.getUrl() : "";
         Map<String, Object> context = new HashMap<String, Object>();
@@ -40,7 +39,6 @@ public interface LambdaStageBaseTask extends Task {
         Map<String, Object> context = new HashMap<String, Object>();
         return context;
     }
-
 
     /**
      * Fill up with values required for next task
@@ -54,12 +52,15 @@ public interface LambdaStageBaseTask extends Task {
         return context;
     }
 
-
     default TaskResult formTaskResult(LambdaCloudOperationOutput ldso) {
         Map<String, Object> context = buildContextOutput(ldso);
         return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
     }
 
+    default TaskResult formTaskResultWithOutput(LambdaCloudOperationOutput ldso, Map<String, Object> outputMap) {
+        Map<String, Object> context = buildContextOutput(ldso);
+        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).outputs(outputMap).build();
+    }
 
     default TaskResult formSuccessTaskResult(StageExecution stage, String successMessage) {
         Map<String, Object> outputMap = new HashMap<>();
@@ -67,6 +68,7 @@ public interface LambdaStageBaseTask extends Task {
         stage.setOutputs(outputMap);
         return TaskResult.builder(ExecutionStatus.SUCCEEDED).outputs(outputMap).build();
     }
+
     default TaskResult formErrorTaskResult(StageExecution stage, String errorMessage) {
         Map<String, Object> outputMap = new HashMap<String, Object>();
         outputMap.put("failureMessage", errorMessage);

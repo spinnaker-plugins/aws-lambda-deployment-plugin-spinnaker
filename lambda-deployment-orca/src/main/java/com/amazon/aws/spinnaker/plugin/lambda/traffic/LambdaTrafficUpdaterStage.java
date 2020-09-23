@@ -40,8 +40,6 @@ public class LambdaTrafficUpdaterStage implements StageDefinitionBuilder {
     @Override
     public void taskGraph(@Nonnull StageExecution stage, @Nonnull TaskNode.Builder builder) {
         logger.debug("taskGraph for Aws.LambdaTrafficUpdateStage");
-        builder.withTask("lambdapublisVersionTask", LambdaPublishVersionTask.class);
-        builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
         builder.withTask("lambdaTrafficUpdateTask", LambdaTrafficUpdateTask.class);
         builder.withTask("lambdaTrafficUpdateVerificationTask", LambdaTrafficUpdateVerificationTask.class);
     }

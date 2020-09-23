@@ -30,4 +30,5 @@ import java.util.Map;
 public class LambdaCloudOperationOutput {
     private String resourceId;
     private String url;
+    private Map<String, Object> outputMap;
 }

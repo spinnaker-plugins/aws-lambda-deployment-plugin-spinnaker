@@ -63,7 +63,10 @@ public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask 
             return formErrorListTaskResult(stage, allMessages);
         }
 
-        final Map<String, Object> outputMap = new HashMap<String, Object>();
+        Map<String, Object> outputMap = stage.getOutputs();
+        if (outputMap == null) {
+            outputMap = new HashMap<String, Object>();
+        }
         outputMap.put("message", "Traffic update succeeded");
         stage.setOutputs(outputMap);
         return TaskResult.builder(ExecutionStatus.SUCCEEDED).outputs(outputMap).build();

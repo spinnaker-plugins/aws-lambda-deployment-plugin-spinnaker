@@ -65,7 +65,11 @@ public class LambdaTrafficUpdateTask implements LambdaStageBaseTask {
             result = LambdaCloudOperationOutput.builder().build();
         }
         Map<String, Object> context = buildContextOutput(result, "url");
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
+        Map<String, Object> outputs = result.getOutputMap();
+        if (outputs == null) {
+            outputs = new HashMap<String, Object>();
+        }
+        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).outputs(outputs).build();
     }
 
     private BaseDeploymentStrategy getDeploymentStrategy(StageExecution stage) {

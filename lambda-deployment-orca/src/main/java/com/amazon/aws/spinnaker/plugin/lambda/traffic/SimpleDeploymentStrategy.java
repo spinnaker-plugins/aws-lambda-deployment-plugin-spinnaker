@@ -25,6 +25,9 @@ import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationPro
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Component
 public class SimpleDeploymentStrategy extends BaseDeploymentStrategy<LambdaSimpleStrategyInput> {
 
@@ -37,7 +40,14 @@ public class SimpleDeploymentStrategy extends BaseDeploymentStrategy<LambdaSimpl
     @Override
     public LambdaCloudOperationOutput deploy(LambdaSimpleStrategyInput inp) {
         String cloudDriverUrl = props.getCloudDriverBaseUrl();
-        return postToCloudDriver(inp, cloudDriverUrl, utils);
+        Map<String, Object> outputMap  = new HashMap<String, Object>();
+        outputMap.put("majorVersionDeployed", inp.getMajorFunctionVersion());
+        outputMap.put("strategyUsed", "SimpleDeploymentStrategy");
+        outputMap.put("aliasDeployed", inp.getAliasName());
+        // TODO: Form a new inputobject such as SimpleStrategyInput and just have the
+        LambdaCloudOperationOutput out = postToCloudDriver(inp, cloudDriverUrl, utils);
+        out.setOutputMap(outputMap);
+        return out;
     }
 
     @Override

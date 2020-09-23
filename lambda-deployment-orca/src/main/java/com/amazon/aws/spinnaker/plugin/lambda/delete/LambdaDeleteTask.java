@@ -60,17 +60,20 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
             return formTaskResult(deleteLambdaVersion(ldi));
         }
 
-        String actualVersion = getVersion(stage, ldi);
-        if (actualVersion == null) {
+        String versionToDelete = getVersion(stage, ldi);
+        if (versionToDelete == null) {
             return formSuccessTaskResult(stage, "Found no version of function to delete");
         }
 
-        if (!actualVersion.contains(",")) {
-            ldi.setQualifier((String) actualVersion);
-            return formTaskResult(deleteLambdaVersion(ldi));
+        final Map<String, Object> outputMap = new HashMap<String, Object>();
+        outputMap.put("deletedVersion", versionToDelete);
+
+        if (!versionToDelete.contains(",")) {
+            ldi.setQualifier(versionToDelete);
+            return formTaskResultWithOutput(deleteLambdaVersion(ldi), outputMap);
         }
 
-        String[] allVersionsList = actualVersion.split(",");
+        String[] allVersionsList = versionToDelete.split(",");
         LambdaCloudOperationOutput ldso = null;
         List<String> urlList = new ArrayList<String>();
 
@@ -82,7 +85,7 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
 
         Map<String, Object> context = buildContextOutput(ldso);
         context.put("urlList", urlList);
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
+        return TaskResult.builder(ExecutionStatus.SUCCEEDED).outputs(outputMap).context(context).build();
     }
 
     private LambdaCloudOperationOutput deleteLambdaVersion(LambdaDeleteStageInput ldi) {
