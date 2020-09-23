@@ -21,7 +21,7 @@ This plugin is currently only compatible with Spinnaker platform 1.23.x and up. 
 
 ### Usage
 1. Add the following to the Halyard config (typically found at `~/.hal/config`) to load the Orca backend
-```
+```yaml
 spinnaker:
   extensibility:
     plugins:
@@ -37,18 +37,18 @@ spinnaker:
            url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.1/plugins.json
 ```
 2. Add the following to `gate-local.yml` in the necessary [profile](https://spinnaker.io/reference/halyard/custom/#custom-profiles) to load the Deck frontend
-```
+```yaml
 spinnaker:
-   extensibility:
-     deck-proxy:
-       enabled: true
-       plugins:
-         Aws.LambdaDeploymentPlugin:
-           enabled: true
-           version: <<VERSION NUMBER>>
-       repositories:
-         awsLambdaDeploymentPluginRepo:
-           url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.1/plugins.json 
+  extensibility:
+    deck-proxy:
+      enabled: true
+      plugins:
+        Aws.LambdaDeploymentPlugin:
+          enabled: true
+          version: <<VERSION NUMBER>>
+      repositories:
+        awsLambdaDeploymentPluginRepo:
+          url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.1/plugins.json 
 ```
 3. Execute `hal deploy apply` to deploy the changes
 
@@ -104,18 +104,18 @@ Verify the above files have been created at the end of the gradle command above.
 * Copy the plugin-ref file from the build above to the plugins directory
 * Create a orca-local.yml file in ~/.spinnaker/ with the following contents:
 
-```
+```yaml
 spinnaker:
-   extensibility:
-     plugins:
-       Aws.LambdaDeploymentPlugin:
-         enabled: true
-         version: 1.0.1
-         extensions:
-           Aws.LambdaDeploymentStage:
-             enabled: true
-             config:
-               defaultMaxWaitTime: 20
+  extensibility:
+    plugins:
+      Aws.LambdaDeploymentPlugin:
+        enabled: true
+        version: 1.0.1
+        extensions:
+          Aws.LambdaDeploymentStage:
+            enabled: true
+            config:
+              defaultMaxWaitTime: 20
 ```
 
 * Restart Orca (from your IntelliJ IDE)
