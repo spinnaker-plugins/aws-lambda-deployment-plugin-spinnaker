@@ -39,7 +39,7 @@ spinnaker:
 2. Add the following to `gate-local.yml` in the necessary [profile](https://spinnaker.io/reference/halyard/custom/#custom-profiles) to load the Deck frontend
 ```yaml
 spinnaker:
- extensibility:
+  extensibility:
     deck-proxy:
       enabled: true
       plugins:
@@ -126,11 +126,11 @@ spinnaker:
 
 ```json
  [
-     {
-         "id": "Aws.LambdaDeploymentPlugin",
-         "url": "./plugins/index.js",
-         "version": "1.1.14"
-     }
+    {
+      "id": "Aws.LambdaDeploymentPlugin",
+      "url": "./plugins/index.js",
+      "version": "1.1.14"
+    }
  ]
 ```
 
