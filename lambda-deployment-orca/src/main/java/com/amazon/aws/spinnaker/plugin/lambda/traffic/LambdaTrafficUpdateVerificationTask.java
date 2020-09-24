@@ -53,22 +53,16 @@ public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask 
         }
 
         LambdaCloudDriverTaskResults op = utils.verifyStatus(url);
+
         if (!op.getStatus().isCompleted()) {
             return TaskResult.builder(ExecutionStatus.RUNNING).build();
         }
 
         if (op.getStatus().isFailed()) {
             ExecutionStatus status = ExecutionStatus.TERMINAL;
-            List<String> allMessages = Arrays.asList(op.getErrors().getMessage());
-            return formErrorListTaskResult(stage, allMessages);
+            return formErrorTaskResult(stage,op.getErrors().getMessage());
         }
 
-        Map<String, Object> outputMap = stage.getOutputs();
-        if (outputMap == null) {
-            outputMap = new HashMap<String, Object>();
-        }
-        outputMap.put("message", "Traffic update succeeded");
-        stage.setOutputs(outputMap);
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).outputs(outputMap).build();
+        return formSuccessTaskResult(stage, "Traffic update succeeded");
     }
 }

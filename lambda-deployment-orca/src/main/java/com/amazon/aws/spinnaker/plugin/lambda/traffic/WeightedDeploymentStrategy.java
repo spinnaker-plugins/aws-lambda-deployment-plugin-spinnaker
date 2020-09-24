@@ -19,6 +19,7 @@ package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaBaseStrategyInput;
+import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaTrafficUpdateInput;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaWeightedStrategyInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
@@ -54,13 +55,16 @@ public class WeightedDeploymentStrategy extends BaseDeploymentStrategy<LambdaWei
 
     @Override
     public LambdaWeightedStrategyInput setupInput(StageExecution stage) {
-        LambdaWeightedStrategyInput aliasInp = utils.getInput(stage, LambdaWeightedStrategyInput.class);
-        aliasInp.setCredentials(aliasInp.getAccount());
-        aliasInp.setAppName(stage.getExecution().getApplication());
-        aliasInp.setWeightToMinorFunctionVersion((double)(100 - aliasInp.getTrafficPercentA()) / 100);
-        aliasInp.setMajorFunctionVersion(getVersion(stage, aliasInp.getVersionNameA(), aliasInp.getVersionNumberA()));
-        aliasInp.setMinorFunctionVersion(getVersion(stage, aliasInp.getVersionNameB(), aliasInp.getVersionNumberB()));
-        return aliasInp;
+        LambdaTrafficUpdateInput aliasInp = utils.getInput(stage, LambdaTrafficUpdateInput.class);
+        LambdaWeightedStrategyInput weightedInput = utils.getInput(stage, LambdaWeightedStrategyInput.class);
+
+        weightedInput.setAccount(aliasInp.getAccount());
+        weightedInput.setCredentials(aliasInp.getAccount());
+
+        weightedInput.setWeightToMinorFunctionVersion((double)(100 - aliasInp.getTrafficPercentA()) / 100);
+        weightedInput.setMajorFunctionVersion(getVersion(stage, aliasInp.getVersionNameA(), aliasInp.getVersionNumberA()));
+        weightedInput.setMinorFunctionVersion(getVersion(stage, aliasInp.getVersionNameB(), aliasInp.getVersionNumberB()));
+        return weightedInput;
     }
 
     @Override

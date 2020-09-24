@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -63,8 +64,7 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
         LambdaGetOutput lf = utils.retrieveLambda(lgi);
         if (lf != null) {
             logger.debug("noOp. Lambda already exists. only needs updating.");
-            context = buildContextOutput();
-            // put something into output so that we know lambda already existed
+            context = new HashMap<String, Object>();
             context.put(LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
             context.put(LambdaStageConstants.lambdaObjectKey, lf);
             context.put(LambdaStageConstants.originalRevisionIdKey, lf.getRevisionId());

@@ -28,17 +28,8 @@ public class LambdaWeightedStrategyInput  extends LambdaBaseStrategyInput {
     String credentials, account, region;
     String appName;
     String functionName;
-    String deploymentStrategy;
-    Boolean isNew;
     String aliasName;
     String aliasDescription;
-
-    private String versionNameA;
-    private String versionNameB;
-    private String versionNumberA;
-    private String versionNumberB;
-    private int trafficPercentA;
-    private int trafficPercentB;
 
     private String majorFunctionVersion;
     private String minorFunctionVersion;

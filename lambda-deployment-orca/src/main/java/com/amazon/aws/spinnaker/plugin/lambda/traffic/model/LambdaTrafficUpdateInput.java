@@ -1,7 +1,7 @@
 /*
- * Copyright 2018 Amazon.com, Inc. or its affiliates.
+ * Copyright 2020 Netflix, Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License")
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-
 package com.amazon.aws.spinnaker.plugin.lambda.traffic.model;
+
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
@@ -24,15 +24,33 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
-public class LambdaSimpleStrategyInput extends LambdaBaseStrategyInput {
+public class LambdaTrafficUpdateInput extends LambdaBaseStrategyInput {
+
     String credentials, account, region;
     String appName;
     String functionName;
+    String qualifier;
+    String latestVersionQualifier;
+    String payload;
+    String deploymentStrategy;
+    Boolean isNew;
     String aliasName;
     String aliasDescription;
 
     private String versionNameA;
+    private String versionNameB;
     private String versionNumberA;
+    private String versionNumberB;
     private int trafficPercentA;
+    private int trafficPercentB;
+
     private String majorFunctionVersion;
+    private String minorFunctionVersion;
+    private double weightToMinorFunctionVersion;
+
+    private String lambdaPayload;
+    private String lambdaOutput;
+    private int timeout;
 }
+
+

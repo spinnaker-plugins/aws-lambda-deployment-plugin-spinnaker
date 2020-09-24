@@ -28,6 +28,15 @@ import java.util.Map;
 
 public interface LambdaStageBaseTask extends Task {
 
+    /**
+     * Fill up with values required for next task
+     * @param ldso
+     * @return
+     */
+    default Map<String, Object> buildContextOutput(LambdaCloudOperationOutput ldso) {
+        return buildContextOutput(ldso, "url");
+    }
+
     default Map<String, Object> buildContextOutput(LambdaCloudOperationOutput ldso, String urlKey) {
         String url = ldso.getUrl() != null ? ldso.getUrl() : "";
         Map<String, Object> context = new HashMap<String, Object>();
@@ -35,30 +44,11 @@ public interface LambdaStageBaseTask extends Task {
         return context;
     }
 
-    default Map<String, Object> buildContextOutput() {
-        Map<String, Object> context = new HashMap<String, Object>();
-        return context;
-    }
-
-    /**
-     * Fill up with values required for next task
-     * @param ldso
-     * @return
-     */
-    default Map<String, Object> buildContextOutput(LambdaCloudOperationOutput ldso) {
-        String url = ldso.getUrl();
-        Map<String, Object> context = new HashMap<>();
-        context.put("url", url);
-        return context;
-    }
-
-    default TaskResult formTaskResult(LambdaCloudOperationOutput ldso) {
+    default TaskResult formTaskResult(LambdaCloudOperationOutput ldso, Map<String, Object> outputMap) {
         Map<String, Object> context = buildContextOutput(ldso);
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
-    }
-
-    default TaskResult formTaskResultWithOutput(LambdaCloudOperationOutput ldso, Map<String, Object> outputMap) {
-        Map<String, Object> context = buildContextOutput(ldso);
+        if (outputMap == null) {
+            outputMap = new HashMap<String, Object>();
+        }
         return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).outputs(outputMap).build();
     }
 

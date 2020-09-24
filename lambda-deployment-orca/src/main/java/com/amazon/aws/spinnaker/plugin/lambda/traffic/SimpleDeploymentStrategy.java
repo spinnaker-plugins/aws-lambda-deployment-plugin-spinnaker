@@ -44,7 +44,6 @@ public class SimpleDeploymentStrategy extends BaseDeploymentStrategy<LambdaSimpl
         outputMap.put("majorVersionDeployed", inp.getMajorFunctionVersion());
         outputMap.put("strategyUsed", "SimpleDeploymentStrategy");
         outputMap.put("aliasDeployed", inp.getAliasName());
-        // TODO: Form a new inputobject such as SimpleStrategyInput and just have the
         LambdaCloudOperationOutput out = postToCloudDriver(inp, cloudDriverUrl, utils);
         out.setOutputMap(outputMap);
         return out;
@@ -53,11 +52,11 @@ public class SimpleDeploymentStrategy extends BaseDeploymentStrategy<LambdaSimpl
     @Override
     public LambdaSimpleStrategyInput setupInput(StageExecution stage) {
         LambdaSimpleStrategyInput aliasInp = utils.getInput(stage, LambdaSimpleStrategyInput.class);
+
         aliasInp.setCredentials(aliasInp.getAccount());
         aliasInp.setAppName(stage.getExecution().getApplication());
-        aliasInp.setWeightToMinorFunctionVersion(0.0);
+
         aliasInp.setMajorFunctionVersion(getVersion(stage, aliasInp.getVersionNameA(), aliasInp.getVersionNumberA()));
-        aliasInp.setMinorFunctionVersion(null);
         return aliasInp;
     }
 

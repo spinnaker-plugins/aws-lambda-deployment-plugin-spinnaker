@@ -57,7 +57,7 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
         ldi.setAppName(stage.getExecution().getApplication());
 
         if (ldi.getVersion().equals("$ALL")) {
-            return formTaskResult(deleteLambdaVersion(ldi));
+            return formTaskResult(deleteLambdaVersion(ldi), null);
         }
 
         String versionToDelete = getVersion(stage, ldi);
@@ -70,7 +70,7 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
 
         if (!versionToDelete.contains(",")) {
             ldi.setQualifier(versionToDelete);
-            return formTaskResultWithOutput(deleteLambdaVersion(ldi), outputMap);
+            return formTaskResult(deleteLambdaVersion(ldi), outputMap);
         }
 
         String[] allVersionsList = versionToDelete.split(",");

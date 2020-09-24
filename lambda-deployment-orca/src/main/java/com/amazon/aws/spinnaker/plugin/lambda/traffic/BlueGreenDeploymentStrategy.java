@@ -17,9 +17,7 @@
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
-import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaBlueGreenStrategyInput;
-import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaInvokeFunctionOutput;
-import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaSimpleStrategyInput;
+import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.*;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaGetOutput;
@@ -92,12 +90,12 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
         inp.setMinorFunctionVersion(null);
         String cloudDriverUrl = props.getCloudDriverBaseUrl();
         Map<String, Object> outputMap  = new HashMap<String, Object>();
+
         outputMap.put("majorVersionDeployed", inp.getMajorFunctionVersion());
         outputMap.put("aliasDeployed", inp.getAliasName());
         outputMap.put("minorVersionDeployed", "");
         outputMap.put("strategyUsed", "BlueGreenDeploymentStrategy");
 
-        // TODO: Form a new inputobject such as SimpleStrategyInput and just have the
         LambdaCloudOperationOutput out = postToCloudDriver(inp, cloudDriverUrl, utils);
         out.setOutputMap(outputMap);
         return out;
@@ -105,17 +103,22 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
 
     @Override
     public LambdaBlueGreenStrategyInput setupInput(StageExecution stage) {
-        LambdaBlueGreenStrategyInput aliasInp = utils.getInput(stage, LambdaBlueGreenStrategyInput.class);
-        aliasInp.setCredentials(aliasInp.getAccount());
-        aliasInp.setAppName(stage.getExecution().getApplication());
-        System.out.println(aliasInp.getLambdaPayload());
+
+        LambdaTrafficUpdateInput aliasInp = utils.getInput(stage, LambdaTrafficUpdateInput.class);
+        LambdaBlueGreenStrategyInput blueGreenInput = utils.getInput(stage, LambdaBlueGreenStrategyInput.class);
+
+        blueGreenInput.setCredentials(aliasInp.getAccount());
+        blueGreenInput.setAppName(stage.getExecution().getApplication());
+
         LambdaGetOutput lf = null;
         lf = utils.findLambda(stage, true);
+
         String qual = utils.getCanonicalVersion(lf, "$LATEST", "", 1);
-        aliasInp.setQualifier(qual);
+        blueGreenInput.setQualifier(qual);
         String latestVersion = this.getVersion(stage, "$LATEST", "");
-        aliasInp.setLatestVersionQualifier(latestVersion);
-        return aliasInp;
+        blueGreenInput.setLatestVersionQualifier(latestVersion);
+
+        return blueGreenInput;
     }
 
     private LambdaInvokeFunctionOutput invokeLambdaFunction(LambdaBlueGreenStrategyInput ldi) {

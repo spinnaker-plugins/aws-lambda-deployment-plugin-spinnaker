@@ -33,16 +33,8 @@ public class LambdaBlueGreenStrategyInput extends LambdaBaseStrategyInput {
     String latestVersionQualifier;
     String payload;
     String deploymentStrategy;
-    Boolean isNew;
     String aliasName;
     String aliasDescription;
-
-    private String versionNameA;
-    private String versionNameB;
-    private String versionNumberA;
-    private String versionNumberB;
-    private int trafficPercentA;
-    private int trafficPercentB;
 
     private String majorFunctionVersion;
     private String minorFunctionVersion;

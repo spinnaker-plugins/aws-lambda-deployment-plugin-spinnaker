@@ -94,10 +94,10 @@ public class LambdaVerificationTask implements LambdaStageBaseTask {
         }
 
         // Process failures:
-        List<String> statusMessages = listOfTaskResults.stream().map(op -> {
+        List<String> errorMessages = listOfTaskResults.stream().map(op -> {
             return op.getErrors().getMessage();
         }).collect(Collectors.toList());
-        return formErrorListTaskResult(stage, statusMessages);
+        return formErrorListTaskResult(stage, errorMessages);
     }
 
     @Nullable
