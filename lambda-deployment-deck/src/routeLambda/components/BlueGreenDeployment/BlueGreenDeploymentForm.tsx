@@ -5,35 +5,19 @@ import React from 'react';
 
 import {
   FormikFormField,
-  HelpField,
   IFormikStageConfigInjectedProps,
   IFormInputProps,
-  JsonEditor,
-  NumberInput,
   ReactSelectInput,
 } from '@spinnaker/core';
 
 import {
-  IAmazonFunctionSourceData,
-} from '@spinnaker/amazon';
-
-import {
-  IVersionConstant,
-  VersionList,
-} from '../../constants';
-
-import {
-  IHealthConstant,
   HealthCheckList,
 } from './health.constants';
-
-import { VersionPicker } from '../VersionPicker';
 
 import { retrieveHealthCheck } from './HealthCheckStrategy';
 
 export function BlueGreenDeploymentForm(props: IFormikStageConfigInjectedProps) {
   const { values, errors } = props.formik;
-  const { functions } = props.application; 
 
   return (
     <div>

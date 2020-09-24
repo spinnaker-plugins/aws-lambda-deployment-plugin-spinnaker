@@ -1,10 +1,6 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
-
-import { Application } from '@spinnaker/core';
-
 import {
-  IAmazonFunction,
   IAmazonFunctionUpsertCommand,
 } from '@spinnaker/amazon';
 

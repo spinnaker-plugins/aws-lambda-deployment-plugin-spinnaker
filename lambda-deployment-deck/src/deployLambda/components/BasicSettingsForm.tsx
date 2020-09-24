@@ -1,7 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import React, {useState} from 'react';
+import React from 'react';
 
 import { Option } from 'react-select';
 
@@ -15,23 +15,11 @@ import {
   IFormikStageConfigInjectedProps,
   IFormInputProps,
   IRegion,
-  ISecurityGroup,
-  IStage,
-  ISubnet,
-  IVpc,
   NameUtils,
-  NetworkReader,
-  ReactInjector,
   ReactSelectInput,
-  SecurityGroupReader,
-  SubnetReader,
-  TetheredCreatable,
-  TetheredSelect,
   TextInput,
   useData,
 } from '@spinnaker/core';
-
-import { uniqBy } from 'lodash';
 
 import {
   availableRuntimes,

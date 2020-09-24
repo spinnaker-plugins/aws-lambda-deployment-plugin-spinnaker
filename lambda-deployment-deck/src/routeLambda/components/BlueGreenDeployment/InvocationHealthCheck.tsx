@@ -6,7 +6,6 @@ import React from 'react';
 import {
   CheckboxInput,
   FormikFormField,
-  HelpField,
   IFormInputProps, 
   IFormikStageConfigInjectedProps,
   NumberInput,

@@ -5,7 +5,6 @@ import React from 'react';
 
 import {
   FormikFormField,
-  HelpField,
   IFormikStageConfigInjectedProps,
   IFormInputProps, 
   NumberInput,
@@ -17,7 +16,6 @@ import {
 } from '@spinnaker/amazon';
 
 import {
-  IVersionConstant,
   VersionList,
 } from '../constants';
 

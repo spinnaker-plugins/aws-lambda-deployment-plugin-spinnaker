@@ -5,25 +5,19 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 
 import {
-  CheckboxInput,
   FormikFormField,
   HelpField,
-  IArtifact,
-  IFormInputProps,
   IFormikStageConfigInjectedProps,
-  IRegion,
-  IVpc,
-  IgorService,
   MapEditorInput,
   NumberInput,
   ReactSelectInput,
   TextInput,
-  useData, 
 } from '@spinnaker/core';
 
 import {
   BasicSettingsForm,
-  ExecutionRoleForm, 
+  ExecutionRoleForm,
+  LambdaAtEdgeForm, 
   NetworkForm,
   TriggerEventsForm,
 } from '.';
@@ -32,18 +26,9 @@ import {
   AliasForm
 } from './addAlias';
 
-import { VpcReader } from '@spinnaker/amazon';
-
-import {constructNewAwsFunctionTemplate} from '../config/function.defaults';
-
 
 export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProps) {
   const { values, errors } = props.formik; 
-  
-
-  const onFieldChange = (fieldName: string, fieldValue: any): void => {
-    props.formik.setFieldValue(fieldName, fieldValue);
-  };
 
   const className = classNames({
     well: true,
@@ -101,6 +86,10 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
         input={props => <NumberInput {...props} min={1} max={900} />}
       />
       <FormikFormField name="targetGroups" label="Target Group Name" input={props => <TextInput {...props} />} />
+
+      <h4> Lambda@Edge </h4>
+      < LambdaAtEdgeForm {...props} />
+      
       <h4> Network </h4>
       < NetworkForm {...props} />
 

@@ -10,24 +10,8 @@ import {
   HelpField,
   IFormikStageConfigInjectedProps,
   IFormInputProps,
-  ISecurityGroup,
-  IStage,
   ISubnet,
-  IVpc,
-  NetworkReader,
-  ReactInjector,
-  ReactSelectInput,
-  SecurityGroupReader,
-  SubnetReader,
-  TetheredSelect,
-  useData,
 } from '@spinnaker/core';
-
-import { uniqBy } from 'lodash';
-
-const toSubnetOption = (value: ISubnet): Option<string> => {
-  return { value: value.id, label: value.id };
-};
 
 function AliasTable() {
   return (

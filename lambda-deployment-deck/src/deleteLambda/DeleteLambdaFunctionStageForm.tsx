@@ -25,8 +25,8 @@ import {
 } from '@spinnaker/amazon';
 
 import {
-  DestroyVersionList,
-  DestroyVersionPicker,
+  DeleteVersionList,
+  DeleteVersionPicker,
 } from './constants';
 
 
@@ -124,9 +124,9 @@ export function DeleteLambdaFunctionStageForm(props: IFormikStageConfigInjectedP
           <ReactSelectInput
             {...inputProps}
             clearable={false}
-            options={DestroyVersionList}
+            options={DeleteVersionList}
             optionRenderer={option => (
-              < DestroyVersionPicker
+              < DeleteVersionPicker
                 config={props}
                 value={(option.value as any)}
                 showingDetails={true}

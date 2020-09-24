@@ -6,7 +6,6 @@ import React from 'react';
 import {
   AccountService, 
   FormikFormField,
-  HelpField,
   IAccount,
   IAccountDetails, 
   IFormInputProps,
@@ -14,14 +13,9 @@ import {
   IFunction,
   IRegion,    
   ReactSelectInput,
-  StageArtifactSelector,
   TextInput,
   useData, 
 } from '@spinnaker/core';
-
-import {  
-  IAmazonFunctionSourceData,
-} from '@spinnaker/amazon';
 
 import {
   DeploymentStrategyList,

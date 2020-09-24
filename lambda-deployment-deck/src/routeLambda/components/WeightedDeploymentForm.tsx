@@ -5,15 +5,10 @@ import React from 'react';
 
 import {
   FormikFormField,
-  HelpField, 
   IFormikStageConfigInjectedProps,
   IFormInputProps,
-  IFunction,
-  IRegion, 
   NumberInput,
   ReactSelectInput,
-  TetheredSelect,
-  TextInput,
 } from '@spinnaker/core';
 
 import {
@@ -21,7 +16,6 @@ import {
 } from '@spinnaker/amazon';
 
 import { 
-  IVersionConstant,
   VersionList,
 } from '../constants';
 

@@ -4,7 +4,6 @@
 import React from 'react';
 
 import { IFormikStageConfigInjectedProps } from '@spinnaker/core';
-import { IAmazonFunctionSourceData } from '@spinnaker/amazon';
 
 import {
   IStrategyConstant,

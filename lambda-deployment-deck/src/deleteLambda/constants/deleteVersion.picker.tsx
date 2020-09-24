@@ -6,9 +6,9 @@ import React from 'react';
 import { IFormikStageConfigInjectedProps } from '@spinnaker/core';
 
 import {
-  IDestroyVersionConstant,
-  DestroyVersionList,
-} from './destroyVersion.constants';
+  IDeleteVersionConstant,
+  DeleteVersionList,
+} from './deleteVersion.constants';
 
 export interface IVersionPickerProps{
   config: IFormikStageConfigInjectedProps;
@@ -22,14 +22,14 @@ export interface IVersionPickerState{
   description: string;
 }
 
-export class DestroyVersionPicker extends React.Component<IVersionPickerProps, IVersionPickerState> {
+export class DeleteVersionPicker extends React.Component<IVersionPickerProps, IVersionPickerState> {
   constructor(props: IVersionPickerProps) {
     super(props);
 
     const { value } = this.props;
 
-    const versionDetails = DestroyVersionList
-        .filter((v: IDestroyVersionConstant) => v.value === value)[0]
+    const versionDetails = DeleteVersionList
+        .filter((v: IDeleteVersionConstant) => v.value === value)[0]
 
     this.state = {
       label: versionDetails.label,

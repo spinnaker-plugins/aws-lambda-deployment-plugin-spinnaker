@@ -6,11 +6,9 @@ import React from 'react';
 import {
   ExecutionDetailsSection,
   ExecutionDetailsTasks,
-  FormikFormField,
   FormikStageConfig,
   FormValidator,
   HelpContentsRegistry,
-  HelpField,
   IExecutionDetailsSectionProps,
   IFormikStageConfigInjectedProps,
   IStage,
@@ -24,7 +22,7 @@ import './LambdaDeleteStage.less';
 
 import { DeleteLambdaFunctionStageForm } from './DeleteLambdaFunctionStageForm';
 
-export function DestroyLambdaExecutionDetails(props: IExecutionDetailsSectionProps) {
+export function DeleteLambdaExecutionDetails(props: IExecutionDetailsSectionProps) {
   const { stage, name, current } = props;
   return (
     <ExecutionDetailsSection name={name} current={current}>
@@ -43,9 +41,9 @@ export function DestroyLambdaExecutionDetails(props: IExecutionDetailsSectionPro
 
   This method returns JSX (https://reactjs.org/docs/introducing-jsx.html) that gets displayed in the Spinnaker UI.
  */
-function DestroyLambdaConfig(props: IStageConfigProps) {
+function DeleteLambdaConfig(props: IStageConfigProps) {
   return (
-    <div className="DestroyLambdaStageConfig">
+    <div className="DeleteLambdaStageConfig">
       <FormikStageConfig
         {...props}
         validate={validate}
@@ -92,8 +90,8 @@ function validate(stageConfig: IStage) {
   return validator.validateForm();
 }
 
-export namespace DestroyLambdaExecutionDetails {
-  export const title = 'Destroy Lambda Stage';
+export namespace DeleteLambdaExecutionDetails {
+  export const title = 'Delete Lambda Stage';
 }
 
 /*
@@ -109,7 +107,7 @@ export const lambdaDeleteStage: IStageTypeConfig = {
   key: 'Aws.LambdaDeleteStage',
   label: `AWS Lambda Delete`,
   description: 'Delete an AWS Lambda Function',
-  component: DestroyLambdaConfig, // stage config
-  executionDetailsSections: [DestroyLambdaExecutionDetails, ExecutionDetailsTasks],
+  component: DeleteLambdaConfig, // stage config
+  executionDetailsSections: [DeleteLambdaExecutionDetails, ExecutionDetailsTasks],
   validateFn: validate,
 };

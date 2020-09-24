@@ -4,30 +4,8 @@
 import React from 'react';
 
 import {
-  AccountService, 
-  FormikFormField,
-  HelpField,
-  IAccount,
-  IAccountDetails, 
-  IFormInputProps,
   IFormikStageConfigInjectedProps,
-  IFunction,
-  IRegion,    
-  ReactSelectInput,
-  StageArtifactSelector,
-  TextInput,
-  useData, 
 } from '@spinnaker/core';
-
-import {  
-  IAmazonFunctionSourceData,
-} from '@spinnaker/amazon';
-
-import {
-  IStrategyConstant,
-  DeploymentStrategyList,
-  DeploymentStrategyPicker,
-} from '../constants';
 
 import {
   retrieveComponent,

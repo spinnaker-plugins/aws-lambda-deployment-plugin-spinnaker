@@ -4,20 +4,11 @@
 import React from 'react';
 
 import {
-  ExecutionDetailsSection,
-  ExecutionDetailsTasks,
-  FormikFormField,
   FormikStageConfig,
-  FormValidator,
-  HelpContentsRegistry,
-  HelpField,
-  IExecutionDetailsSectionProps,
+  FormValidator,  
   IFormikStageConfigInjectedProps,
   IStage,
   IStageConfigProps,
-  IStageTypeConfig,
-  NumberInput,
-  Validators,
 } from '@spinnaker/core';
 
 import './LambdaDeploymentStage.less';
