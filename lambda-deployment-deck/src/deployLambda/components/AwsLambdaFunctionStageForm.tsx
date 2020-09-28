@@ -2,15 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useState } from 'react';
+
 import classNames from 'classnames';
+
+import { Option } from 'react-select';
+
 
 import {
   FormikFormField,
   HelpField,
+  IFormInputProps,
   IFormikStageConfigInjectedProps,
   MapEditorInput,
   NumberInput,
   ReactSelectInput,
+  TetheredCreatable,
   TextInput,
 } from '@spinnaker/core';
 
@@ -22,11 +28,6 @@ import {
   TriggerEventsForm,
 } from '.';
 
-import {
-  AliasForm
-} from './addAlias';
-
-
 export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProps) {
   const { values, errors } = props.formik; 
 
@@ -35,6 +36,10 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
     'alert-danger': !!errors.functionName,
     'alert-info': !errors.functionName,
   }); 
+
+  const onLayerChange = (o: Option, field: any) => {
+    props.formik.setFieldValue(field, o.map((layer: any) => layer.value));
+  }
 
   return (
     <div className="form-horizontal">
@@ -74,6 +79,36 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
       <h4> Settings </h4>
       <FormikFormField name="description" label="Description" input={props => <TextInput {...props} />} />
       <FormikFormField
+        name="layers"
+        label="Layer ARNs"
+        help={<HelpField content="The resource ARNs for Lambda layer. Input the entire ARN and select `Create option TRIGGER-ARN-INPUT` to add the ARN." />}
+        input={(inputProps: IFormInputProps) => (
+          <TetheredCreatable
+            {...inputProps}
+            multi={true}
+            placeholder={
+              "Layer ARN..."
+            }
+            onChange={(e: Option) => {
+                onLayerChange(e, 'layers');
+            }}
+            value={values.layers ?
+              values.layers
+                .map((layer: string) => ({value: layer, label:layer})) :
+              []
+            }
+          />
+        )}
+        required={false}
+      />
+      <FormikFormField
+        name="reservedConcurrentExecutions"
+        label="Reserved Concurrency"
+        help={<HelpField content="The total number of current executions of your Lambda function that can be instantiated at any time." />}
+        input={props => <NumberInput {...props} max={3000} />}
+        required={false}
+      />
+      <FormikFormField
         name="memorySize" 
         label="Memory (MB)"
         help={<HelpField id="aws.functionBasicSettings.memorySize" />}
@@ -85,20 +120,13 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
         help={<HelpField id="aws.functionBasicSettings.timeout" />}
         input={props => <NumberInput {...props} min={1} max={900} />}
       />
-      <FormikFormField name="targetGroups" label="Target Group Name" input={props => <TextInput {...props} />} />
-
+      
       <h4> Lambda@Edge </h4>
       < LambdaAtEdgeForm {...props} />
       
       <h4> Network </h4>
       < NetworkForm {...props} />
 
-      <h4> Event Triggers </h4>
-      < TriggerEventsForm {...props} />      
-      {/* 
-      <h4> Aliases </h4>
-      < AliasForm {...props} />
-      */}
       <h4> Debugging and Error Handling </h4>
       Dead Letter Config
       <FormikFormField

@@ -6,12 +6,14 @@ import React from 'react';
 import {
   AccountService, 
   FormikFormField,
+  HelpField,
   IAccount,
   IAccountDetails, 
   IFormInputProps,
   IFormikStageConfigInjectedProps,
   IFunction,
-  IRegion,    
+  IRegion,
+  NumberInput, 
   ReactSelectInput,
   TextInput,
   useData, 
@@ -25,6 +27,10 @@ import {
 import {
   DeploymentStrategyForm,
 } from './components/DeploymentStrategyForm';
+
+import {
+  TriggerEventsForm
+} from './TriggerEventsForm';
 
 export function RouteLambdaFunctionStageForm(props: IFormikStageConfigInjectedProps) {
   const { values, errors } = props.formik; 
@@ -124,6 +130,7 @@ export function RouteLambdaFunctionStageForm(props: IFormikStageConfigInjectedPr
       <FormikFormField
         label="Strategy"
         name="deploymentStrategy"
+        help={<HelpField content="" />}
         input={(inputProps: IFormInputProps) => (
           <ReactSelectInput
             {...inputProps}
@@ -139,6 +146,18 @@ export function RouteLambdaFunctionStageForm(props: IFormikStageConfigInjectedPr
           />
         )}
       />
+ 
+      <h4> Alias Settings </h4>  
+      < TriggerEventsForm {...props} />     
+
+      <FormikFormField
+        name="provisionedConcurrentExecutions"
+        label="Provisioned Concurrency"
+        help={<HelpField content="To enable your function to scale without fluctuations in latency, use provisioned concurrency. Provisioned concurrency runs continually and has separate pricing for concurrency and execution duration." />}
+        input={props => <NumberInput {...props} max={3000} />}
+        required={false}
+      />
+       
       { values.deploymentStrategy ?
         <div>
           <h4> Strategy Settings </h4>
