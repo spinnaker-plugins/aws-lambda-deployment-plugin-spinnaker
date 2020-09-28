@@ -25,6 +25,7 @@ public class LambdaStageConstants {
     public static final String lambaCodeUpdatedKey = "lambdaCodeUpdated";
     public static final String lambaConfigurationUpdatedKey = "lambdaConfigUpdated";
     public static final String lambaVersionPublishedKey = "lambdaVersionPublished";
+    public static final String lambaPutConcurrencyKey = "lambdaPutConcurrency";
 
     public static final String createdUrlKey = "createdUrl";
     public static final String updateCodeUrlKey = "updateCodeUrl";
@@ -36,5 +37,5 @@ public class LambdaStageConstants {
     public static final String originalRevisionIdKey = "originalRevisionId";
     public static final String newRevisionIdKey = "newRevisionId";
 
-    public static List<String> allUrlKeys = List.of(createdUrlKey, updateCodeUrlKey, updateConfigUrlKey, updateEventUrlKey, publishVersionUrlKey);
+    public static List<String> allUrlKeys = List.of(createdUrlKey, updateCodeUrlKey, updateConfigUrlKey, updateEventUrlKey, publishVersionUrlKey, lambaPutConcurrencyKey);
 }

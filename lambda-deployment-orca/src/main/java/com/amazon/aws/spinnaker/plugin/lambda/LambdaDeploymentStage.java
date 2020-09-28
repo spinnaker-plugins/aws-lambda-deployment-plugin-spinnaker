@@ -18,10 +18,7 @@
 package com.amazon.aws.spinnaker.plugin.lambda;
 
 import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.LambdaUpdateEventConfigurationTask;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaCreateTask;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaPublishVersionTask;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaUpdateCodeTask;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaUpdateConfigurationTask;
+import com.amazon.aws.spinnaker.plugin.lambda.upsert.*;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.LambdaCacheRefreshTask;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.LambdaVerificationTask;
 import com.netflix.spinnaker.orca.api.pipeline.graph.StageDefinitionBuilder;
@@ -50,6 +47,7 @@ public class LambdaDeploymentStage implements StageDefinitionBuilder {
         builder.withTask("lambdaUpdateCodeTask", LambdaUpdateCodeTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
         builder.withTask("lambdaUpdateConfigTask", LambdaUpdateConfigurationTask.class);
+        builder.withTask("lambdaPutConcurrencyTask", LambdaPutConcurrencyTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
         builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
         builder.withTask("lambdaPublishVersionTask", LambdaPublishVersionTask.class);

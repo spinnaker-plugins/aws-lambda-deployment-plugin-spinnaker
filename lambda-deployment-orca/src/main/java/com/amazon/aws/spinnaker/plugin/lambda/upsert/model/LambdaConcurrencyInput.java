@@ -13,37 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package com.amazon.aws.spinnaker.plugin.lambda.upsert.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.List;
 
 @Data
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LambdaDeploymentInput {
-    private static Logger logger = LoggerFactory.getLogger(LambdaDeploymentInput.class);
-    private String account, region, functionName, runtime, s3bucket, s3key, handler, role, credentials, description, appName;
-    int memorySize;
-    int timeout;
-    Boolean publish;
-
-    HashMap<String, String> envVariables;
-    HashMap<String, String> tags;
-    HashMap<String, String> deadLetterConfig;
-    HashMap<String, String> tracingConfig;
-    List<String> subnetIds;
-    List<String> securityGroupIds;
-    List<String> layers;
-
-    String targetGroups;
-    String kmskeyArn;
+public class LambdaConcurrencyInput {
+    private String account, appName, credentials,region ,functionName;
+    private String qualifier, concurrencyQualifier;
+    private int reservedConcurrentExecutions, provisionedConcurrentExecutions;
 }

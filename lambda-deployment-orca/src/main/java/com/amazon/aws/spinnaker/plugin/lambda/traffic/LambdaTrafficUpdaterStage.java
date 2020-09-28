@@ -18,6 +18,7 @@
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaPublishVersionTask;
+import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaPutConcurrencyTask;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.LambdaVerificationTask;
 import com.netflix.spinnaker.orca.api.pipeline.graph.StageDefinitionBuilder;
 import com.netflix.spinnaker.orca.api.pipeline.graph.TaskNode;
@@ -41,6 +42,7 @@ public class LambdaTrafficUpdaterStage implements StageDefinitionBuilder {
     public void taskGraph(@Nonnull StageExecution stage, @Nonnull TaskNode.Builder builder) {
         logger.debug("taskGraph for Aws.LambdaTrafficUpdateStage");
         builder.withTask("lambdaTrafficUpdateTask", LambdaTrafficUpdateTask.class);
+        builder.withTask("lambdaPutConcurrencyTask", LambdaPutConcurrencyTask.class);
         builder.withTask("lambdaTrafficUpdateVerificationTask", LambdaTrafficUpdateVerificationTask.class);
     }
 }

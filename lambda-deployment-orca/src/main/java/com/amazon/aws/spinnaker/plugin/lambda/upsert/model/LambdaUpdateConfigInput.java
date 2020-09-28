@@ -38,6 +38,7 @@ public class LambdaUpdateConfigInput {
     private HashMap<String, String> tracingConfig;
     private List<String> subnetIds;
     private List<String> securityGroupIds;
+    private List<String> layers;
 
     private String targetGroups;
     private String encryptionKMSKeyArn;

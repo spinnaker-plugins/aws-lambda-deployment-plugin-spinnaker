@@ -21,10 +21,7 @@ import com.amazon.aws.spinnaker.plugin.lambda.delete.LambdaDeleteTask;
 import com.amazon.aws.spinnaker.plugin.lambda.delete.LambdaDeleteVerificationTask;
 import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.LambdaUpdateEventConfigurationTask;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.*;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaPublishVersionTask;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaUpdateConfigurationTask;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaUpdateCodeTask;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaCreateTask;
+import com.amazon.aws.spinnaker.plugin.lambda.upsert.*;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.LambdaCacheRefreshTask;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.LambdaVerificationTask;
@@ -61,6 +58,7 @@ public class LambdaSpringLoaderPlugin extends SpringLoaderPlugin {
                 Pair.of("Aws.LambdaDeleteStage", LambdaDeleteStage.class),
                 Pair.of("lambdaTrafficUpdateTask", LambdaTrafficUpdateTask.class),
                 Pair.of("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class),
+                Pair.of("lambdaPutConcurrencyTask", LambdaPutConcurrencyTask.class),
                 Pair.of("lambdaTrafficUpdateVerificationTask", LambdaTrafficUpdateVerificationTask.class),
                 Pair.of("lambdaUpdateEventConfigurationTask", LambdaUpdateEventConfigurationTask.class),
                 Pair.of("trafficUpdateStrategyInjector", TrafficUpdateStrategyInjector.class),
