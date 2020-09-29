@@ -21,11 +21,11 @@ import java.util.List;
 
 public class LambdaStageConstants {
 
-    public static final String lambaCreatedKey = "lambdaCreated";
-    public static final String lambaCodeUpdatedKey = "lambdaCodeUpdated";
-    public static final String lambaConfigurationUpdatedKey = "lambdaConfigUpdated";
-    public static final String lambaVersionPublishedKey = "lambdaVersionPublished";
-    public static final String lambaPutConcurrencyKey = "lambdaPutConcurrency";
+    public static final String lambaCreatedKey = "lambdaCreatedTaskUrl";
+    public static final String lambaCodeUpdatedKey = "lambdaCodeUpdatedTaskUrl";
+    public static final String lambaConfigurationUpdatedKey = "lambdaConfigUpdatedTaskUrl";
+    public static final String lambaVersionPublishedKey = "lambdaVersionPublishedTaskUrl";
+    public static final String lambaPutConcurrencyKey = "lambdaPutConcurrencyTaskUrl";
 
     public static final String createdUrlKey = "createdUrl";
     public static final String updateCodeUrlKey = "updateCodeUrl";

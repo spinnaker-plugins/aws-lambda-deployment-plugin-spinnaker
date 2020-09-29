@@ -107,7 +107,6 @@ public class LambdaCloudDriverUtils {
                 .build();
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
-        Map xx = new HashMap<String, String>();
         try {
             Response response = call.execute();
             String respString = response.body().string();

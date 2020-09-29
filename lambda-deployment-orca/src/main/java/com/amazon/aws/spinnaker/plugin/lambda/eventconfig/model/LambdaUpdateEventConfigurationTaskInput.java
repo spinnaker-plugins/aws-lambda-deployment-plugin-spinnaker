@@ -30,5 +30,6 @@ public class LambdaUpdateEventConfigurationTaskInput {
     private String appName, credentials, account, functionName, region;
     private List<String> triggerArns;
     private int batchsize;
+    private String aliasName, qualifier;
     private List<LambdaEventConfigurationDescription> eventConfigurationInputList;
 }

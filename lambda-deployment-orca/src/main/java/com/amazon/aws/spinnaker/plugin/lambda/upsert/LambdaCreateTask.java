@@ -84,8 +84,8 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
         String rawString = utils.asString(ldi);
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
-        LambdaCloudOperationOutput xx = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
-        return xx;
+        LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
+        return operationOutput;
     }
 
     @Nullable

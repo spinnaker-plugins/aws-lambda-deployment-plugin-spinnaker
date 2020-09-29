@@ -88,8 +88,8 @@ public class LambdaPublishVersionTask implements LambdaStageBaseTask {
         inp.setRevisionId(revisionId);
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
-        LambdaCloudOperationOutput xx = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
-        return xx;
+        LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
+        return operationOutput;
     }
 
     @Nullable

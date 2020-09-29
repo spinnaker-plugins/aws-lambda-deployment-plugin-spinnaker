@@ -70,8 +70,8 @@ public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
         String endPoint = cloudDriverUrl + CLOUDDRIVER_RESERVED_CONCURRENCY_PATH;
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
-        LambdaCloudOperationOutput xx = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
-        return xx;
+        LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
+        return operationOutput;
     }
 
     private LambdaCloudOperationOutput putProvisionedConcurrency(LambdaConcurrencyInput inp) {
@@ -80,8 +80,8 @@ public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
         String endPoint = cloudDriverUrl + CLOUDDRIVER_PROVISIONED_CONCURRENCY_PATH;
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
-        LambdaCloudOperationOutput xx = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
-        return xx;
+        LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
+        return operationOutput;
     }
 
     private LambdaCloudOperationOutput updateConcurrency(LambdaConcurrencyInput inp) {

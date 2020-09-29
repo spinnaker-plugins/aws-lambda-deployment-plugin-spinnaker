@@ -18,7 +18,6 @@
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
-import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaBaseStrategyInput;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaTrafficUpdateInput;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaWeightedStrategyInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
@@ -42,12 +41,12 @@ public class WeightedDeploymentStrategy extends BaseDeploymentStrategy<LambdaWei
     @Override
     public LambdaCloudOperationOutput deploy(LambdaWeightedStrategyInput inp) {
         String cloudDriverUrl = props.getCloudDriverBaseUrl();
-        Map<String, Object> outputMap  = new HashMap<String, Object>();
+        Map<String, Object> outputMap  = new HashMap<>();
         outputMap.put("majorVersionDeployed", inp.getMajorFunctionVersion());
         outputMap.put("minorVersionDeployed", inp.getMinorFunctionVersion());
         outputMap.put("aliasDeployed", inp.getAliasName());
         outputMap.put("strategyUsed", "WeightedDeploymentStrategy");
-        // TODO: Form a new inputobject such as SimpleStrategyInput and just have the
+        // TODO: Form a new inputObject such as SimpleStrategyInput and just have the
         LambdaCloudOperationOutput out = postToCloudDriver(inp, cloudDriverUrl, utils);
         out.setOutputMap(outputMap);
         return out;
@@ -70,5 +69,5 @@ public class WeightedDeploymentStrategy extends BaseDeploymentStrategy<LambdaWei
     @Override
     public LambdaCloudDriverUtils getUtils() {
         return utils;
-    };
+    }
 }
