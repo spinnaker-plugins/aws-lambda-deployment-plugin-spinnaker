@@ -24,6 +24,6 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LambdaConcurrencyInput {
     private String account, appName, credentials,region ,functionName;
-    private String qualifier, concurrencyQualifier;
+    private String qualifier, aliasName;
     private int reservedConcurrentExecutions, provisionedConcurrentExecutions;
 }

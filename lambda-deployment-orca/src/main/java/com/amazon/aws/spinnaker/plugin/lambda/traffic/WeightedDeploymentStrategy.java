@@ -57,7 +57,7 @@ public class WeightedDeploymentStrategy extends BaseDeploymentStrategy<LambdaWei
     public LambdaWeightedStrategyInput setupInput(StageExecution stage) {
         LambdaTrafficUpdateInput aliasInp = utils.getInput(stage, LambdaTrafficUpdateInput.class);
         LambdaWeightedStrategyInput weightedInput = utils.getInput(stage, LambdaWeightedStrategyInput.class);
-
+        weightedInput.setAppName(stage.getExecution().getApplication());
         weightedInput.setAccount(aliasInp.getAccount());
         weightedInput.setCredentials(aliasInp.getAccount());
 

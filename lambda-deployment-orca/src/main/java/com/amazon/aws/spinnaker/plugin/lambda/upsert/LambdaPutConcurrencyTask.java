@@ -75,7 +75,7 @@ public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
     }
 
     private LambdaCloudOperationOutput putProvisionedConcurrency(LambdaConcurrencyInput inp) {
-        inp.setQualifier(inp.getConcurrencyQualifier());
+        inp.setQualifier(inp.getAliasName());
         String rawString = utils.asString(inp);
         String endPoint = cloudDriverUrl + CLOUDDRIVER_PROVISIONED_CONCURRENCY_PATH;
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
@@ -87,7 +87,7 @@ public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
     private LambdaCloudOperationOutput updateConcurrency(LambdaConcurrencyInput inp) {
         inp.setCredentials(inp.getAccount());
         if (inp.getProvisionedConcurrentExecutions() != 0 &&
-                StringUtils.isNotNullOrEmpty(inp.getConcurrencyQualifier())) {
+                StringUtils.isNotNullOrEmpty(inp.getAliasName())) {
             return putProvisionedConcurrency(inp);
         }
         if (inp.getReservedConcurrentExecutions() != 0) {

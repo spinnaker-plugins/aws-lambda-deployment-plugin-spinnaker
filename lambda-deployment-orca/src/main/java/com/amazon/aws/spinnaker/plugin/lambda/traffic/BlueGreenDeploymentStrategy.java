@@ -17,6 +17,7 @@
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
+import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.LambdaUpdateEventConfigurationTask;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.*;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
@@ -26,6 +27,8 @@ import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +39,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBlueGreenStrategyInput> {
-
+    private static final Logger logger = LoggerFactory.getLogger(BlueGreenDeploymentStrategy.class);
     @Autowired
     private LambdaCloudDriverUtils utils;
 
@@ -69,10 +72,11 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
                 break;
             }
             try {
-                Thread.sleep(sleepTime);
+                utils.await();
                 timeout -= sleepTime;
             }
-            catch (Exception e) {
+            catch (Throwable e) {
+                logger.error("Error waiting for blue green test to complete");
                 continue;
             }
         }
@@ -106,6 +110,7 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
 
         LambdaTrafficUpdateInput aliasInp = utils.getInput(stage, LambdaTrafficUpdateInput.class);
         LambdaBlueGreenStrategyInput blueGreenInput = utils.getInput(stage, LambdaBlueGreenStrategyInput.class);
+        aliasInp.setAppName(stage.getExecution().getApplication());
 
         blueGreenInput.setCredentials(aliasInp.getAccount());
         blueGreenInput.setAppName(stage.getExecution().getApplication());
