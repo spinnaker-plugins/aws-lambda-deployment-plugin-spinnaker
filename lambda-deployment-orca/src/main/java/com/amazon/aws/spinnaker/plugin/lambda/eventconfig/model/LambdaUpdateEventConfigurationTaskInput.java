@@ -1,7 +1,7 @@
 /*
- * Copyright 2020 Netflix, Inc.
+ * Copyright 2018 Amazon.com, Inc. or its affiliates.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.amazon.aws.spinnaker.plugin.lambda.eventconfig.model;
+packagee com.amazon.aws.spinnaker.plugin.lambda.eventconfig.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;

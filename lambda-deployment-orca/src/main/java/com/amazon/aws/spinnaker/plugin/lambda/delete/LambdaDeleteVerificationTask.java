@@ -1,7 +1,7 @@
 /*
- * Copyright 2020 Netflix, Inc.
+ * Copyright 2018 Amazon.com, Inc. or its affiliates.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -58,7 +58,6 @@ public class LambdaDeleteVerificationTask implements LambdaStageBaseTask {
         }
         Map<String, Object> outputMap = new HashMap<>();
         outputMap.put("message", "Lambda (Version) Deletion succeeded");
-        // TODO: Put exact version numbers that were deleted here...
         stage.getOutputs().putAll(outputMap);
         return TaskResult.builder(ExecutionStatus.SUCCEEDED).outputs(outputMap).build();
     }

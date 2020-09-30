@@ -1,7 +1,7 @@
 /*
- * Copyright 2020 Netflix, Inc.
+ * Copyright 2018 Amazon.com, Inc. or its affiliates.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -93,7 +93,6 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
         return ldso;
     }
 
-
     private String getVersion(StageExecution stage, LambdaDeleteStageInput ldi) {
         if (ldi.getVersion() == null) {
             return null;
@@ -120,8 +119,5 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
         LambdaCloudOperationOutput resp = LambdaCloudOperationOutput.builder().url(url).build();
         return resp;
     }
-
-
-
 }
 

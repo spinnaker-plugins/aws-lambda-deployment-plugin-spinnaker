@@ -18,7 +18,6 @@ package com.amazon.aws.spinnaker.plugin.lambda.upsert;
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaConcurrencyInput;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaPublisVersionInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaStageConstants;
@@ -60,9 +59,21 @@ public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
         if ((inp.getProvisionedConcurrentExecutions() == 0)  && (inp.getReservedConcurrentExecutions() == 0)){
             return formSuccessTaskResult(stage, "Lambda concurrency : nothing to update");
         }
-        LambdaCloudOperationOutput output = updateConcurrency(inp);
+        LambdaCloudOperationOutput output = putConcurrency(inp);
         Map<String, Object> context = buildContextOutput(output,  LambdaStageConstants.lambaPutConcurrencyKey);
         return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
+    }
+
+    private LambdaCloudOperationOutput putConcurrency(LambdaConcurrencyInput inp) {
+        inp.setCredentials(inp.getAccount());
+        if (inp.getProvisionedConcurrentExecutions() != 0 &&
+                StringUtils.isNotNullOrEmpty(inp.getAliasName())) {
+            return putProvisionedConcurrency(inp);
+        }
+        if (inp.getReservedConcurrentExecutions() != 0) {
+            return putReservedConcurrency(inp);
+        }
+        return LambdaCloudOperationOutput.builder().build();
     }
 
     private LambdaCloudOperationOutput putReservedConcurrency( LambdaConcurrencyInput inp) {
@@ -82,18 +93,6 @@ public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
         String url = cloudDriverUrl + respObj.getResourceUri();
         LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
         return operationOutput;
-    }
-
-    private LambdaCloudOperationOutput updateConcurrency(LambdaConcurrencyInput inp) {
-        inp.setCredentials(inp.getAccount());
-        if (inp.getProvisionedConcurrentExecutions() != 0 &&
-                StringUtils.isNotNullOrEmpty(inp.getAliasName())) {
-            return putProvisionedConcurrency(inp);
-        }
-        if (inp.getReservedConcurrentExecutions() != 0) {
-            return putReservedConcurrency(inp);
-        }
-        return LambdaCloudOperationOutput.builder().build();
     }
 
     @Nullable
