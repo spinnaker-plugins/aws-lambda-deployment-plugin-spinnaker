@@ -127,6 +127,20 @@ export function RouteLambdaFunctionStageForm(props: IFormikStageConfigInjectedPr
           < TextInput {...inputProps} />
         )}
       />
+      
+      <h4> Alias Settings </h4>  
+      < TriggerEventsForm {...props} />     
+
+      <FormikFormField
+        name="provisionedConcurrentExecutions"
+        label="Provisioned Concurrency"
+        help={<HelpField content="To enable your function to scale without fluctuations in latency, use provisioned concurrency. Provisioned concurrency runs continually and has separate pricing for concurrency and execution duration." />}
+        input={props => <NumberInput {...props} max={3000} />}
+        required={false}
+      />
+      
+
+      <h4> Deployment Strategy </h4>
       <FormikFormField
         label="Strategy"
         name="deploymentStrategy"
@@ -145,24 +159,10 @@ export function RouteLambdaFunctionStageForm(props: IFormikStageConfigInjectedPr
             )}
           />
         )}
-      />
- 
-      <h4> Alias Settings </h4>  
-      < TriggerEventsForm {...props} />     
-
-      <FormikFormField
-        name="provisionedConcurrentExecutions"
-        label="Provisioned Concurrency"
-        help={<HelpField content="To enable your function to scale without fluctuations in latency, use provisioned concurrency. Provisioned concurrency runs continually and has separate pricing for concurrency and execution duration." />}
-        input={props => <NumberInput {...props} max={3000} />}
-        required={false}
-      />
-       
-      { values.deploymentStrategy ?
-        <div>
-          <h4> Strategy Settings </h4>
-          < DeploymentStrategyForm {...props} /> 
-        </div> : null
+      /> 
+      { values.deploymentStrategy ? 
+        < DeploymentStrategyForm {...props} /> 
+        : null
       }
     </div>
   );

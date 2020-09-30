@@ -4,16 +4,32 @@
 import React from 'react';
 
 import {
+  ArtifactTypePatterns,
   CheckboxInput,
+  excludeAllTypesExcept,
   FormikFormField,
+  IArtifact,
+  IExpectedArtifact,
   IFormInputProps, 
   IFormikStageConfigInjectedProps,
-  NumberInput,
   JsonEditor,
+  NumberInput,
+  StageArtifactSelectorDelegate,
 } from '@spinnaker/core';
 
 export function InvokeLambdaHealthCheck(props: IFormikStageConfigInjectedProps) {
   const { values, errors } = props.formik;
+
+  const excludedArtifactTypes = excludeAllTypesExcept(
+    ArtifactTypePatterns.BITBUCKET_FILE,
+    ArtifactTypePatterns.CUSTOM_OBJECT,
+    ArtifactTypePatterns.EMBEDDED_BASE64,
+    ArtifactTypePatterns.GCS_OBJECT,
+    ArtifactTypePatterns.GITHUB_FILE,
+    ArtifactTypePatterns.GITLAB_FILE,
+    ArtifactTypePatterns.S3_OBJECT,
+    ArtifactTypePatterns.HTTP_FILE,
+  );
 
   const onPayloadChange = ( fieldValue: any): void => {
     props.formik.setFieldValue("lambdaPayload", fieldValue);
@@ -21,6 +37,28 @@ export function InvokeLambdaHealthCheck(props: IFormikStageConfigInjectedProps) 
 
   const onOutputChange = ( fieldValue: any): void => {
     props.formik.setFieldValue("lambdaOutput", fieldValue);
+  };
+
+  const onTemplateArtifactEdited = (artifact: IArtifact, name: string) => {
+    props.formik.setFieldValue(`${name}.id`, null);
+    props.formik.setFieldValue(`${name}.artifact`, artifact);
+    props.formik.setFieldValue(`${name}.account`, artifact.artifactAccount);
+  };
+
+  const onTemplateArtifactSelected = (id: string, name: string) => {
+    props.formik.setFieldValue(`${name}.id`, id);
+    props.formik.setFieldValue(`${name}.artifact`, null);
+  };
+
+  const getInputArtifact = (stage: any, name: string) => {
+    if (!stage[name]) {
+      return {
+        account: '',
+        id: '',
+      };
+    } else {
+      return stage[name];
+    }
   };
 
   return (
@@ -36,21 +74,38 @@ export function InvokeLambdaHealthCheck(props: IFormikStageConfigInjectedProps) 
         name="timeout"
         label="Timeout"
         input={props => <NumberInput {...props} min={0} max={900} />}
+      /> 
+      <StageArtifactSelectorDelegate
+        artifact={getInputArtifact(values, 'payloadArtifact').artifact}
+        excludedArtifactTypePatterns={excludedArtifactTypes}
+        expectedArtifactId={getInputArtifact(values, 'payloadArtifact').id}
+        label="Payload Artifact"
+        onArtifactEdited={artifact => {
+          onTemplateArtifactEdited(artifact, 'payloadArtifact');
+        }}
+        helpKey={''}
+        onExpectedArtifactSelected={(artifact: IExpectedArtifact) =>
+          onTemplateArtifactSelected(artifact.id, 'payloadrtifact')
+        }
+        pipeline={props.pipeline}
+        stage={values}
       />
-      <FormikFormField
-        name="lambdaPayload"
-        label="Payload"
-        input={(inputProps: IFormInputProps) => (
-          <JsonEditor value={values.lambdaPayload} onChange={onPayloadChange} />
-        )}
+      <StageArtifactSelectorDelegate
+        artifact={getInputArtifact(values, 'outputArtifact').artifact}
+        excludedArtifactTypePatterns={excludedArtifactTypes}
+        expectedArtifactId={getInputArtifact(values, 'outputArtifact').id}
+        label="Output Artifact"
+        onArtifactEdited={artifact => {
+          onTemplateArtifactEdited(artifact, 'outputArtifact');
+        }}
+        helpKey={''}
+        onExpectedArtifactSelected={(artifact: IExpectedArtifact) =>
+          onTemplateArtifactSelected(artifact.id, 'outputArtifact')
+        }
+        pipeline={props.pipeline}
+        stage={values}
       />
-      <FormikFormField
-        name="lambdaOutput"
-        label="Expected Output"
-        input={(inputProps: IFormInputProps) => (
-          <JsonEditor value={values.lambdaOutput} onChange={onOutputChange} />
-        )}
-      />
+ 
     </div>
   )
 }

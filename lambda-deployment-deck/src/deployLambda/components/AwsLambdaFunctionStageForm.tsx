@@ -59,18 +59,29 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
       <h4> Execution Role </h4>
       < ExecutionRoleForm {...props} />
 
+      <h4> Lambda@Edge </h4>
+      < LambdaAtEdgeForm {...props} />
+
       <h4> Environment </h4>
-      <FormikFormField
-        name="envVariables"
-        label="Env Variables"
-        input={props => <MapEditorInput {...props} allowEmptyValues={true} addButtonLabel="Add" />}
-      />
-      <FormikFormField
-        name="encryptionKMSKeyArn"
-        label="Key ARN"
-        help={<HelpField id="aws.function.kmsKeyArn" />}
-        input={props => <TextInput {...props} />}
-      />
+      { values.enableLambdaAtEdge !== true ?
+        <>
+          <FormikFormField
+            name="envVariables"
+            label="Env Variables"
+            input={props => <MapEditorInput {...props} allowEmptyValues={true} addButtonLabel="Add" />}
+          /> 
+          <FormikFormField
+            name="encryptionKMSKeyArn"
+            label="Key ARN"
+            help={<HelpField id="aws.function.kmsKeyArn" />}
+            input={props => <TextInput {...props} />}
+          /> 
+        </> :
+        <div className="horizontal center">
+          Environment variables not available with Lambda@Edge functions.
+        </div>
+      }
+
       <h4> Tags </h4>
       <FormikFormField
         name="tags"
@@ -112,20 +123,22 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
         name="memorySize" 
         label="Memory (MB)"
         help={<HelpField id="aws.functionBasicSettings.memorySize" />}
-        input={props => <NumberInput {...props} min={128} max={3008} />}
+        input={props => <NumberInput {...props} min={128} max={ values.enableLambdaAtEdge === true ? 128 : 3008 } />}
       />
       <FormikFormField
         name="timeout"
         label="Timeout (seconds)"
         help={<HelpField id="aws.functionBasicSettings.timeout" />}
-        input={props => <NumberInput {...props} min={1} max={900} />}
+        input={props => <NumberInput {...props} min={1} max={ values.enableLambdaAtEdge === true ? 5 : 900 } />}
       />
-      
-      <h4> Lambda@Edge </h4>
-      < LambdaAtEdgeForm {...props} />
-      
+       
       <h4> Network </h4>
-      < NetworkForm {...props} />
+      { values.enableLambdaAtEdge !== true ?
+        < NetworkForm {...props} /> : 
+        <div className="horizontal center">
+          VPC configuration not available with Lambda@Edge functions.
+        </div>
+      }
 
       <h4> Debugging and Error Handling </h4>
       Dead Letter Config
