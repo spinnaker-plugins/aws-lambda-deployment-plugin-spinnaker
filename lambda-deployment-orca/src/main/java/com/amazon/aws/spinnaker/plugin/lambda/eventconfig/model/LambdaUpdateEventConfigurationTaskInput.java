@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-packagee com.amazon.aws.spinnaker.plugin.lambda.eventconfig.model;
+package com.amazon.aws.spinnaker.plugin.lambda.eventconfig.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
