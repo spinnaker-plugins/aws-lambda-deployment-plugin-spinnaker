@@ -19,9 +19,7 @@ package com.amazon.aws.spinnaker.plugin.lambda.upsert;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaDeploymentInput;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaPublisVersionInput;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaUpdateConfigInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
@@ -35,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -71,7 +68,7 @@ public class LambdaPublishVersionTask implements LambdaStageBaseTask {
             return false;
         LambdaGetInput lgi = utils.getInput(stage, LambdaGetInput.class);
         lgi.setAppName(stage.getExecution().getApplication());
-        LambdaGetOutput lf = utils.retrieveLambda(lgi);
+        LambdaDefinition lf = utils.retrieveLambda(lgi);
         String newRevisionId = lf.getRevisionId();
         String origRevisionId = (String)stage.getContext().get(LambdaStageConstants.originalRevisionIdKey);
         stage.getContext().put(LambdaStageConstants.newRevisionIdKey, newRevisionId);

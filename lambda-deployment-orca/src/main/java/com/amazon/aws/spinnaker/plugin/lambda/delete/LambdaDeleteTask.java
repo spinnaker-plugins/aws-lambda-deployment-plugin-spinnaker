@@ -21,7 +21,7 @@ import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
 import com.amazon.aws.spinnaker.plugin.lambda.delete.model.LambdaDeleteStageInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
-import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaGetOutput;
+import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
@@ -106,7 +106,7 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
             return ldi.getVersionNumber();
         }
 
-        LambdaGetOutput lf = utils.findLambda(stage);
+        LambdaDefinition lf = utils.findLambda(stage);
         return utils.getCanonicalVersion(lf, ldi.getVersion(), ldi.getVersionNumber(), ldi.getRetentionNumber());
     }
 

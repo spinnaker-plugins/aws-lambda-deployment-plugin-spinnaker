@@ -61,7 +61,7 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
         LambdaGetInput lgi = utils.getInput(stage, LambdaGetInput.class);
         lgi.setAppName(stage.getExecution().getApplication());
         Map<String, Object> context = null;
-        LambdaGetOutput lf = utils.retrieveLambda(lgi);
+        LambdaDefinition lf = utils.retrieveLambda(lgi);
         if (lf != null) {
             logger.debug("noOp. Lambda already exists. only needs updating.");
             context = new HashMap<String, Object>();

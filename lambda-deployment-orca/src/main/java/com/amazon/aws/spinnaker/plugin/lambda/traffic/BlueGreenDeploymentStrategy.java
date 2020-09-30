@@ -17,14 +17,11 @@
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
-import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.LambdaUpdateEventConfigurationTask;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.*;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
-import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaGetOutput;
+import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
-import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
-import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import org.slf4j.Logger;
@@ -33,9 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBlueGreenStrategyInput> {
@@ -115,7 +110,7 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
         blueGreenInput.setCredentials(aliasInp.getAccount());
         blueGreenInput.setAppName(stage.getExecution().getApplication());
 
-        LambdaGetOutput lf = null;
+        LambdaDefinition lf = null;
         lf = utils.findLambda(stage, true);
 
         String qual = utils.getCanonicalVersion(lf, "$LATEST", "", 1);

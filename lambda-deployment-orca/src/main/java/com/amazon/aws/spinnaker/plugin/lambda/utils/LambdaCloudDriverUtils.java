@@ -26,12 +26,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
-import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import okhttp3.*;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,11 +116,11 @@ public class LambdaCloudDriverUtils {
     }
 
     public boolean lambdaExists(LambdaGetInput inp) {
-        LambdaGetOutput thisLambda = retrieveLambda(inp);
+        LambdaDefinition thisLambda = retrieveLambda(inp);
         return thisLambda != null;
     }
 
-    public LambdaGetOutput retrieveLambda(LambdaGetInput inp) {
+    public LambdaDefinition retrieveLambda(LambdaGetInput inp) {
         //{{clouddriver_url}}/functions?functionName=a1-json_simple_lambda_222&region=us-west-2&account=aws-managed-1
         logger.debug("Retrieve Lambda");
         String cloudDriverUrl =  props.getCloudDriverBaseUrl();
@@ -150,7 +147,7 @@ public class LambdaCloudDriverUtils {
             }
             logger.debug("Found a function");
             String respString = response.body().string();
-            LambdaGetOutput lambdaDef = this.asObjectFromList(respString, LambdaGetOutput.class);
+            LambdaDefinition lambdaDef = this.asObjectFromList(respString, LambdaDefinition.class);
             return lambdaDef;
         }
         catch (Exception e) {
@@ -209,7 +206,7 @@ public class LambdaCloudDriverUtils {
         }
     }
 
-    public String getCanonicalVersion(LambdaGetOutput lf, String inputVersion, String versionNumber, int retentionNumber) {
+    public String getCanonicalVersion(LambdaDefinition lf, String inputVersion, String versionNumber, int retentionNumber) {
         List<String> revisions = getSortedRevisions(lf);
 
         if (inputVersion.startsWith("$PROVIDED")) {  // actual version
@@ -242,7 +239,7 @@ public class LambdaCloudDriverUtils {
         return null;
     }
 
-    public List<String> getSortedRevisions(LambdaGetOutput lf) {
+    public List<String> getSortedRevisions(LambdaDefinition lf) {
         List<String> revisions =  lf.getRevisions().values().stream().collect(Collectors.toList());
         List<Integer> revInt = revisions.stream()
                                         .filter(x -> { return NumberUtils.isCreatable(x); })
@@ -254,15 +251,15 @@ public class LambdaCloudDriverUtils {
         return answers;
     }
 
-    public LambdaGetOutput findLambda(StageExecution stage) {
+    public LambdaDefinition findLambda(StageExecution stage) {
         return findLambda(stage, false);
     }
 
-    public LambdaGetOutput findLambda(StageExecution stage, boolean shouldRetry) {
+    public LambdaDefinition findLambda(StageExecution stage, boolean shouldRetry) {
         LambdaGetInput lgi = this.getInput(stage, LambdaGetInput.class);
         lgi.setAppName(stage.getExecution().getApplication());
         //LambdaGetOutput lf = (LambdaGetOutput)stage.getContext().get(LambdaStageConstants.lambdaObjectKey);
-        LambdaGetOutput lf = this.retrieveLambda(lgi);
+        LambdaDefinition lf = this.retrieveLambda(lgi);
         int count = 0;
         while (lf == null && count < 5 && shouldRetry == true) {
             count++;

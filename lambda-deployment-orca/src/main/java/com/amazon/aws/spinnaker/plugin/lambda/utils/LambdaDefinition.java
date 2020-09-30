@@ -30,7 +30,7 @@ import java.util.Map;
 @Data
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LambdaGetOutput  extends FunctionConfiguration {
+public class LambdaDefinition extends FunctionConfiguration {
     private String cloudProvider;
     private String account;
     private String region;

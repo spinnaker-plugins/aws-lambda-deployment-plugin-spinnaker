@@ -21,7 +21,7 @@ import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaBaseStrategyInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
-import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaGetOutput;
+import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -62,7 +62,7 @@ public class BaseDeploymentStrategy<T extends LambdaBaseStrategyInput> {
             return versionNumberProvided;
         }
 
-        LambdaGetOutput lf = utils.findLambda(stage);
+        LambdaDefinition lf = utils.findLambda(stage);
         return getUtils().getCanonicalVersion(lf, version, versionNumberProvided, 0);
     }
 }

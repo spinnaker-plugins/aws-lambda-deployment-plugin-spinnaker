@@ -60,7 +60,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
         LambdaUpdateEventConfigurationTaskInput taskInput = utils.getInput(stage, LambdaUpdateEventConfigurationTaskInput.class);
         taskInput.setAppName(stage.getExecution().getApplication());
         Boolean justCreated = (Boolean)stage.getContext().getOrDefault(LambdaStageConstants.lambaCreatedKey, false);
-        LambdaGetOutput lf = utils.findLambda(stage, justCreated);
+        LambdaDefinition lf = utils.findLambda(stage, justCreated);
         if (lf == null) {
             return formErrorTaskResult(stage, String.format("Could not find lambda to update event config for"));
         }
@@ -80,7 +80,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
      * @param taskInput
      * @param lf
      */
-    private void deleteAllExistingEvents(LambdaUpdateEventConfigurationTaskInput taskInput, LambdaGetOutput lf) {
+    private void deleteAllExistingEvents(LambdaUpdateEventConfigurationTaskInput taskInput, LambdaDefinition lf) {
         if (StringUtils.isNotNullOrEmpty(taskInput.getAliasName())) {
             // TODO: cant handle delete of alias ARNS yet
             return;
@@ -97,7 +97,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
      * @param lf
      * @return
      */
-    private LambdaUpdateEventConfigurationTaskOutput deleteRemovedAndChangedEvents(LambdaUpdateEventConfigurationTaskInput taskInput, LambdaGetOutput lf) {
+    private LambdaUpdateEventConfigurationTaskOutput deleteRemovedAndChangedEvents(LambdaUpdateEventConfigurationTaskInput taskInput, LambdaDefinition lf) {
         LambdaUpdateEventConfigurationTaskOutput ans = LambdaUpdateEventConfigurationTaskOutput.builder().build();
         ans.setEventOutputs(new ArrayList<LambdaCloudOperationOutput>());
         if (lf == null) {
@@ -119,7 +119,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
         return ans;
     }
 
-    List<String> getExistingEvents(LambdaGetOutput lf) {
+    List<String> getExistingEvents(LambdaDefinition lf) {
         List<EventSourceMappingConfiguration> esmList = lf.getEventSourceMappings();
         if (esmList == null) {
             return new ArrayList<String>();
@@ -129,7 +129,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
         return allEventArns;
     }
 
-    private void deleteEvent(String eventArn, LambdaUpdateEventConfigurationTaskInput ti,  LambdaGetOutput lgo) {
+    private void deleteEvent(String eventArn, LambdaUpdateEventConfigurationTaskInput ti,  LambdaDefinition lgo) {
         logger.debug("To be deleted: " + eventArn);
         List<EventSourceMappingConfiguration> esmList = lgo.getEventSourceMappings();
         Optional<EventSourceMappingConfiguration> oo =
@@ -154,7 +154,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
         deleteLambdaEventConfig(inp);
     }
 
-    private LambdaUpdateEventConfigurationTaskOutput updateEventConfiguration(LambdaUpdateEventConfigurationTaskInput taskInput, LambdaGetOutput lf) {
+    private LambdaUpdateEventConfigurationTaskOutput updateEventConfiguration(LambdaUpdateEventConfigurationTaskInput taskInput, LambdaDefinition lf) {
         LambdaUpdateEventConfigurationTaskOutput ans = LambdaUpdateEventConfigurationTaskOutput.builder().build();
         ans.setEventOutputs(new ArrayList<LambdaCloudOperationOutput>());
         taskInput.setCredentials(taskInput.getAccount());
