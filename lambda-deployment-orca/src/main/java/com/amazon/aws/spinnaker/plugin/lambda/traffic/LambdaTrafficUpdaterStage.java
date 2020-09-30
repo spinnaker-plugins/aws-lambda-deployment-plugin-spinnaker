@@ -17,6 +17,7 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
+import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.LambdaUpdateEventConfigurationTask;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaPublishVersionTask;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaPutConcurrencyTask;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.LambdaVerificationTask;
@@ -43,6 +44,8 @@ public class LambdaTrafficUpdaterStage implements StageDefinitionBuilder {
         logger.debug("taskGraph for Aws.LambdaTrafficUpdateStage");
         builder.withTask("lambdaTrafficUpdateTask", LambdaTrafficUpdateTask.class);
         builder.withTask("lambdaPutConcurrencyTask", LambdaPutConcurrencyTask.class);
+        //TODO: Not sure if we need verification tasks between these.
+        builder.withTask("lambdaEventConfigurationTask", LambdaUpdateEventConfigurationTask.class);
         builder.withTask("lambdaTrafficUpdateVerificationTask", LambdaTrafficUpdateVerificationTask.class);
     }
 }

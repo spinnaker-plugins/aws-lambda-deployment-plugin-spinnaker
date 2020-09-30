@@ -59,7 +59,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
         cloudDriverUrl = props.getCloudDriverBaseUrl();
         LambdaUpdateEventConfigurationTaskInput taskInput = utils.getInput(stage, LambdaUpdateEventConfigurationTaskInput.class);
         taskInput.setAppName(stage.getExecution().getApplication());
-        Boolean justCreated = (Boolean)stage.getContext().get(LambdaStageConstants.lambaCreatedKey);
+        Boolean justCreated = (Boolean)stage.getContext().getOrDefault(LambdaStageConstants.lambaCreatedKey, false);
         LambdaGetOutput lf = utils.findLambda(stage, justCreated);
         if (lf == null) {
             return formErrorTaskResult(stage, String.format("Could not find lambda to update event config for"));
@@ -162,9 +162,14 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
             taskInput.setQualifier(taskInput.getAliasName());
         }
         String endPoint = cloudDriverUrl + CLOUDDRIVER_UPDATE_EVENT_CONFIGURATION_LAMBDA_PATH;
-        List<String> existingEvents = getExistingEvents(lf);
+        List<String> existingEvents = new ArrayList<String>();
+        if (StringUtils.isNullOrEmpty(taskInput.getAliasName())) {
+            // still cant update and delete events on aliases.
+            existingEvents = getExistingEvents(lf);
+        }
+        final List<String> tmpEvents = existingEvents;
         taskInput.getTriggerArns().stream()
-               .filter(curr -> { return !existingEvents.contains(curr); })
+               .filter(curr -> { return !tmpEvents.contains(curr); })
                .forEach( curr -> {
                    LambdaEventConfigurationDescription singleEvent = formEventObject(curr, taskInput);
                    String rawString = utils.asString(singleEvent);
@@ -180,7 +185,8 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
     private LambdaEventConfigurationDescription formEventObject(String curr, LambdaUpdateEventConfigurationTaskInput taskInput) {
         LambdaEventConfigurationDescription singleEvent = LambdaEventConfigurationDescription.builder().eventSourceArn(curr).batchsize(taskInput.getBatchsize()).enabled(true)
                 .account(taskInput.getAccount()).credentials(taskInput.getCredentials()).appName(taskInput.getAppName())
-                .region(taskInput.getRegion()).functionName(taskInput.getFunctionName()).build();
+                .region(taskInput.getRegion()).functionName(taskInput.getFunctionName()).qualifier(taskInput.getQualifier()).
+                        build();
         return singleEvent;
 
     }

@@ -28,5 +28,6 @@ public class LambdaEventConfigurationDescription {
     String eventSourceArn;
     boolean enabled;
     int batchsize;
+    String qualifier;
 
 }

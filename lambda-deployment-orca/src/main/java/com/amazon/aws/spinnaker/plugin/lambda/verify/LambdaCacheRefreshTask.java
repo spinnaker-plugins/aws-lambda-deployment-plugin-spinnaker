@@ -36,10 +36,7 @@ import java.util.Map;
 
 @Component
 public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
-
     static final String REFRESH_TYPE = "Function";
-
-    public static final String TASK_NAME = "forceCacheRefresh";
 
     @Autowired
     private CloudDriverCacheService cacheService;
@@ -50,14 +47,10 @@ public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
     @Nonnull
     @Override
     public TaskResult execute(@Nonnull StageExecution stage) {
-
         Map<String, Object> task = new HashMap<>(stage.getContext());
         task.put("appName", stage.getExecution().getApplication());
-
         Response rs = cacheService.forceCacheUpdate("aws", REFRESH_TYPE, task);
-
         utils.await();
-
         return TaskResult.ofStatus(ExecutionStatus.SUCCEEDED);
     }
 }
