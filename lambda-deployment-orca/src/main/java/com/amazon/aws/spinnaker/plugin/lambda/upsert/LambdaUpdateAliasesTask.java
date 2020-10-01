@@ -19,7 +19,8 @@ package com.amazon.aws.spinnaker.plugin.lambda.upsert;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaUpdateCodeInput;
+import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.model.LambdaUpdateEventConfigurationTaskOutput;
+import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaUpdateAliasesInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaStageConstants;
@@ -30,20 +31,24 @@ import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
-public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
-    private static Logger logger = LoggerFactory.getLogger(LambdaUpdateCodeTask.class);
+public class LambdaUpdateAliasesTask implements LambdaStageBaseTask {
+    private static Logger logger = LoggerFactory.getLogger(LambdaUpdateAliasesTask.class);
     private static final ObjectMapper objMapper = new ObjectMapper();
-    private static String CLOUDDRIVER_CREATE_PATH = "/aws/ops/createLambdaFunction";
-    private static String CLOUDDRIVER_UPDATE_CODE_PATH = "/aws/ops/updateLambdaFunctionCode";
-    private static String CLOUDDRIVER_UPDATE_CONFIG_PATH = "/aws/ops/updateLambdaFunctionConfiguration";
+    private static String CLOUDDRIVER_UPDATE_ALIAS_PATH = "/aws/ops/upsertLambdaFunctionAlias";
+    private static final String DEFAULT_ALIAS_DESCRIPTION = "Created via Spinnaker";
+    private static final String LATEST_VERSION_STRING = "$LATEST";
 
     @Autowired
     CloudDriverConfigurationProperties props;
@@ -56,27 +61,62 @@ public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
         cloudDriverUrl = props.getCloudDriverBaseUrl();
-        // check if context has createdLmabda false
-        Boolean justCreated = (Boolean)stage.getContext().getOrDefault(LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
-        if (justCreated) {
-            return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(stage.getContext()).build();
+
+        if (!shouldAddAliases(stage)) {
+            return formSuccessTaskResult(stage, "No aliases to add");
         }
-        LambdaCloudOperationOutput output = updateLambdaCode(stage);
-        Map<String, Object> context = buildContextOutput(output, LambdaStageConstants.updateCodeUrlKey);
+
+        List<LambdaCloudOperationOutput> output = updateLambdaAliases(stage);
+        Map<String, Object> context = buildContextOutput(output);
         context.put(LambdaStageConstants.lambaCodeUpdatedKey, Boolean.TRUE);
         return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
     }
 
-    private LambdaCloudOperationOutput updateLambdaCode(StageExecution stage) {
-        LambdaUpdateCodeInput inp = utils.getInput(stage, LambdaUpdateCodeInput.class);
-        inp.setAppName(stage.getExecution().getApplication());
-        inp.setCredentials(inp.getAccount());
-        String endPoint = cloudDriverUrl + CLOUDDRIVER_UPDATE_CODE_PATH;
+    /**
+     * Fill up with values required for next task
+     */
+    private Map<String, Object> buildContextOutput(List<LambdaCloudOperationOutput> ldso) {
+        List<String> urlList = new ArrayList<String>();
+        ldso.forEach(x -> {
+            urlList.add(x.getUrl());
+        });
+        Map<String, Object> context = new HashMap<>();
+        context.put(LambdaStageConstants.eventTaskKey, urlList);
+        return context;
+    }
+
+    private boolean shouldAddAliases(StageExecution stage) {
+        return stage.getContext().containsKey("aliases");
+    }
+
+    private LambdaCloudOperationOutput updateSingleAlias(LambdaUpdateAliasesInput inp, String alias) {
+        inp.setAliasDescription(DEFAULT_ALIAS_DESCRIPTION);
+        inp.setAliasName(alias);
+        inp.setMajorFunctionVersion(LATEST_VERSION_STRING);
+        String endPoint = cloudDriverUrl + CLOUDDRIVER_UPDATE_ALIAS_PATH;
         String rawString = utils.asString(inp);
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
         LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
         return operationOutput;
+    }
+
+    private List<LambdaCloudOperationOutput> updateLambdaAliases(StageExecution stage) {
+        List<LambdaCloudOperationOutput> result = new ArrayList<>();
+        List<String> aliases = (List<String>)stage.getContext().get("aliases");
+        LambdaUpdateAliasesInput inp = utils.getInput(stage, LambdaUpdateAliasesInput.class);
+        inp.setAppName(stage.getExecution().getApplication());
+        inp.setCredentials(inp.getAccount());
+        for (String alias: aliases) {
+            if (StringUtils.isNullOrEmpty(alias))
+                continue;
+            String formattedAlias = alias.trim();
+            if (StringUtils.isNullOrEmpty(formattedAlias))
+                continue;
+            LambdaCloudOperationOutput operationOutput = updateSingleAlias(inp, formattedAlias);
+            result.add(operationOutput);
+        }
+        return result;
     }
 
     @Nullable

@@ -63,6 +63,9 @@ public class LambdaVerificationTask implements LambdaStageBaseTask {
         if (null != stageContext.get(LambdaStageConstants.eventTaskKey))
             urlList.addAll((List<String>)stageContext.get(LambdaStageConstants.eventTaskKey));
 
+        if (null != stageContext.get(LambdaStageConstants.aliasTaskKey))
+            urlList.addAll((List<String>)stageContext.get(LambdaStageConstants.aliasTaskKey));
+
         List<LambdaCloudDriverTaskResults> listOfTaskResults = urlList.stream().map(url -> {
             return utils.verifyStatus(url);
         }).collect(Collectors.toList());

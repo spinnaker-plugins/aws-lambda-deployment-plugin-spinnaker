@@ -55,7 +55,8 @@ public interface LambdaStageBaseTask extends Task {
     default TaskResult formSuccessTaskResult(StageExecution stage, String successMessage) {
         Map<String, Object> outputMap = new HashMap<>();
         outputMap.put("status", successMessage);
-        stage.setOutputs(outputMap);
+        Map<String, Object> out =stage.getOutputs();
+        stage.getOutputs().putAll(outputMap);
         return TaskResult.builder(ExecutionStatus.SUCCEEDED).outputs(outputMap).build();
     }
 

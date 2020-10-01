@@ -33,6 +33,7 @@ public class LambdaStageConstants {
     public static final String updateEventUrlKey = "updateEventUrl";
     public static final String publishVersionUrlKey = "publishVersionUrl";
     public static final String eventTaskKey = "eventConfigUrlList";
+    public static final String aliasTaskKey = "updateAliasesUrlList";
     public static final String lambdaObjectKey = "lambdaObject";
     public static final String originalRevisionIdKey = "originalRevisionId";
     public static final String newRevisionIdKey = "newRevisionId";
