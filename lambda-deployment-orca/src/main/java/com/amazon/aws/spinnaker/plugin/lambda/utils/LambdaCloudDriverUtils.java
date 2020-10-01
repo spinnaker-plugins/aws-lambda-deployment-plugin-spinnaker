@@ -16,6 +16,7 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.utils;
 
+import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaDeploymentInput;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverErrorObject;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaVerificationStatusOutput;
@@ -29,7 +30,9 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import okhttp3.*;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -267,6 +270,40 @@ public class LambdaCloudDriverUtils {
             this.await();
         }
         return lf;
+    }
+
+    public boolean validateUpsertLambdaInput(LambdaDeploymentInput inputLambda, List<String> errorMessages) {
+        if (!ObjectUtils.defaultIfNull(inputLambda.getEnableLambdaAtEdge(), Boolean.FALSE)) {
+            return true;
+        }
+        return validateLambdaEdgeInput(inputLambda, errorMessages);
+    }
+
+    public boolean validateLambdaEdgeInput(LambdaDeploymentInput inputLambda, List<String> errorMessages) {
+        int numErrors = errorMessages.size();
+
+        if (inputLambda.getEnvVariables() == null || inputLambda.getEnvVariables().size() > 0) {
+            errorMessages.add("Edge enabled lambdas cannot have env variables");
+        }
+        if (inputLambda.getTimeout() > 5) {
+            errorMessages.add("Edge enabled lambdas cannot have timeout > 5");
+        }
+        if (inputLambda.getMemorySize() > 128) {
+            errorMessages.add("Edge enabled lambdas cannot have memory > 128");
+        }
+        if (!inputLambda.getRegion().equals("us-east-1")) {
+            errorMessages.add("Edge enabled lambdas need to be deployed in us-east-1 region");
+        }
+        if (StringUtils.isNotNullOrEmpty(inputLambda.getVpcId())) {
+            errorMessages.add("Edge enabled lambdas cannot have vpc associations");
+        }
+        if (inputLambda.getSubnetIds() == null || inputLambda.getSubnetIds().size() > 0) {
+            errorMessages.add("Edge enabled lambdas cannot have subnets");
+        }
+        if (inputLambda.getSecurityGroupIds() == null || inputLambda.getSecurityGroupIds().size() > 0) {
+            errorMessages.add("Edge enabled lambdas cannot have security groups");
+        }
+        return errorMessages.size() == numErrors;
     }
 
     public void await() {

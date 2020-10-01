@@ -29,7 +29,6 @@ import java.util.List;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LambdaDeploymentInput {
-    private static Logger logger = LoggerFactory.getLogger(LambdaDeploymentInput.class);
     private String account, region, functionName, runtime, s3bucket, s3key, handler, role, credentials, description, appName;
     int memorySize;
     int timeout;
@@ -42,6 +41,8 @@ public class LambdaDeploymentInput {
     List<String> subnetIds;
     List<String> securityGroupIds;
     List<String> layers;
+    Boolean enableLambdaAtEdge;
+    String vpcId;
 
     String targetGroups;
     String kmskeyArn;

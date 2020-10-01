@@ -32,7 +32,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -40,9 +42,6 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaCreateTask.class);
     private static final ObjectMapper objMapper = new ObjectMapper();
     private static String CLOUDDRIVER_CREATE_PATH = "/aws/ops/createLambdaFunction";
-    private static String CLOUDDRIVER_UPDATE_CODE_PATH = "/aws/ops/updateLambdaFunctionCode";
-    private static String CLOUDDRIVER_UPDATE_CONFIG_PATH = "/aws/ops/updateLambdaFunctionConfiguration";
-
 
     @Autowired
     CloudDriverConfigurationProperties props;
@@ -57,6 +56,10 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
         cloudDriverUrl = props.getCloudDriverBaseUrl();
         logger.debug("Executing LambdaDeploymentTask...");
         LambdaDeploymentInput ldi = utils.getInput(stage, LambdaDeploymentInput.class);
+        List<String> errors = new ArrayList<>();
+        if (!utils.validateUpsertLambdaInput(ldi, errors)) {
+            return this.formErrorListTaskResult(stage, errors);
+        }
         ldi.setAppName(stage.getExecution().getApplication());
         LambdaGetInput lgi = utils.getInput(stage, LambdaGetInput.class);
         lgi.setAppName(stage.getExecution().getApplication());
