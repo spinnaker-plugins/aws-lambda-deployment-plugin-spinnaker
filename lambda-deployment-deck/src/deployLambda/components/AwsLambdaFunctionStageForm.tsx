@@ -59,9 +59,6 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
       <h4> Execution Role </h4>
       < ExecutionRoleForm {...props} />
 
-      <h4> Lambda@Edge </h4>
-      < LambdaAtEdgeForm {...props} />
-
       <h4> Environment </h4>
       { values.enableLambdaAtEdge !== true ?
         <>
@@ -130,8 +127,9 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
         label="Timeout (seconds)"
         help={<HelpField id="aws.functionBasicSettings.timeout" />}
         input={props => <NumberInput {...props} min={1} max={ values.enableLambdaAtEdge === true ? 5 : 900 } />}
-      />
-       
+      /> 
+      < LambdaAtEdgeForm {...props} />
+
       <h4> Network </h4>
       { values.enableLambdaAtEdge !== true ?
         < NetworkForm {...props} /> : 
@@ -139,7 +137,10 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
           VPC configuration not available with Lambda@Edge functions.
         </div>
       }
-
+ 
+      <h4> Event Triggers </h4>
+      < TriggerEventsForm {...props} />
+     
       <h4> Debugging and Error Handling </h4>
       Dead Letter Config
       <FormikFormField

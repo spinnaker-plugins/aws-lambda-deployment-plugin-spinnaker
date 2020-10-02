@@ -14,9 +14,7 @@ import {
 } from '@spinnaker/core';
 
 const helpFieldContent = {
-  "lambdaAtEdge": "",
-  "distribution": "The CloudFront distribution that will send events to your Lambda function.",
-  "cloudfrontEvent": "The CloudFront distribution that will send events to your Lambda function.",
+  "lambdaAtEdge": "Validate AWS Lambda function configuration against Lambda@Edge requirements. This will not enable Lambda@Edge on this function. ",
 }
 
 const cloudFrontEvents = [
@@ -39,27 +37,9 @@ export function LambdaAtEdgeForm( props: IFormikStageConfigInjectedProps ) {
     <div>
       <FormikFormField
         name="enableLambdaAtEdge"
-        label="Enable Lambda@Edge"
+        label="Enable Lambda@Edge Validation"
         help={<HelpField content={helpFieldContent.lambdaAtEdge} />}
         input={props => <CheckboxInput {...props} />}
-      />
-      <FormikFormField
-        name="edgeDistribution"
-        label="Distribution ARN"
-        help={<HelpField content={helpFieldContent.distribution} />}
-        input={props => <TextInput {...props} />}
-      />
-      <FormikFormField
-        label="cloudfrontEvent"
-        name="CloudFront Event"
-        help={<HelpField content={helpFieldContent.cloudfrontEvent} />}
-        input={(inputProps: IFormInputProps) => (
-          <ReactSelectInput
-            {...inputProps}
-            clearable={false}
-            options={cloudFrontEvents}
-          />
-        )}
       />
     </div>
   )

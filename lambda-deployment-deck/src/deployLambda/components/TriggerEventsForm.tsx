@@ -27,7 +27,7 @@ export function TriggerEventsForm( props: IFormikStageConfigInjectedProps ) {
       <FormikFormField
         name="triggerArns"
         label="Event ARNs"
-        help={<HelpField content="The resource ARNs for Lambda event trigger sources. Input the entire ARN and select `Create option TRIGGER-ARN-INPUT` to add the ARN." />}
+        help={<HelpField content="The resource ARNs for Lambda event trigger sources. Triggers created here will only be applied to the higher level function, and will NOT be applied to function aliases. Input the entire ARN and select `Create option TRIGGER-ARN-INPUT` to add the ARN." />}
         input={(inputProps: IFormInputProps) => (
           <TetheredCreatable
             {...inputProps}
@@ -51,7 +51,6 @@ export function TriggerEventsForm( props: IFormikStageConfigInjectedProps ) {
       <FormikFormField
         name="batchsize"
         label="Event Batch Size"
-        help={<HelpField content="" />}
         input={(inputProps: IFormInputProps) => (
           < NumberInput
             {...inputProps}

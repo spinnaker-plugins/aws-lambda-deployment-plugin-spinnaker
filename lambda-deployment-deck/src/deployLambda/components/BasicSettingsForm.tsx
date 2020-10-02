@@ -17,6 +17,7 @@ import {
   IRegion,
   NameUtils,
   ReactSelectInput,
+  TetheredCreatable,
   TextInput,
   useData,
 } from '@spinnaker/core';
@@ -37,7 +38,12 @@ export function BasicSettingsForm( props: IFormikStageConfigInjectedProps ) {
   }
 
   const onAliasChange = (o: Option, field: any) => {
-    props.formik.setFieldValue(field, o.value);
+    props.formik.setFieldValue(field, o.map((layer: any) => layer.value));
+  }
+
+  const onRegionChange = (fieldValue: string) => {
+    props.formik.setFieldValue('enableLambdaAtEdge', false);
+    props.formik.setFieldValue('region', fieldValue);
   }
 
   const onFunctionUidChange = (fieldValue: string) => {
@@ -78,6 +84,7 @@ export function BasicSettingsForm( props: IFormikStageConfigInjectedProps ) {
       <FormikFormField
         label="Region"
         name="region"
+        onChange={onRegionChange}
         input={(inputProps: IFormInputProps) => (
           <ReactSelectInput
             {...inputProps}
@@ -113,16 +120,15 @@ export function BasicSettingsForm( props: IFormikStageConfigInjectedProps ) {
         help={< HelpField content={lambdaHelpFields.detail}/>}
         onChange={onDetailChange}
         input={props => <TextInput {...props} />}
-      />
-      { /*
+      /> 
       <FormikFormField
         name="aliasNames"
         label="Alias Name"
-        help={<HelpField content="The resource ARNs for Lambda event trigger sources. Input the entire ARN and select `Create option TRIGGER-ARN-INPUT` to add the ARN." />}
+        help={<HelpField content="AWS Lambda aliases are like a pointer to a specific function version. Users can access the function version using the alias Amazon Resource Name (ARN). Input the alias name and select `Create option ALIAS-INPUT` to add the alias." />}
         input={(inputProps: IFormInputProps) => (
           <TetheredCreatable
             {...inputProps}
-            multi={false}
+            multi={true}
             clearable={false}
             placeholder={
               "Input Alias Name..."
@@ -131,14 +137,13 @@ export function BasicSettingsForm( props: IFormikStageConfigInjectedProps ) {
                 onAliasChange(e, 'aliases');
             }}
             value={values.aliases ?
-              ({value: values.aliases, label: values.aliases}) :
-              null 
+              values.aliases.map((alias: string) => ({value: alias, label:alias})) :
+              []  
             }
           />
         )}
         required={true}
       />
-      */ }
       <FormikFormField
         name="runtime"
         label="Runtime"
