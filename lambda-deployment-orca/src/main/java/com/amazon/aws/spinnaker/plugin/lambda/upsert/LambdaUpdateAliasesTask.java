@@ -68,7 +68,7 @@ public class LambdaUpdateAliasesTask implements LambdaStageBaseTask {
 
         List<LambdaCloudOperationOutput> output = updateLambdaAliases(stage);
         Map<String, Object> context = buildContextOutput(output);
-        context.put(LambdaStageConstants.lambaCodeUpdatedKey, Boolean.TRUE);
+        context.put(LambdaStageConstants.lambaConfigurationUpdatedKey, Boolean.TRUE);
         return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
     }
 

@@ -24,6 +24,7 @@ import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
         if (results) {
             return updateLambdaToLatest(inp);
         }
+        else {
+            // have to update outputs with expected response and actual response.
+        }
         return null;
     }
 
@@ -75,12 +79,18 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
                 continue;
             }
         }
+
         if (!done)
             return false;
+
         if (taskResult.getStatus().isFailed()) {
             return  false;
         }
-        return true;
+
+        LambdaCloudDriverInvokeOperationResults invokeResponse = utils.getLambdaInvokeResults(url);
+        String expected = inp.getLambdaOutput();
+        String actual = invokeResponse.getBody();
+        return ObjectUtils.defaultIfNull(expected, "").equals(actual);
     }
 
     private LambdaCloudOperationOutput updateLambdaToLatest(LambdaBlueGreenStrategyInput inp) {

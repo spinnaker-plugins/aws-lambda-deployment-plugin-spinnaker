@@ -16,6 +16,7 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.utils;
 
+import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaCloudDriverInvokeOperationResults;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaDeploymentInput;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverErrorObject;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
@@ -26,6 +27,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
@@ -75,16 +78,40 @@ public class LambdaCloudDriverUtils {
         }
     }
 
+    public LambdaCloudDriverInvokeOperationResults getLambdaInvokeResults(String endPoint) {
+        String respString = getFromCloudDriver(endPoint);
+        LambdaCloudDriverInvokeOperationResults respObject = null;
+        try {
+            JsonNode jsonResults = objectMapper.readTree(respString);
+            JsonNode statusNode = jsonResults.get("status");
+            ArrayNode resultsNode = (ArrayNode)jsonResults.get("resultObjects");
+            if ((resultsNode != null) && resultsNode.isArray()) {
+                respObject =objectMapper.convertValue(resultsNode.get(0), LambdaCloudDriverInvokeOperationResults.class);
+                JsonNode respStringNode = objectMapper.readTree(respObject.getResponseString());
+                int statusCode = ((IntNode)respStringNode.get("statusCode")).intValue();
+                String body = ((TextNode)respStringNode.get("body")).textValue();
+                respObject.setStatusCode(statusCode);
+                respObject.setBody(body);
+            }
+            LambdaVerificationStatusOutput st = objectMapper.convertValue(statusNode, LambdaVerificationStatusOutput.class);
+
+            return respObject;
+        }
+        catch (Exception e) {
+            logger.error(String.format("Failed verifying task at {}", endPoint), e);
+            return respObject;
+        }
+    }
 
     public LambdaCloudDriverTaskResults verifyStatus(String endPoint) {
         String respString = getFromCloudDriver(endPoint);
         try {
-
             JsonNode jsonResults = objectMapper.readTree(respString);
             JsonNode statusNode = jsonResults.get("status");
             ArrayNode resultsNode = (ArrayNode)jsonResults.get("resultObjects");
             LambdaCloudDriverResultObject ro = null;
             LambdaCloudDriverErrorObject err = null;
+            LambdaCloudDriverInvokeOperationResults respObject;
             if ((resultsNode != null) && resultsNode.isArray()) {
                 ro = objectMapper.convertValue(resultsNode.get(0), LambdaCloudDriverResultObject.class);
                 err = objectMapper.convertValue(resultsNode.get(0), LambdaCloudDriverErrorObject.class);
@@ -98,7 +125,6 @@ public class LambdaCloudDriverUtils {
             throw new RuntimeException(e);
         }
     }
-
 
     public String getFromCloudDriver(String endPoint) {
         Request request = new Request.Builder()
