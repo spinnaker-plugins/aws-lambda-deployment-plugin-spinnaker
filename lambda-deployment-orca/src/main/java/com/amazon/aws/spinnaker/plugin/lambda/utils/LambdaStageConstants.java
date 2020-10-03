@@ -21,22 +21,23 @@ import java.util.List;
 
 public class LambdaStageConstants {
 
-    public static final String lambaCreatedKey = "lambdaCreatedTaskUrl";
-    public static final String lambaCodeUpdatedKey = "lambdaCodeUpdatedTaskUrl";
-    public static final String lambaConfigurationUpdatedKey = "lambdaConfigUpdatedTaskUrl";
-    public static final String lambaVersionPublishedKey = "lambdaVersionPublishedTaskUrl";
-    public static final String lambaPutConcurrencyKey = "lambdaPutConcurrencyTaskUrl";
+    public static final String lambaCreatedKey = "lambdaCreated";
+    public static final String lambaCodeUpdatedKey = "lambdaCodeUpdated";
+    public static final String lambaConfigurationUpdatedKey = "lambdaConfigUpdated";
+    public static final String lambaVersionPublishedKey = "lambdaVersionPublished";
+    public static final String lambaAliasesUpdatedKey = "lambdaAliasesUpdated";
 
     public static final String createdUrlKey = "createdUrl";
     public static final String updateCodeUrlKey = "updateCodeUrl";
     public static final String updateConfigUrlKey = "updateConfigUrl";
     public static final String updateEventUrlKey = "updateEventUrl";
     public static final String publishVersionUrlKey = "publishVersionUrl";
+    public static final String putConcurrencyUrlKey = "lambdaPutConcurrencyUrl";
     public static final String eventTaskKey = "eventConfigUrlList";
     public static final String aliasTaskKey = "updateAliasesUrlList";
     public static final String lambdaObjectKey = "lambdaObject";
     public static final String originalRevisionIdKey = "originalRevisionId";
     public static final String newRevisionIdKey = "newRevisionId";
 
-    public static List<String> allUrlKeys = List.of(createdUrlKey, updateCodeUrlKey, updateConfigUrlKey, updateEventUrlKey, publishVersionUrlKey, lambaPutConcurrencyKey);
+    public static List<String> allUrlKeys = List.of(createdUrlKey, updateCodeUrlKey, updateConfigUrlKey, updateEventUrlKey, publishVersionUrlKey, putConcurrencyUrlKey);
 }

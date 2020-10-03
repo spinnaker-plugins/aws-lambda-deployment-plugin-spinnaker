@@ -23,10 +23,12 @@ import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BaseDeploymentStrategy<T extends LambdaBaseStrategyInput> {
-
+    private static final Logger logger = LoggerFactory.getLogger(BaseDeploymentStrategy.class);
     static String CLOUDDRIVER_UPSERT_ALIAS_PATH = "/aws/ops/upsertLambdaFunctionAlias";
 
     @Autowired
@@ -41,6 +43,7 @@ public class BaseDeploymentStrategy<T extends LambdaBaseStrategyInput> {
         String rawString = utils.asString(inp);
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
+        logger.debug("Posted to cloudDriver for deployment: " + url);
         LambdaCloudOperationOutput out = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
         return out;
     }

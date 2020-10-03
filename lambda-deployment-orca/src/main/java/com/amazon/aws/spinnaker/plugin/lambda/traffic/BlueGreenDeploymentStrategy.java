@@ -52,7 +52,7 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
             return updateLambdaToLatest(inp);
         }
         else {
-            // have to update outputs with expected response and actual response.
+            logger.error("BlueGreen Deployment failed");
         }
         return null;
     }
@@ -90,7 +90,11 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
         LambdaCloudDriverInvokeOperationResults invokeResponse = utils.getLambdaInvokeResults(url);
         String expected = inp.getLambdaOutput();
         String actual = invokeResponse.getBody();
-        return ObjectUtils.defaultIfNull(expected, "").equals(actual);
+        boolean comparison = ObjectUtils.defaultIfNull(expected, "").equals(actual);
+        if (!comparison) {
+            logger.error(String.format("BlueGreenDeployment failed: Comparison failed. expected : [%s], actual : [%s]", expected, output));
+        }
+        return comparison;
     }
 
     private LambdaCloudOperationOutput updateLambdaToLatest(LambdaBlueGreenStrategyInput inp) {
@@ -99,12 +103,9 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
         inp.setMinorFunctionVersion(null);
         String cloudDriverUrl = props.getCloudDriverBaseUrl();
         Map<String, Object> outputMap  = new HashMap<String, Object>();
-
-        outputMap.put("majorVersionDeployed", inp.getMajorFunctionVersion());
-        outputMap.put("aliasDeployed", inp.getAliasName());
-        outputMap.put("minorVersionDeployed", "");
-        outputMap.put("strategyUsed", "BlueGreenDeploymentStrategy");
-
+        outputMap.put("deployment:majorVersionDeployed", inp.getMajorFunctionVersion());
+        outputMap.put("deployment:aliasDeployed", inp.getAliasName());
+        outputMap.put("deployment:strategyUsed", "BlueGreenDeploymentStrategy");
         LambdaCloudOperationOutput out = postToCloudDriver(inp, cloudDriverUrl, utils);
         out.setOutputMap(outputMap);
         return out;
@@ -139,6 +140,7 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
         String rawString = utils.asString(ldi);
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
+        logger.debug("Posted to cloudDriver for blueGreenDeployment: " + url);
         LambdaInvokeFunctionOutput ldso = LambdaInvokeFunctionOutput.builder().url(url).build();
         return ldso;
     }

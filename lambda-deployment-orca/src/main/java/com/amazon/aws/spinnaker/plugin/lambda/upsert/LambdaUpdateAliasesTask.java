@@ -60,29 +60,30 @@ public class LambdaUpdateAliasesTask implements LambdaStageBaseTask {
     @NotNull
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
+        logger.debug("Executing LambdaUpdateAliasesTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
-
+        prepareTask(stage);
         if (!shouldAddAliases(stage)) {
-            return formSuccessTaskResult(stage, "No aliases to add");
+            addToOutput(stage, LambdaStageConstants.lambaAliasesUpdatedKey, Boolean.FALSE);
+            return taskComplete(stage);
         }
-
         List<LambdaCloudOperationOutput> output = updateLambdaAliases(stage);
-        Map<String, Object> context = buildContextOutput(output);
-        context.put(LambdaStageConstants.lambaConfigurationUpdatedKey, Boolean.TRUE);
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
+        buildContextOutput(stage, output);
+        addToTaskContext(stage, LambdaStageConstants.lambaAliasesUpdatedKey, Boolean.TRUE);
+        addToOutput(stage, LambdaStageConstants.lambaAliasesUpdatedKey, Boolean.TRUE);
+        return taskComplete(stage);
     }
 
     /**
      * Fill up with values required for next task
      */
-    private Map<String, Object> buildContextOutput(List<LambdaCloudOperationOutput> ldso) {
+    private void buildContextOutput(StageExecution stage, List<LambdaCloudOperationOutput> ldso) {
         List<String> urlList = new ArrayList<String>();
         ldso.forEach(x -> {
             urlList.add(x.getUrl());
         });
         Map<String, Object> context = new HashMap<>();
-        context.put(LambdaStageConstants.eventTaskKey, urlList);
-        return context;
+        addToTaskContext(stage,LambdaStageConstants.eventTaskKey, urlList);
     }
 
     private boolean shouldAddAliases(StageExecution stage) {
@@ -97,6 +98,7 @@ public class LambdaUpdateAliasesTask implements LambdaStageBaseTask {
         String rawString = utils.asString(inp);
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
+        logger.debug("Posted to cloudDriver for updateLambdaAliases: " + url);
         LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
         return operationOutput;
     }

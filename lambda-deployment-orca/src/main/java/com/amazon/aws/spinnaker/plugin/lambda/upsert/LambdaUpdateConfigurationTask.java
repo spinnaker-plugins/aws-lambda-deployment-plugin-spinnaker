@@ -37,11 +37,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class LambdaUpdateConfigurationTask implements LambdaStageBaseTask {
-    private static Logger logger = LoggerFactory.getLogger(LambdaUpdateCodeTask.class);
+    private static Logger logger = LoggerFactory.getLogger(LambdaUpdateConfigurationTask.class);
     private static final ObjectMapper objMapper = new ObjectMapper();
     private static String CLOUDDRIVER_UPDATE_CONFIG_PATH = "/aws/ops/updateLambdaFunctionConfiguration";
 
@@ -55,22 +54,22 @@ public class LambdaUpdateConfigurationTask implements LambdaStageBaseTask {
     @NotNull
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
+        logger.debug("Executing LambdaUpdateConfigurationTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
+        prepareTask(stage);
         Boolean justCreated = (Boolean)stage.getContext().getOrDefault(LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
         if (justCreated) {
             return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(stage.getContext()).build();
         }
-
         List<String> errors = new ArrayList<>();
         LambdaDeploymentInput ldi = utils.getInput(stage, LambdaDeploymentInput.class);
         if (!utils.validateUpsertLambdaInput(ldi, errors)) {
             return this.formErrorListTaskResult(stage, errors);
         }
-
         LambdaCloudOperationOutput output = this.updateLambdaConfig(stage, ldi);
-        Map<String, Object> context = buildContextOutput(output,  LambdaStageConstants.updateConfigUrlKey);
-        context.put(LambdaStageConstants.lambaConfigurationUpdatedKey, Boolean.TRUE);
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
+        addCloudOperationToContext(stage, output,  LambdaStageConstants.updateConfigUrlKey);
+        addToTaskContext(stage, LambdaStageConstants.lambaConfigurationUpdatedKey, Boolean.TRUE);
+        return taskComplete(stage);
     }
 
     private LambdaCloudOperationOutput updateLambdaConfig(StageExecution stage,  LambdaDeploymentInput ldi ) {
@@ -80,6 +79,7 @@ public class LambdaUpdateConfigurationTask implements LambdaStageBaseTask {
         String endPoint = cloudDriverUrl + CLOUDDRIVER_UPDATE_CONFIG_PATH;
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
+        logger.debug("Posted to cloudDriver for updateLambdaConfig: " + url);
         LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
         return operationOutput;
     }

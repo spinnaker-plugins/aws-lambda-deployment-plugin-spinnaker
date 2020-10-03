@@ -20,7 +20,6 @@ import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaDeploymentInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
@@ -33,14 +32,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Component
 public class LambdaCreateTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaCreateTask.class);
-    private static final ObjectMapper objMapper = new ObjectMapper();
     private static String CLOUDDRIVER_CREATE_PATH = "/aws/ops/createLambdaFunction";
 
     @Autowired
@@ -53,8 +50,9 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
     @NotNull
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
-        cloudDriverUrl = props.getCloudDriverBaseUrl();
         logger.debug("Executing LambdaDeploymentTask...");
+        cloudDriverUrl = props.getCloudDriverBaseUrl();
+        prepareTask(stage);
         LambdaDeploymentInput ldi = utils.getInput(stage, LambdaDeploymentInput.class);
         List<String> errors = new ArrayList<>();
         if (!utils.validateUpsertLambdaInput(ldi, errors)) {
@@ -63,20 +61,20 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
         ldi.setAppName(stage.getExecution().getApplication());
         LambdaGetInput lgi = utils.getInput(stage, LambdaGetInput.class);
         lgi.setAppName(stage.getExecution().getApplication());
-        Map<String, Object> context = null;
-        LambdaDefinition lf = utils.retrieveLambda(lgi);
-        if (lf != null) {
+        LambdaDefinition lambdaDefinition = utils.retrieveLambda(lgi);
+        if (lambdaDefinition != null) {
             logger.debug("noOp. Lambda already exists. only needs updating.");
-            context = new HashMap<String, Object>();
-            context.put(LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
-            context.put(LambdaStageConstants.lambdaObjectKey, lf);
-            context.put(LambdaStageConstants.originalRevisionIdKey, lf.getRevisionId());
-            return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
+            fillTaskContext(stage, lambdaDefinition);
+            addToOutput(stage, LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
+            addToTaskContext(stage, LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
+            addToOutput(stage, LambdaStageConstants.originalRevisionIdKey, lambdaDefinition.getRevisionId());
+            return taskComplete(stage);
         }
+        addToOutput(stage, LambdaStageConstants.lambaCreatedKey, Boolean.TRUE);
+        addToTaskContext(stage, LambdaStageConstants.lambaCreatedKey, Boolean.TRUE);
         LambdaCloudOperationOutput output = createLambda(stage);
-        context = buildContextOutput(output, LambdaStageConstants.createdUrlKey);
-        context.put(LambdaStageConstants.lambaCreatedKey, Boolean.TRUE);
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
+        addCloudOperationToContext(stage, output, LambdaStageConstants.createdUrlKey);
+        return taskComplete(stage);
     }
 
     private LambdaCloudOperationOutput createLambda(StageExecution stage) {
@@ -87,8 +85,15 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
         String rawString = utils.asString(ldi);
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
+        logger.debug("Posted to cloudDriver for createLambda: " + url);
         LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
         return operationOutput;
+    }
+
+    private void fillTaskContext(StageExecution stage, LambdaDefinition lf) {
+        addToTaskContext(stage, LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
+        addToTaskContext(stage, LambdaStageConstants.lambdaObjectKey, lf);
+        addToTaskContext(stage, LambdaStageConstants.originalRevisionIdKey, lf.getRevisionId());
     }
 
     @Nullable
@@ -100,5 +105,4 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
     @Override
     public void onCancel(@NotNull StageExecution stage) {
     }
-
 }

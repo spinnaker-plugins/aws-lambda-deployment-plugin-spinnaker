@@ -46,6 +46,7 @@ public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask 
     @NotNull
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
+        prepareTask(stage);
         Map<String, Object> stageContext = stage.getContext();
         String url = (String)stageContext.get("url");
         if (url == null) {
@@ -63,6 +64,7 @@ public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask 
             return formErrorTaskResult(stage,op.getErrors().getMessage());
         }
 
-        return formSuccessTaskResult(stage, "Traffic update succeeded");
+        copyContextToOutput(stage);
+        return taskComplete(stage);
     }
 }

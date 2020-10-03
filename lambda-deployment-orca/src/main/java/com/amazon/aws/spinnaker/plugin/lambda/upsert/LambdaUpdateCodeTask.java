@@ -35,8 +35,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @Component
 public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaUpdateCodeTask.class);
@@ -55,16 +53,17 @@ public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
     @NotNull
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
+        logger.debug("Executing LambdaUpdateCodeTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
-        // check if context has createdLmabda false
+        prepareTask(stage);
         Boolean justCreated = (Boolean)stage.getContext().getOrDefault(LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
         if (justCreated) {
-            return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(stage.getContext()).build();
+            return taskComplete(stage);
         }
         LambdaCloudOperationOutput output = updateLambdaCode(stage);
-        Map<String, Object> context = buildContextOutput(output, LambdaStageConstants.updateCodeUrlKey);
-        context.put(LambdaStageConstants.lambaCodeUpdatedKey, Boolean.TRUE);
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
+        addCloudOperationToContext(stage, output, LambdaStageConstants.updateCodeUrlKey);
+        addToTaskContext(stage, LambdaStageConstants.lambaCodeUpdatedKey, Boolean.TRUE);
+        return taskComplete(stage);
     }
 
     private LambdaCloudOperationOutput updateLambdaCode(StageExecution stage) {
@@ -75,6 +74,7 @@ public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
         String rawString = utils.asString(inp);
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
+        logger.debug("Posted to cloudDriver for updateLambdaCode: " + url);
         LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
         return operationOutput;
     }

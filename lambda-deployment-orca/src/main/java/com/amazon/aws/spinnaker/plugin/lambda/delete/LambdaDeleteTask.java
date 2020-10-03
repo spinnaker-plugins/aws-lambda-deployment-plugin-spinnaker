@@ -53,39 +53,36 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
     public TaskResult execute(@NotNull StageExecution stage) {
         logger.debug("Executing LambdaDeletionTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
+        prepareTask(stage);
         LambdaDeleteStageInput ldi = utils.getInput(stage, LambdaDeleteStageInput.class);
         ldi.setAppName(stage.getExecution().getApplication());
 
         if (ldi.getVersion().equals("$ALL")) {
-            return formTaskResult(deleteLambdaVersion(ldi), null);
+            return formTaskResult(stage, deleteLambdaVersion(ldi), stage.getOutputs());
         }
 
         String versionToDelete = getVersion(stage, ldi);
         if (versionToDelete == null) {
-            return formSuccessTaskResult(stage, "Found no version of function to delete");
+            return formSuccessTaskResult(stage, "LambdaDeleteTask",  "Found no version of function to delete");
         }
 
-        final Map<String, Object> outputMap = new HashMap<String, Object>();
-        outputMap.put("deletedVersion", versionToDelete);
-
+        addToTaskContext(stage, "deletedVersion", versionToDelete);
         if (!versionToDelete.contains(",")) {
             ldi.setQualifier(versionToDelete);
-            return formTaskResult(deleteLambdaVersion(ldi), outputMap);
+            return formTaskResult(stage, deleteLambdaVersion(ldi), stage.getOutputs());
         }
 
         String[] allVersionsList = versionToDelete.split(",");
-        LambdaCloudOperationOutput ldso = null;
         List<String> urlList = new ArrayList<String>();
 
         for (String currVersion : allVersionsList) {
             ldi.setQualifier((String) currVersion);
-            ldso = deleteLambdaVersion(ldi);
+            LambdaCloudOperationOutput ldso = deleteLambdaVersion(ldi);
             urlList.add(ldso.getUrl());
         }
 
-        Map<String, Object> context = buildContextOutput(ldso);
-        context.put("urlList", urlList);
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).outputs(outputMap).context(context).build();
+        addToTaskContext(stage, "urlList", urlList);
+        return taskComplete(stage);
     }
 
     private LambdaCloudOperationOutput deleteLambdaVersion(LambdaDeleteStageInput ldi) {
@@ -116,6 +113,7 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
         String rawString = utils.asString(inp);
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
+        logger.debug("Posted to cloudDriver for deleteLambda: " + url);
         LambdaCloudOperationOutput resp = LambdaCloudOperationOutput.builder().url(url).build();
         return resp;
     }

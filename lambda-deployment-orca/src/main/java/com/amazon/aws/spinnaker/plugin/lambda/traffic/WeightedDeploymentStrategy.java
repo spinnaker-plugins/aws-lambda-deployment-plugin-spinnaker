@@ -42,10 +42,10 @@ public class WeightedDeploymentStrategy extends BaseDeploymentStrategy<LambdaWei
     public LambdaCloudOperationOutput deploy(LambdaWeightedStrategyInput inp) {
         String cloudDriverUrl = props.getCloudDriverBaseUrl();
         Map<String, Object> outputMap  = new HashMap<>();
-        outputMap.put("majorVersionDeployed", inp.getMajorFunctionVersion());
-        outputMap.put("minorVersionDeployed", inp.getMinorFunctionVersion());
-        outputMap.put("aliasDeployed", inp.getAliasName());
-        outputMap.put("strategyUsed", "WeightedDeploymentStrategy");
+        outputMap.put("deployment:majorVersionDeployed", inp.getMajorFunctionVersion());
+        outputMap.put("deployment:minorVersionDeployed", inp.getMinorFunctionVersion());
+        outputMap.put("deployment:aliasDeployed", inp.getAliasName());
+        outputMap.put("deployment:strategyUsed", "WeightedDeploymentStrategy");
         // TODO: Form a new inputObject such as SimpleStrategyInput and just have the
         LambdaCloudOperationOutput out = postToCloudDriver(inp, cloudDriverUrl, utils);
         out.setOutputMap(outputMap);

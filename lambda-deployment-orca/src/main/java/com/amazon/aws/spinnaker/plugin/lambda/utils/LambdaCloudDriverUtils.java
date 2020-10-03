@@ -202,6 +202,9 @@ public class LambdaCloudDriverUtils {
             objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
             TypeFactory typeFactory = objectMapper.getTypeFactory();
             List<T> someClassList = objectMapper.readValue(inpString, typeFactory.constructCollectionType(List.class, type));
+            if (someClassList.size() == 0) {
+                return null;
+            }
             return someClassList.get(0);
         }
         catch (Throwable e) {

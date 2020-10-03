@@ -163,10 +163,11 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
         }
         String endPoint = cloudDriverUrl + CLOUDDRIVER_UPDATE_EVENT_CONFIGURATION_LAMBDA_PATH;
         List<String> existingEvents = new ArrayList<String>();
-        if (StringUtils.isNullOrEmpty(taskInput.getAliasName())) {
-            // still cant update and delete events on aliases.
-            existingEvents = getExistingEvents(lf);
-        }
+        //if (StringUtils.isNullOrEmpty(taskInput.getAliasName())) {
+        //    // still cant update and delete events on aliases.
+        //    existingEvents = getExistingEvents(lf);
+        //}
+        existingEvents = getExistingEvents(lf);
         final List<String> tmpEvents = existingEvents;
         taskInput.getTriggerArns().stream()
                .filter(curr -> { return !tmpEvents.contains(curr); })
@@ -175,6 +176,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
                    String rawString = utils.asString(singleEvent);
                    LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
                    String url = cloudDriverUrl + respObj.getResourceUri();
+                   logger.debug("Posted to cloudDriver for updateEventConfiguration: " + url);
                    LambdaCloudOperationOutput z = LambdaCloudOperationOutput.builder().url(url).resourceId(respObj.getResourceUri()).build();
                    ans.getEventOutputs().add(z);
                });
@@ -198,10 +200,10 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
         String rawString = utils.asString(inp);
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
+        logger.debug("Posted to cloudDriver for deleteLambdaEventConfig: " + url);
         LambdaCloudOperationOutput resp = LambdaCloudOperationOutput.builder().url(url).build();
         return resp;
     }
-
 
     /**
      * Fill up with values required for next task

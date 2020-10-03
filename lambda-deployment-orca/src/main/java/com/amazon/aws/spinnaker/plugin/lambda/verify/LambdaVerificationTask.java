@@ -20,7 +20,6 @@ import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaStageConstants;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
-import com.netflix.spinnaker.orca.api.pipeline.Task;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
@@ -50,10 +49,22 @@ public class LambdaVerificationTask implements LambdaStageBaseTask {
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
         logger.debug("Executing lambdaVerificationTask...");
+        cloudDriverUrl = props.getCloudDriverBaseUrl();
+        prepareTask(stage);
+        try {
+            return doVerify(stage);
+        }
+        catch (Throwable e) {
+            logger.error("Exception verifying task", e);
+            logException(stage, e);
+            addExceptionToOutput(stage, e) ;
+            return formErrorTaskResult(stage, "Exception during task verification");
+        }
+    }
+
+    private TaskResult doVerify(StageExecution stage) {
         Map<String, Object> stageContext = stage.getContext();
-
         List<String> urlKeyList = LambdaStageConstants.allUrlKeys;
-
         List<String> urlList = urlKeyList.stream().filter(x -> {
             return (String)stageContext.get(x) != null ;
         }).map(singleUrlKey ->  {
@@ -75,25 +86,33 @@ public class LambdaVerificationTask implements LambdaStageBaseTask {
             return TaskResult.builder(ExecutionStatus.RUNNING).build();
         }
 
+        // Clear the keys, now that the tasks are complete.
+        urlKeyList.forEach(x -> {
+            stageContext.remove(x);
+        });
+        stageContext.remove(LambdaStageConstants.eventTaskKey);
+        stageContext.remove(LambdaStageConstants.aliasTaskKey);
+
         boolean anyFailures = listOfTaskResults.stream().anyMatch(taskResult -> {
             return taskResult.getStatus().isFailed();
         });
 
         if (!anyFailures) {
-            final Map<String, Object> outputMap = new HashMap<String, Object>();
+            copyContextToOutput(stage);
             listOfTaskResults.stream().forEach(taskResult -> {
                 if (taskResult.getResults() != null) {
                     String arn = taskResult.getResults().getFunctionArn();
                     if (arn != null) {
-                        outputMap.put("functionARN", arn);
-                        outputMap.put("resourceId", arn);
-                        outputMap.put("url", taskResult.getResults().getFunctionName());
-                        outputMap.put("functionName", taskResult.getResults().getFunctionName());
+                        addToOutput(stage, "functionARN", arn);
+                        addToOutput(stage, "resourceId", arn);
+                        addToOutput(stage, "url", taskResult.getResults().getFunctionName());
+                        addToOutput(stage, "functionName", taskResult.getResults().getFunctionName());
                     }
                 }
             });
-            stage.getOutputs().putAll(outputMap);
-            return TaskResult.builder(ExecutionStatus.SUCCEEDED).outputs(outputMap).build();
+
+            copyContextToOutput(stage);
+            return taskComplete(stage);
         }
 
         // Process failures:

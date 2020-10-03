@@ -24,6 +24,7 @@ import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
+import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -51,25 +52,27 @@ public class LambdaTrafficUpdateTask implements LambdaStageBaseTask {
     @NotNull
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
+        logger.debug("Executing LambdaTrafficUpdateTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
+        prepareTask(stage);
         LambdaCloudOperationOutput result = null;
         BaseDeploymentStrategy strat = getDeploymentStrategy(stage);
         if (shouldUpdateAlias(stage)) {
             LambdaBaseStrategyInput input = strat.setupInput(stage);
             result = strat.deploy(input);
             if (result == null) {
-                return this.formErrorTaskResult(stage, "Deployment failed");
+                return formErrorTaskResult(stage, "Deployment failed");
             }
+            final StageExecution tmpStage = stage;
+            result.getOutputMap().forEach((x,y) -> {
+                addToTaskContext(tmpStage, (String)x, y);
+            });
         }
         else {
             result = LambdaCloudOperationOutput.builder().build();
         }
-        Map<String, Object> context = buildContextOutput(result, "url");
-        Map<String, Object> outputs = result.getOutputMap();
-        if (outputs == null) {
-            outputs = new HashMap<String, Object>();
-        }
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).outputs(outputs).build();
+        addCloudOperationToContext(stage, result, "url");
+        return taskComplete(stage);
     }
 
     private BaseDeploymentStrategy getDeploymentStrategy(StageExecution stage) {

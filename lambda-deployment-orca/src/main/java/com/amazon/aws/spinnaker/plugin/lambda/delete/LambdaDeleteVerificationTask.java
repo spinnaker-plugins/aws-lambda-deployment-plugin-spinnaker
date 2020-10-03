@@ -46,6 +46,7 @@ public class LambdaDeleteVerificationTask implements LambdaStageBaseTask {
     @NotNull
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
+        prepareTask(stage);
         Map<String, Object> stageContext = stage.getContext();
         String url = (String)stageContext.get("url");
         LambdaCloudDriverTaskResults op = utils.verifyStatus(url);
@@ -58,7 +59,8 @@ public class LambdaDeleteVerificationTask implements LambdaStageBaseTask {
         }
         Map<String, Object> outputMap = new HashMap<>();
         outputMap.put("message", "Lambda (Version) Deletion succeeded");
+        copyContextToOutput(stage);
         stage.getOutputs().putAll(outputMap);
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).outputs(outputMap).build();
+        return taskComplete(stage);
     }
 }

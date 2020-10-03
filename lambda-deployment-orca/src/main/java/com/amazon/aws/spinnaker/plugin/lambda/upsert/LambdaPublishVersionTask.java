@@ -33,13 +33,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @Component
 public class LambdaPublishVersionTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaPublishVersionTask.class);
     private static final ObjectMapper objMapper = new ObjectMapper();
-    private static String CLOUDDRIVER_PUBLISH_VERSION_PATH = "/aws/ops/publishLambdaFunctionVersion";
+    private static final String CLOUDDRIVER_PUBLISH_VERSION_PATH = "/aws/ops/publishLambdaFunctionVersion";
 
     @Autowired
     CloudDriverConfigurationProperties props;
@@ -51,15 +49,17 @@ public class LambdaPublishVersionTask implements LambdaStageBaseTask {
     @NotNull
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
+        logger.debug("Executing LambdaPublishVersionTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
+        prepareTask(stage);
         if (!requiresVersionPublish(stage)) {
-            return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(stage.getContext()).build();
+            addToOutput(stage, LambdaStageConstants.lambaVersionPublishedKey, Boolean.FALSE);
+            return taskComplete(stage);
         }
-
         LambdaCloudOperationOutput output = this.publishVersion(stage);
-        Map<String, Object> context = buildContextOutput(output,  LambdaStageConstants.publishVersionUrlKey);
-        context.put(LambdaStageConstants.lambaVersionPublishedKey, Boolean.TRUE);
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
+        addCloudOperationToContext(stage, output, LambdaStageConstants.publishVersionUrlKey);
+        this.addToTaskContext(stage, LambdaStageConstants.lambaVersionPublishedKey, Boolean.TRUE);
+        return taskComplete(stage);
     }
 
     private boolean requiresVersionPublish(StageExecution stage) {
@@ -85,6 +85,7 @@ public class LambdaPublishVersionTask implements LambdaStageBaseTask {
         inp.setRevisionId(revisionId);
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
+        logger.debug("Posted to cloudDriver for publishVersion: " + url);
         LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
         return operationOutput;
     }
@@ -98,5 +99,4 @@ public class LambdaPublishVersionTask implements LambdaStageBaseTask {
     @Override
     public void onCancel(@NotNull StageExecution stage) {
     }
-
 }

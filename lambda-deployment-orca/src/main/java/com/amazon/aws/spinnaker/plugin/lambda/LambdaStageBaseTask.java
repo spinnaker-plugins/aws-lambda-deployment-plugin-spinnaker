@@ -28,43 +28,83 @@ import java.util.Map;
 
 public interface LambdaStageBaseTask extends Task {
 
+    default public boolean validateInput(StageExecution stage) {
+        return true;
+    }
+
+    default void prepareTask(StageExecution stage) {
+        if (stage.getOutputs() == null) {
+            stage.setOutputs(new HashMap<String, Object>());
+        }
+        stage.getContext().put("taskContext", new HashMap<String, Object>());
+    }
+
+    default void addToTaskContext(StageExecution stage, String key, Object value) {
+        ((Map<String, Object>)stage.getContext().get("taskContext")).put(key, value);
+    }
+
     /**
-     * Fill up with values required for next task
-     * @param ldso
-     * @return
+     * In verify tasks, copy stuff from context to output if the cloudDriver operation succeeded
+     * If we get all the outputs from the cloudoperation results, this may not be needed.
+     * Meanwhile, during a task, we copy potential required outputs to context and then
+     * during the verification of that task, if (and only if) the task was successful, we copy the context to output
+     * @param stage
      */
-    default Map<String, Object> buildContextOutput(LambdaCloudOperationOutput ldso) {
-        return buildContextOutput(ldso, "url");
+    default void copyContextToOutput(StageExecution stage) {
+        Map c = (Map<String, Object>)stage.getContext().get("taskContext");
+        c.forEach((x, y) -> stage.getOutputs().put((String)x, y));
     }
 
-    default Map<String, Object> buildContextOutput(LambdaCloudOperationOutput ldso, String urlKey) {
+    default Map<String, Object> getTaskContext(StageExecution stage) {
+        return (Map<String, Object>)stage.getContext().get("taskContext");
+    }
+
+    default void addToOutput(StageExecution stage, String key, Object value) {
+        stage.getOutputs().put(key, value);
+    }
+
+    default void addErrorMessage(StageExecution stage, String errorMesssage) {
+        stage.getOutputs().put("failureMessage", errorMesssage);
+    }
+
+    default void logException(StageExecution stage, Throwable e) {
+        //TODO: Print the entire stage context etc.
+        e.printStackTrace();
+    }
+
+    default void addExceptionToOutput(StageExecution stage, Throwable e) {
+        stage.getOutputs().put("failureMessage", e.getMessage());
+    }
+
+    default void addCloudOperationToContext(StageExecution stage, LambdaCloudOperationOutput ldso) {
+        addCloudOperationToContext(stage, ldso, "url");
+    }
+
+    default void addCloudOperationToContext(StageExecution stage, LambdaCloudOperationOutput ldso, String urlKey) {
         String url = ldso.getUrl() != null ? ldso.getUrl() : "";
-        Map<String, Object> context = new HashMap<String, Object>();
-        context.put(urlKey, url);
-        return context;
+        this.addToTaskContext(stage, urlKey, url);
+    }
+    default TaskResult taskComplete(StageExecution stage) {
+        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(getTaskContext(stage)).outputs(stage.getOutputs()).build();
     }
 
-    default TaskResult formTaskResult(LambdaCloudOperationOutput ldso, Map<String, Object> outputMap) {
-        Map<String, Object> context = buildContextOutput(ldso);
+
+    default TaskResult formTaskResult(StageExecution stage, LambdaCloudOperationOutput ldso, Map<String, Object> outputMap) {
+        addCloudOperationToContext(stage, ldso);
         if (outputMap == null) {
             outputMap = new HashMap<String, Object>();
         }
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).outputs(outputMap).build();
+        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(getTaskContext(stage)).outputs(outputMap).build();
     }
 
-    default TaskResult formSuccessTaskResult(StageExecution stage, String successMessage) {
-        Map<String, Object> outputMap = new HashMap<>();
-        outputMap.put("status", successMessage);
-        Map<String, Object> out =stage.getOutputs();
-        stage.getOutputs().putAll(outputMap);
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).outputs(outputMap).build();
+    default TaskResult formSuccessTaskResult(StageExecution stage, String taskName, String successMessage) {
+        addToOutput(stage, "status:" + taskName, successMessage);
+        return TaskResult.builder(ExecutionStatus.SUCCEEDED).outputs(stage.getOutputs()).build();
     }
 
     default TaskResult formErrorTaskResult(StageExecution stage, String errorMessage) {
-        Map<String, Object> outputMap = new HashMap<String, Object>();
-        outputMap.put("failureMessage", errorMessage);
-        stage.getOutputs().putAll(outputMap);
-        return TaskResult.builder(ExecutionStatus.TERMINAL).outputs(outputMap).build();
+        addErrorMessage(stage, errorMessage);
+        return TaskResult.builder(ExecutionStatus.TERMINAL).outputs(stage.getOutputs()).build();
     }
 
     default TaskResult formErrorListTaskResult(StageExecution stage, List<String> errorMessages) {

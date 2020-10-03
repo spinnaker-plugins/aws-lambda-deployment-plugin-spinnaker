@@ -41,9 +41,9 @@ public class SimpleDeploymentStrategy extends BaseDeploymentStrategy<LambdaSimpl
     public LambdaCloudOperationOutput deploy(LambdaSimpleStrategyInput inp) {
         String cloudDriverUrl = props.getCloudDriverBaseUrl();
         Map<String, Object> outputMap  = new HashMap<String, Object>();
-        outputMap.put("majorVersionDeployed", inp.getMajorFunctionVersion());
-        outputMap.put("strategyUsed", "SimpleDeploymentStrategy");
-        outputMap.put("aliasDeployed", inp.getAliasName());
+        outputMap.put("deployment:majorVersionDeployed", inp.getMajorFunctionVersion());
+        outputMap.put("deployment:strategyUsed", "SimpleDeploymentStrategy");
+        outputMap.put("deployment:aliasDeployed", inp.getAliasName());
         LambdaCloudOperationOutput out = postToCloudDriver(inp, cloudDriverUrl, utils);
         out.setOutputMap(outputMap);
         return out;

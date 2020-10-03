@@ -34,11 +34,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @Component
 public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
-    private static Logger logger = LoggerFactory.getLogger(LambdaPublishVersionTask.class);
+    private static Logger logger = LoggerFactory.getLogger(LambdaPutConcurrencyTask.class);
     private static final ObjectMapper objMapper = new ObjectMapper();
     private static String CLOUDDRIVER_PROVISIONED_CONCURRENCY_PATH = "/aws/ops/putLambdaProvisionedConcurrency";
     private static String CLOUDDRIVER_RESERVED_CONCURRENCY_PATH = "/aws/ops/putLambdaReservedConcurrency";
@@ -53,15 +51,19 @@ public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
     @NotNull
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
+        logger.debug("Executing LambdaPutConcurrencyTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
+        prepareTask(stage);
         LambdaConcurrencyInput inp = utils.getInput(stage, LambdaConcurrencyInput.class);
         inp.setAppName(stage.getExecution().getApplication());
         if ((inp.getProvisionedConcurrentExecutions() == 0)  && (inp.getReservedConcurrentExecutions() == 0)){
-            return formSuccessTaskResult(stage, "Lambda concurrency : nothing to update");
+            addToOutput(stage, "LambdaPutConcurrencyTask" , "Lambda concurrency : nothing to update");
+            return taskComplete(stage);
         }
+
         LambdaCloudOperationOutput output = putConcurrency(inp);
-        Map<String, Object> context = buildContextOutput(output,  LambdaStageConstants.lambaPutConcurrencyKey);
-        return TaskResult.builder(ExecutionStatus.SUCCEEDED).context(context).build();
+        addCloudOperationToContext(stage, output, LambdaStageConstants.putConcurrencyUrlKey);
+        return taskComplete(stage);
     }
 
     private LambdaCloudOperationOutput putConcurrency(LambdaConcurrencyInput inp) {
@@ -81,6 +83,7 @@ public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
         String endPoint = cloudDriverUrl + CLOUDDRIVER_RESERVED_CONCURRENCY_PATH;
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
+        logger.debug("Posted to cloudDriver for putReservedConcurrency: " + url);
         LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
         return operationOutput;
     }
@@ -91,6 +94,7 @@ public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
         String endPoint = cloudDriverUrl + CLOUDDRIVER_PROVISIONED_CONCURRENCY_PATH;
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
+        logger.debug("Posted to cloudDriver for putProvisionedConcurrency: " + url);
         LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
         return operationOutput;
     }
