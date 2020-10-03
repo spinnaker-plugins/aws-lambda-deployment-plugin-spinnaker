@@ -57,10 +57,8 @@ public class LambdaDeleteVerificationTask implements LambdaStageBaseTask {
             List<String> allMessages = Arrays.asList(op.getErrors().getMessage());
             return formErrorListTaskResult(stage, allMessages);
         }
-        Map<String, Object> outputMap = new HashMap<>();
-        outputMap.put("message", "Lambda (Version) Deletion succeeded");
         copyContextToOutput(stage);
-        stage.getOutputs().putAll(outputMap);
+        addToOutput(stage, "deleteTask", "done");
         return taskComplete(stage);
     }
 }

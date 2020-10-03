@@ -28,7 +28,7 @@ import java.util.Map;
 
 public interface LambdaStageBaseTask extends Task {
 
-    default public boolean validateInput(StageExecution stage) {
+    default boolean validateInput(StageExecution stage) {
         return true;
     }
 
@@ -36,7 +36,9 @@ public interface LambdaStageBaseTask extends Task {
         if (stage.getOutputs() == null) {
             stage.setOutputs(new HashMap<String, Object>());
         }
-        stage.getContext().put("taskContext", new HashMap<String, Object>());
+        if (stage.getContext().get("taskContext") == null) {
+            stage.getContext().put("taskContext", new HashMap<String, Object>());
+        }
     }
 
     default void addToTaskContext(StageExecution stage, String key, Object value) {

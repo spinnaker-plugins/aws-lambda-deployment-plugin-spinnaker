@@ -58,6 +58,7 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
         ldi.setAppName(stage.getExecution().getApplication());
 
         if (ldi.getVersion().equals("$ALL")) {
+            addToTaskContext(stage, "deleteTask:deleteVersion", ldi.getVersion());
             return formTaskResult(stage, deleteLambdaVersion(ldi), stage.getOutputs());
         }
 
@@ -66,7 +67,8 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
             return formSuccessTaskResult(stage, "LambdaDeleteTask",  "Found no version of function to delete");
         }
 
-        addToTaskContext(stage, "deletedVersion", versionToDelete);
+        addToTaskContext(stage, "deleteTask:deleteVersion", versionToDelete);
+
         if (!versionToDelete.contains(",")) {
             ldi.setQualifier(versionToDelete);
             return formTaskResult(stage, deleteLambdaVersion(ldi), stage.getOutputs());
@@ -80,7 +82,6 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
             LambdaCloudOperationOutput ldso = deleteLambdaVersion(ldi);
             urlList.add(ldso.getUrl());
         }
-
         addToTaskContext(stage, "urlList", urlList);
         return taskComplete(stage);
     }
