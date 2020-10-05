@@ -134,8 +134,8 @@ export function RouteLambdaFunctionStageForm(props: IFormikStageConfigInjectedPr
       <FormikFormField
         name="provisionedConcurrentExecutions"
         label="Provisioned Concurrency"
-        help={<HelpField content="To enable your function to scale without fluctuations in latency, use provisioned concurrency. Provisioned concurrency runs continually and has separate pricing for concurrency and execution duration." />}
-        input={props => <NumberInput {...props} max={3000} />}
+        help={<HelpField content="To enable your function to scale without fluctuations in latency, use provisioned concurrency. Provisioned concurrency runs continually and has separate pricing for concurrency and execution duration. Concurrency cannot be provisioned with a weighted deployment strategy." />}
+        input={props => <NumberInput {...props} min={0} max={values.deploymentStrategy === "$WEIGHTED" ? 0 : 3000} />}
         required={false}
       />
       
