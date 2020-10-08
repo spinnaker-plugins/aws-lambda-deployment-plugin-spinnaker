@@ -31,10 +31,14 @@ jobs:
       - name: download jq
         run: sudo apt-get install jq
 
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
       - name: checkout code
         uses: actions/checkout@v2
         with:
-          ref: 'master'
+          ref: 'release/${{ steps.get_version.outputs.VERSION }}'
 
       - name: run tests
         run: ./gradlew test
