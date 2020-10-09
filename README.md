@@ -15,26 +15,26 @@ This plugin is currently only compatible with Spinnaker platform 1.23.x and up. 
 
 ## Requirements
 1. This plugin requires Java 11
-2. AWS Lambda functions must be enabled in your spinnaker environment [more info](https://aws.amazon.com/blogs/opensource/how-to-integrate-aws-lambda-with-spinnaker/)
+2. AWS Lambda functions must be enabled in your spinnaker environment and for all required AWS accounts. Find more information [here](https://aws.amazon.com/blogs/opensource/how-to-integrate-aws-lambda-with-spinnaker/) or within [samples](samples/README.md).
  
 ## Plugin Users Guide
 
 ### Usage
 1. Add the following to the Halyard config (typically found at `~/.hal/config`) to load the Orca backend
 ```yaml
-spinnaker:
-  extensibility:
-    plugins:
-      Aws.LambdaDeploymentPlugin:
-        enabled: true
-        version: <<VERSION NUMBER>> 
-        extensions:
-          Aws.LambdaDeploymentStage:
-            enabled: true
-    repositories:
-      awsLambdaDeploymentPluginRepo:
-        id: awsLambdaDeploymentPluginRepo
-        url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.1/plugins.json
+  spinnaker:
+    extensibility:
+      plugins:
+        Aws.LambdaDeploymentPlugin:
+          enabled: true
+          version: <<VERSION NUMBER>> 
+          extensions:
+            Aws.LambdaDeploymentStage:
+              enabled: true
+      repositories:
+        awsLambdaDeploymentPluginRepo:
+          id: awsLambdaDeploymentPluginRepo
+          url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.1/plugins.json
 ```
 2. Add the following to `gate-local.yml` in the necessary [profile](https://spinnaker.io/reference/halyard/custom/#custom-profiles) to load the Deck frontend
 ```yaml

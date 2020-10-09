@@ -1,0 +1,301 @@
+currentDeployment: default
+deploymentConfigurations:
+- name: default
+  version: 1.22.1
+  providers:
+    appengine:
+      enabled: false
+      accounts: []
+    aws:
+      enabled: true
+      accounts:
+      - name: aws-acct-1 
+        requiredGroupMembership: []
+        permissions: {}
+        accountId: '111122223333'
+        regions: []
+        assumeRole: role/spinnakerManaged
+        lifecycleHooks: []
+      - name: aws-acct-2
+        requiredGroupMembership: []
+        permissions: {}
+        accountId: '444455556666'
+        regions: []
+        assumeRole: role/spinnakerManaged
+        lifecycleHooks: []
+      primaryAccount: isengard-default
+      bakeryDefaults:
+        baseImages: []
+      accessKeyId: << ACCESS KEY ID >> 
+      secretAccessKey: << SECRET ACCESS KEY >>
+      defaultKeyPairTemplate: '{{name}}-keypair'
+      defaultRegions:
+      - name: us-west-2
+      defaults:
+        iamRole: BaseIAMRole
+    ecs:
+      enabled: false
+      accounts: []
+    azure:
+      enabled: false
+      accounts: []
+      bakeryDefaults:
+        templateFile: azure-linux.json
+        baseImages: []
+    dcos:
+      enabled: false
+      accounts: []
+      clusters: []
+    dockerRegistry:
+      enabled: false
+      accounts: []
+    google:
+      enabled: false
+      accounts: []
+      bakeryDefaults:
+        templateFile: gce.json
+        baseImages: []
+        zone: us-central1-f
+        network: default
+        useInternalIp: false
+    huaweicloud:
+      enabled: false
+      accounts: []
+      bakeryDefaults:
+        baseImages: []
+    kubernetes:
+      enabled: false
+      accounts: []
+    tencentcloud:
+      enabled: false
+      accounts: []
+      bakeryDefaults:
+        baseImages: []
+    oracle:
+      enabled: false
+      accounts: []
+      bakeryDefaults:
+        templateFile: oci.json
+        baseImages: []
+    cloudfoundry:
+      enabled: false
+      accounts: []
+  deploymentEnvironment:
+    size: SMALL
+    type: LocalGit
+    imageVariant: SLIM
+    updateVersions: true
+    consul:
+      enabled: false
+    vault:
+      enabled: false
+    customSizing: {}
+    sidecars: {}
+    initContainers: {}
+    hostAliases: {}
+    affinity: {}
+    tolerations: {}
+    nodeSelectors: {}
+    gitConfig:
+      upstreamUser: spinnaker
+      originUser: << GIT USERNAME >> 
+    livenessProbeConfig:
+      enabled: false
+    haServices:
+      clouddriver:
+        enabled: false
+        disableClouddriverRoDeck: false
+      echo:
+        enabled: false
+  persistentStorage:
+    persistentStoreType: s3
+    azs: {}
+    gcs:
+      rootFolder: front50
+    redis: {}
+    s3:
+      bucket: << S3 BUCKET NAME >> 
+      rootFolder: front50
+      region: us-west-2
+      pathStyleAccess: false
+      accessKeyId: << ACCESS KEY ID >>
+      secretAccessKey: << SECRET ACCESS KEY >> 
+    oracle: {}
+  features:
+    chaos: false
+    artifactsRewrite: true
+  metricStores:
+    datadog:
+      enabled: false
+      tags: []
+    prometheus:
+      enabled: false
+      add_source_metalabels: true
+    stackdriver:
+      enabled: false
+    newrelic:
+      enabled: false
+      tags: []
+    period: 30
+    enabled: false
+  notifications:
+    slack:
+      enabled: false
+    twilio:
+      enabled: false
+      baseUrl: https://api.twilio.com/
+    github-status:
+      enabled: false
+  timezone: America/Los_Angeles
+  ci:
+    jenkins:
+      enabled: false
+      masters: []
+    travis:
+      enabled: false
+      masters: []
+    wercker:
+      enabled: false
+      masters: []
+    concourse:
+      enabled: false
+      masters: []
+    gcb:
+      enabled: false
+      accounts: []
+    codebuild:
+      enabled: false
+      accounts: []
+  repository:
+    artifactory:
+      enabled: false
+      searches: []
+  security:
+    apiSecurity:
+      ssl:
+        enabled: false
+    uiSecurity:
+      ssl:
+        enabled: false
+    authn:
+      oauth2:
+        enabled: false
+        client: {}
+        resource: {}
+        userInfoMapping: {}
+      saml:
+        enabled: false
+        userAttributeMapping: {}
+      ldap:
+        enabled: false
+      x509:
+        enabled: false
+      iap:
+        enabled: false
+      enabled: false
+    authz:
+      groupMembership:
+        service: EXTERNAL
+        google:
+          roleProviderType: GOOGLE
+        github:
+          roleProviderType: GITHUB
+        file:
+          roleProviderType: FILE
+        ldap:
+          roleProviderType: LDAP
+      enabled: false
+  artifacts:
+    bitbucket:
+      enabled: false
+      accounts: []
+    gcs:
+      enabled: false
+      accounts: []
+    oracle:
+      enabled: false
+      accounts: []
+    github:
+      enabled: false
+      accounts: []
+    gitlab:
+      enabled: false
+      accounts: []
+    gitrepo:
+      enabled: false
+      accounts: []
+    http:
+      enabled: false
+      accounts: []
+    helm:
+      enabled: false
+      accounts: []
+    s3:
+      enabled: true
+      accounts:
+      - name: s3-artifact-provider
+        region: us-east-1
+    maven:
+      enabled: false
+      accounts: []
+    templates: []
+  pubsub:
+    enabled: false
+    google:
+      enabled: false
+      pubsubType: GOOGLE
+      subscriptions: []
+      publishers: []
+  canary:
+    enabled: false
+    serviceIntegrations:
+    - name: google
+      enabled: false
+      accounts: []
+      gcsEnabled: false
+      stackdriverEnabled: false
+    - name: prometheus
+      enabled: false
+      accounts: []
+    - name: datadog
+      enabled: false
+      accounts: []
+    - name: signalfx
+      enabled: false
+      accounts: []
+    - name: aws
+      enabled: false
+      accounts: []
+      s3Enabled: false
+    - name: newrelic
+      enabled: false
+      accounts: []
+    reduxLoggerEnabled: true
+    defaultJudge: NetflixACAJudge-v1.0
+    stagesEnabled: true
+    templatesEnabled: true
+    showAllConfigsEnabled: true
+  spinnaker:
+    extensibility:
+      plugins: 
+        Aws.LambdaDeploymentPlugin:
+          id: Aws.LambdaDeploymentPlugin
+          enabled: true
+          version: 0.0.1
+          extensions:
+            Aws.LambdaDeploymentStage:
+              enabled: true
+      repositories: 
+        awsLambdaDeploymentPluginRepo:
+          id: awsLambdaDeploymentPluginRepo
+          url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.1/plugins.json 
+  webhook:
+    trust:
+      enabled: false
+  stats:
+    enabled: true
+    endpoint: https://stats.spinnaker.io
+    instanceId: 01EFJ7MVJJFKC561VHPYP82JEZ
+    deploymentMethod: {}
+    connectionTimeoutMillis: 3000
+    readTimeoutMillis: 5000
