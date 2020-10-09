@@ -14,8 +14,7 @@ export function ExecutionRoleForm( props: IFormikStageConfigInjectedProps ) {
     <FormikFormField
       name="role"
       label="Role ARN"
-      input={props => <TextInput {...props} placeholder="Enter role ARN" name="role" />}
-      required={true}
+      input={props => <TextInput {...props} placeholder="Enter role ARN" name="role" />} 
     />
   );
 }

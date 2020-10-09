@@ -49,15 +49,17 @@ public class LambdaDeleteVerificationTask implements LambdaStageBaseTask {
         prepareTask(stage);
         Map<String, Object> stageContext = stage.getContext();
         String url = (String)stageContext.get("url");
-        LambdaCloudDriverTaskResults op = utils.verifyStatus(url);
-        if (!op.getStatus().isCompleted()) {
+        if (url != null) {
+            LambdaCloudDriverTaskResults op = utils.verifyStatus(url);
+            if (!op.getStatus().isCompleted()) {
                 return TaskResult.builder(ExecutionStatus.RUNNING).build();
+            }
+            if (op.getStatus().isFailed()) {
+                List<String> allMessages = Arrays.asList(op.getErrors().getMessage());
+                return formErrorListTaskResult(stage, allMessages);
+            }
+            copyContextToOutput(stage);
         }
-        if (op.getStatus().isFailed()) {
-            List<String> allMessages = Arrays.asList(op.getErrors().getMessage());
-            return formErrorListTaskResult(stage, allMessages);
-        }
-        copyContextToOutput(stage);
         addToOutput(stage, "deleteTask", "done");
         return taskComplete(stage);
     }

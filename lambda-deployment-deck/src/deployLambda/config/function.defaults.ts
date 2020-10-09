@@ -10,8 +10,8 @@ export function constructNewAwsFunctionTemplate(): IAmazonFunctionUpsertCommand 
   return {
     role: '',
     runtime: '',
-    s3bucket: '',
     s3key: '',
+    s3bucket: '',
     handler: '',
     functionName: '',
     publish: false,

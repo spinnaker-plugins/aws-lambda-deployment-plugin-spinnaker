@@ -240,34 +240,37 @@ public class LambdaCloudDriverUtils {
 
     public String getCanonicalVersion(LambdaDefinition lf, String inputVersion, String versionNumber, int retentionNumber) {
         List<String> revisions = getSortedRevisions(lf);
-
-        if (inputVersion.startsWith("$PROVIDED")) {  // actual version
-            return versionNumber;
-        }
-
-        if (inputVersion.startsWith("$LATEST")) { // latest version number
-            return revisions.get(0);
-        }
-
-        if (inputVersion.startsWith("$OLDEST")) { // oldest version number
-            return revisions.get(revisions.size() - 1);
-        }
-
-        if (inputVersion.startsWith("$PREVIOUS")) { // latest - 1 version number
-            if (revisions.size() >= 2)
-                return revisions.get(1);
-            else
-                return null;
-        }
-
-        if (inputVersion.startsWith("$MOVING")) { // list of versions
-            if (revisions.size() > retentionNumber) {
-                List<String> toRemoveList = revisions.subList(retentionNumber, revisions.size());
-                return String.join(",", toRemoveList);
+        if (revisions.size () != 0) {
+            if (inputVersion.startsWith("$PROVIDED")) {  // actual version
+                return versionNumber;
             }
+
+            if (inputVersion.startsWith("$LATEST")) { // latest version number
+                return revisions.get(0);
+            }
+
+            if (inputVersion.startsWith("$OLDEST")) { // oldest version number
+                return revisions.get(revisions.size() - 1);
+            }
+
+            if (inputVersion.startsWith("$PREVIOUS")) { // latest - 1 version number
+                if (revisions.size() >= 2)
+                    return revisions.get(1);
+                else
+                    return null;
+            }
+
+            if (inputVersion.startsWith("$MOVING")) { // list of versions
+                if (revisions.size() > retentionNumber) {
+                    List<String> toRemoveList = revisions.subList(retentionNumber, revisions.size());
+                    return String.join(",", toRemoveList);
+                }
+            }
+            // Couldnt find it.
+            logger.error(String.format("Found invalid version string %s", inputVersion));
+            return null;
         }
-        // Couldnt find it.
-        logger.error(String.format("Found invalid version string %s", inputVersion));
+        logger.error("No published versions exist for function.");
         return null;
     }
 

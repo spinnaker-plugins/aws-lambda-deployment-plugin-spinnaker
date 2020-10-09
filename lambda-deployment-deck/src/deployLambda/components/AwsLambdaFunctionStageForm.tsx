@@ -106,15 +106,13 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
               []
             }
           />
-        )}
-        required={false}
+        )} 
       />
       <FormikFormField
         name="reservedConcurrentExecutions"
         label="Reserved Concurrency"
         help={<HelpField content="The total number of current executions of your Lambda function that can be instantiated at any time." />}
-        input={props => <NumberInput {...props} max={3000} />}
-        required={false}
+        input={props => <NumberInput {...props} max={3000} />} 
       />
       <FormikFormField
         name="memorySize" 

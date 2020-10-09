@@ -28,7 +28,8 @@ export function DeleteLambdaExecutionDetails(props: IExecutionDetailsSectionProp
     <ExecutionDetailsSection name={name} current={current}>
       <StageFailureMessage stage={stage} message={stage.outputs.failureMessage} />
       <div>
-        <p> <b> Status: </b> {stage.outputs.message ? stage.outputs.message : "N/A"} </p> 
+        <p> <b> Status: </b> {stage.outputs.deleteTask === "done" ? "COMPLETE" : stage.outputs.deleteTask } </p>
+        <p> <b> Deleted Version: </b> {stage.outputs['deleteTask:deleteVersion'] ? stage.outputs['deleteTask:deleteVersion'] : "N/A"} </p> 
       </div>
     </ExecutionDetailsSection>
   );

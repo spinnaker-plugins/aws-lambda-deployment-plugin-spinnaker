@@ -44,8 +44,7 @@ export function TriggerEventsForm( props: IFormikStageConfigInjectedProps ) {
               []
             } 
           />
-        )}
-        required={false}
+        )} 
       />
       
       <FormikFormField
@@ -57,8 +56,7 @@ export function TriggerEventsForm( props: IFormikStageConfigInjectedProps ) {
             min={1}
             max={10} 
           />
-        )}
-        required={false}
+        )} 
       /> 
     </div>
   );

@@ -98,8 +98,7 @@ export function NetworkForm( props: IFormikStageConfigInjectedProps ) {
             stringOptions={availableVpcs}
             clearable={true}
           />
-        )} 
-        required={false}
+        )}  
       />      
       <div className="form-group">
         <div className="col-md-4 sm-label-right">

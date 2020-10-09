@@ -64,6 +64,7 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
 
         String versionToDelete = getVersion(stage, ldi);
         if (versionToDelete == null) {
+            addErrorMessage(stage, "No version found for Lambda function. Unable to perform delete operation.");
             return formSuccessTaskResult(stage, "LambdaDeleteTask",  "Found no version of function to delete");
         }
 
@@ -104,7 +105,10 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
         }
 
         LambdaDefinition lf = utils.findLambda(stage);
-        return utils.getCanonicalVersion(lf, ldi.getVersion(), ldi.getVersionNumber(), ldi.getRetentionNumber());
+        if (lf != null) {
+            return utils.getCanonicalVersion(lf, ldi.getVersion(), ldi.getVersionNumber(), ldi.getRetentionNumber());
+        }
+        return null;
     }
 
     private LambdaCloudOperationOutput deleteLambda(LambdaDeleteStageInput inp) {

@@ -3,9 +3,11 @@
 
 import React from 'react';
 
+import {isEmpty} from 'lodash';
+
 export function upsertDefaults(initialValues: any, defaultValues: any) {
   Object.entries(defaultValues).forEach(([key, value]) => {
-    if (!initialValues[key]){
+    if (!initialValues[key] && !isEmpty(value)){
       initialValues[key] = value;
     }
   })

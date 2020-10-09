@@ -39,23 +39,34 @@ export function LambdaDeploymentConfig(props: IStageConfigProps) {
 
 export function validate(stageConfig: IStage) {
   const validator = new FormValidator(stageConfig);
-  validator
-    .field('s3bucket', 'S3 Bucket Name')
-    .optional()
-    .withValidators(s3BucketNameValidator);
+
+  validator.field('runtime', 'Runtime').required();
+
+  validator.field('s3key', 'S3 Object Key').required();
+
+  validator.field('handler', 'Handler').required();
+
+  validator.field('functionUid', 'Function Name').required();
 
   validator
     .field('stackName', 'Stack Name')
-    .required()
+    .optional()
     .withValidators(simpleStringValidator);
 
   validator
-    .field('detailName', 'Detail Name') 
+    .field('detailName', 'Detail Name')
+    .optional()
     .withValidators(simpleStringValidator);
+
+  validator
+    .field('s3bucket', 'S3 Bucket Name')
+    .required()
+    .withValidators(s3BucketNameValidator);
 
   validator
     .field('role', 'Role ARN')
     .required()
     .withValidators(iamRoleValidator);
+
   return validator.validateForm();
 }

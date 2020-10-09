@@ -141,8 +141,7 @@ export function BasicSettingsForm( props: IFormikStageConfigInjectedProps ) {
               []  
             }
           />
-        )}
-        required={true}
+        )} 
       />
       <FormikFormField
         name="runtime"
