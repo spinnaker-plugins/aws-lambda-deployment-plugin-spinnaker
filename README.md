@@ -34,7 +34,7 @@ This plugin is currently only compatible with Spinnaker platform 1.23.x and up. 
       repositories:
         awsLambdaDeploymentPluginRepo:
           id: awsLambdaDeploymentPluginRepo
-          url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.1/plugins.json
+          url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.2/plugins.json
 ```
 2. Add the following to `gate-local.yml` in the necessary [profile](https://spinnaker.io/reference/halyard/custom/#custom-profiles) to load the Deck frontend
 ```yaml
@@ -48,7 +48,7 @@ spinnaker:
           version: <<VERSION NUMBER>>
       repositories:
         awsLambdaDeploymentPluginRepo:
-          url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.1/plugins.json 
+          url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.2/plugins.json 
 ```
 3. Execute `hal deploy apply` to deploy the changes
 

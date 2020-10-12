@@ -3,11 +3,20 @@
 
 import React from 'react';
 
-import {isEmpty} from 'lodash';
+import {isNil, isString} from 'lodash';
+
+function isEmptyString(val: any){
+  if ( isString(val) ) {
+    if ( (isNil(val)) || (val === "") ) {
+      return true;
+    }
+  }
+  return false;
+}
 
 export function upsertDefaults(initialValues: any, defaultValues: any) {
   Object.entries(defaultValues).forEach(([key, value]) => {
-    if (!initialValues[key] && !isEmpty(value)){
+    if (!initialValues[key] && !isEmptyString(value)){
       initialValues[key] = value;
     }
   })
