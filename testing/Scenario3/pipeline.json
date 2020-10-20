@@ -1,0 +1,102 @@
+{
+  "keepWaitingPipelines": false,
+  "lastModifiedBy": "anonymous",
+  "limitConcurrent": true,
+  "spelEvaluator": "v4",
+  "stages": [
+    {
+      "KMSKeyArn": "",
+      "account": "",
+      "aliases": "prod",
+      "cloudProvider": "aws",
+      "credentials": "",
+      "deadLetterConfig": {
+        "targetArn": ""
+      },
+      "describeName": "functional",
+      "description": "Functional Test for Scenario 3.",
+      "kmskeyArn": "",
+      "envVariables": {
+        "scenario": "3"
+      },
+      "functionName": "{}-test-functional-scenario3",
+      "functionUid": "scenario3",
+      "handler": "lambda_func.handler",
+      "memorySize": 128, 
+      "name": "AWS Lambda Deployment",
+      "operation": "",
+      "publish": true,
+      "refId": "4",
+      "region": "us-east-1",
+      "requisiteStageRefIds": [],
+      "role": "arn:aws:iam::111122223333:role/spinnaker-lambda-role",
+      "runtime": "python3.7",
+      "s3bucket": "lambda-test-bucket-0900",
+      "s3key": "lambda_func.zip",
+      "securityGroupIds": [],
+      "stackName": "test",
+      "subnetIds": [],
+      "tags": {
+        "Project": "Autodesk"
+      },
+      "targetGroups": "",
+      "timeout": 100,
+      "tracingConfig": {
+        "mode": "PassThrough"
+      },
+      "type": "Aws.LambdaDeploymentStage",
+      "vpcId": ""
+    },
+    {
+      "KMSKeyArn": "",
+      "account": "",
+      "aliases": "prod",
+      "batchsize": 5,
+      "cloudProvider": "aws",
+      "credentials": "",
+      "deadLetterConfig": {
+        "targetArn": ""
+      },
+      "describeName": "functional",
+      "description": "Functional Test for Scenario 3",
+      "kmskeyArn": "",
+      "envVariables": {
+        "scenario": "3"
+      },
+      "functionName": "sandbox-test-functional-scenario3",
+      "functionUid": "scenario3",
+      "handler": "lambda_func.handler",
+      "memorySize": 128,
+      "name": "AWS Lambda Deployment",
+      "operation": "",
+      "publish": true,
+      "refId": "5",
+      "region": "us-east-1",
+      "requisiteStageRefIds": [
+        "4"
+      ],
+      "role": "arn:aws:iam::111122223333:role/spinnaker-lambda-role",
+      "runtime": "python3.7",
+      "s3bucket": "lambda-test-bucket-0900",
+      "s3key": "lambda_func.zip",
+      "securityGroupIds": [],
+      "stackName": "test",
+      "subnetIds": [],
+      "tags": {
+        "Project": "Autodesk"
+      },
+      "targetGroups": "",
+      "timeout": 100,
+      "tracingConfig": {
+        "mode": "PassThrough"
+      },
+      "triggerArns": [
+        ""
+      ],
+      "type": "Aws.LambdaDeploymentStage",
+      "vpcId": ""
+    }
+  ],
+  "triggers": [],
+  "updateTs": "1600114650000"
+}

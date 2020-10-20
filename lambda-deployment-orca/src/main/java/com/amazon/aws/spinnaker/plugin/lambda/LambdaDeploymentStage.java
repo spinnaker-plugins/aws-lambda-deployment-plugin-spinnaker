@@ -43,9 +43,9 @@ public class LambdaDeploymentStage implements StageDefinitionBuilder {
     public void taskGraph(@Nonnull StageExecution stage, @Nonnull TaskNode.Builder builder) {
         logger.debug("taskGraph for Aws.LambdaDeploymentStage");
         builder.withTask("lambdaCreateTask", LambdaCreateTask.class);
-        builder.withTask("lambdaUpdateConfigTask", LambdaUpdateConfigurationTask.class);
-        builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
         builder.withTask("lambdaUpdateCodeTask", LambdaUpdateCodeTask.class);
+        builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
+        builder.withTask("lambdaUpdateConfigTask", LambdaUpdateConfigurationTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
         builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
         builder.withTask("lambdaPutConcurrencyTask", LambdaPutConcurrencyTask.class);
