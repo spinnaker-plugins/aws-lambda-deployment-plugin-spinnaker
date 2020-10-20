@@ -16,6 +16,8 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.delete;
 
+import com.amazon.aws.spinnaker.plugin.lambda.verify.LambdaCacheRefreshTask;
+
 import com.netflix.spinnaker.orca.api.pipeline.graph.StageDefinitionBuilder;
 import com.netflix.spinnaker.orca.api.pipeline.graph.TaskNode;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
@@ -39,5 +41,6 @@ public class LambdaDeleteStage implements StageDefinitionBuilder {
         logger.debug("taskGraph for Aws.LambdaDeleteStage");
         builder.withTask("lambdaDeleteTask", LambdaDeleteTask.class);
         builder.withTask("lambdaDeleteVerificationTask", LambdaDeleteVerificationTask.class);
+        builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
     }
 }
