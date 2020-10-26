@@ -1,0 +1,11 @@
+spinnaker:
+  extensibility:
+    plugins:
+      Aws.LambdaDeploymentPlugin:
+        enabled: true
+        version: 1.0.1
+        extensions:
+          lambdaDeploymentStage:
+            enabled: true
+            config:
+              defaultMaxWaitTime: 20
