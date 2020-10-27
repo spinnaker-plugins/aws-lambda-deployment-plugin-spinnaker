@@ -1,0 +1,17 @@
+[
+  {
+    "id": "Aws.LambdaDeploymentPlugin",
+    "description": "AWS Lambda Deployment Plugin",
+    "provider": "https://aws.amazon.com",
+    "releases": [
+      {
+        "version": "0.0.3",
+        "date": "2020-10-27T15:58:20.310166Z",
+        "requires": "orca>=0.0.0,deck>=0.0.0",
+        "sha512sum": "2f239673405e3b3ca789cc6d3052d0f8c251e5e68e2125ba63b44d8aa9e59248440eb93ef7cd9d555f1089365da988812599201c20a8a3f7662ad6ecd0806f40",
+        "preferred": false,
+        "url": "https://github.com/spinnaker-plugins/aws-lambda-deployment-plugin-spinnaker/releases/download/0.0.3/aws-lambda-deployment-plugin-spinnaker-0.0.3.zip"
+      }
+    ]
+  }
+]
