@@ -1,0 +1,8 @@
+spinnaker:
+   extensibility:
+     deck-proxy:
+       enabled: true
+       plugins: 
+         Aws.LambdaDeploymentPlugin:
+           enabled: true
+           version: <<VERSION NUMBER>>

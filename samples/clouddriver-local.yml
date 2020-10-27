@@ -1,0 +1,24 @@
+aws:
+  lambda:
+    enabled: true
+  accounts:
+  - name: aws-acct-1
+    lambdaEnabled: true
+    accountId: '111122223333'
+    requiredGroupMembership: []
+    permissions: {}
+    regions: 
+    - name: us-west-2
+    - name: us-east-1
+    assumeRole: role/spinnakerManaged
+    lifecycleHooks: []
+  - name: aws-acct-2
+    lambdaEnabled: true
+    accountId: '444455556666'
+    requiredGroupMembership: []
+    permissions: {} 
+    regions:
+    - name: us-west-2
+    - name: us-east-1
+    assumeRole: role/spinnakerManaged
+    lifecycleHooks: []
