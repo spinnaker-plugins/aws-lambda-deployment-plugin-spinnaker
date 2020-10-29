@@ -93,9 +93,9 @@ export namespace RouteLambdaExecutionDetails {
   - validateFn -> A validation function for the stage config form.
  */
 export const lambdaRouteStage: IStageTypeConfig = {
-  key: 'Aws.LambdaTrafficShaper',
+  key: 'Aws.LambdaTrafficRoutingStage',
   label: `AWS Lambda Route`,
-  description: 'Shape traffic for the deployment of your Lambda function',
+  description: 'Route traffic across various versions of your Lambda function',
   component: RouteLambdaConfig, // stage config
   executionDetailsSections: [RouteLambdaExecutionDetails, ExecutionDetailsTasks],
   validateFn: validate,

@@ -19,6 +19,7 @@ package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaBaseStrategyInput;
+import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaDeploymentStrategyOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
@@ -34,7 +35,7 @@ public class BaseDeploymentStrategy<T extends LambdaBaseStrategyInput> {
     @Autowired
     protected LambdaCloudDriverUtils utils;
 
-    public LambdaCloudOperationOutput deploy(T inp) {
+    public LambdaDeploymentStrategyOutput deploy(T inp) {
         throw new RuntimeException("Not Implemented");
     }
 

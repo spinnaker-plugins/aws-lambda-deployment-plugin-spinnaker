@@ -92,10 +92,22 @@ public class LambdaCloudDriverUtils {
             if ((resultsNode != null) && resultsNode.isArray()) {
                 respObject =objectMapper.convertValue(resultsNode.get(0), LambdaCloudDriverInvokeOperationResults.class);
                 JsonNode respStringNode = objectMapper.readTree(respObject.getResponseString());
-                int statusCode = ((IntNode)respStringNode.get("statusCode")).intValue();
-                String body = ((TextNode)respStringNode.get("body")).textValue();
-                respObject.setStatusCode(statusCode);
-                respObject.setBody(body);
+                if (respStringNode.has("statusCode")) {
+                    int statusCode = ((IntNode)respStringNode.get("statusCode")).intValue();
+                    respObject.setStatusCode(statusCode);
+                }
+                if (respStringNode.has("body")) {
+                    String body = ((TextNode) respStringNode.get("body")).textValue();
+                    respObject.setBody(body);
+                }
+                if (respStringNode.has("errorMessage")) {
+                    String errorMessage = ((TextNode) respStringNode.get("errorMessage")).textValue();
+                    respObject.setErrorMessage(errorMessage);
+                    respObject.setHasErrors(true);
+                }
+                else {
+                    respObject.setHasErrors(false);
+                }
             }
             LambdaVerificationStatusOutput st = objectMapper.convertValue(statusNode, LambdaVerificationStatusOutput.class);
 
