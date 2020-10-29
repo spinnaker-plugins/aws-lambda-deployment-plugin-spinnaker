@@ -19,6 +19,8 @@ package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
 import com.amazon.aws.spinnaker.plugin.lambda.*;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaBaseStrategyInput;
+import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaDeploymentStrategyOutput;
+import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaDeploymentInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
@@ -27,6 +29,7 @@ import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationPro
 import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,31 +58,44 @@ public class LambdaTrafficUpdateTask implements LambdaStageBaseTask {
         logger.debug("Executing LambdaTrafficUpdateTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
         prepareTask(stage);
-        LambdaCloudOperationOutput result = null;
-        BaseDeploymentStrategy strat = getDeploymentStrategy(stage);
-        if (shouldUpdateAlias(stage)) {
-            LambdaBaseStrategyInput input = strat.setupInput(stage);
-            result = strat.deploy(input);
-            if (result == null) {
-                return formErrorTaskResult(stage, "Deployment failed");
-            }
-            final StageExecution tmpStage = stage;
-            result.getOutputMap().forEach((x,y) -> {
-                addToTaskContext(tmpStage, (String)x, y);
-            });
+        LambdaDeploymentStrategyOutput result = null;
+        BaseDeploymentStrategy deploymentStrategy = getDeploymentStrategy(stage);
+        List<String> validationErrors = new ArrayList<>();
+        if (!validateInput(stage, validationErrors)) {
+            logger.error("Validation failed for traffic update task");
+            return this.formErrorListTaskResult(stage, validationErrors);
         }
-        else {
-            result = LambdaCloudOperationOutput.builder().build();
+        LambdaBaseStrategyInput input = deploymentStrategy.setupInput(stage);
+        result = deploymentStrategy.deploy(input);
+        if (!result.isSucceeded()) {
+            return formErrorTaskResult(stage, result.getErrorMessage());
         }
-        addCloudOperationToContext(stage, result, "url");
+        final StageExecution tmpStage = stage;
+        result.getOutput().getOutputMap().forEach((x,y) -> {
+            addToTaskContext(tmpStage, (String)x, y);
+        });
+
+        addCloudOperationToContext(stage, result.getOutput(), "url");
         return taskComplete(stage);
+    }
+
+    @Override
+    public boolean validateInput(StageExecution stage, List<String> errors) {
+        boolean exists = stage.getContext().containsKey("aliasName") ;
+        if (!exists) {
+            errors.add("Traffic Update requires aliasName field");
+            return false;
+        }
+        String xx = (String)stage.getContext().get("aliasName");
+        if (StringUtils.isNullOrEmpty(xx)) {
+            errors.add("Traffic Update requires aliasName field");
+            return false;
+        }
+        return true;
     }
 
     private BaseDeploymentStrategy getDeploymentStrategy(StageExecution stage) {
         return injector.getStrategy(DeploymentStrategyEnum.valueOf((String)stage.getContext().get("deploymentStrategy")));
-    }
-    private boolean shouldUpdateAlias(StageExecution stage) {
-        return stage.getContext().containsKey("aliasName");
     }
 
     @Nullable

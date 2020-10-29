@@ -18,6 +18,7 @@
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
+import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaDeploymentStrategyOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaSimpleStrategyInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
@@ -38,7 +39,7 @@ public class SimpleDeploymentStrategy extends BaseDeploymentStrategy<LambdaSimpl
     CloudDriverConfigurationProperties props;
 
     @Override
-    public LambdaCloudOperationOutput deploy(LambdaSimpleStrategyInput inp) {
+    public LambdaDeploymentStrategyOutput deploy(LambdaSimpleStrategyInput inp) {
         String cloudDriverUrl = props.getCloudDriverBaseUrl();
         Map<String, Object> outputMap  = new HashMap<String, Object>();
         outputMap.put("deployment:majorVersionDeployed", inp.getMajorFunctionVersion());
@@ -46,7 +47,10 @@ public class SimpleDeploymentStrategy extends BaseDeploymentStrategy<LambdaSimpl
         outputMap.put("deployment:aliasDeployed", inp.getAliasName());
         LambdaCloudOperationOutput out = postToCloudDriver(inp, cloudDriverUrl, utils);
         out.setOutputMap(outputMap);
-        return out;
+        LambdaDeploymentStrategyOutput deployOutput =LambdaDeploymentStrategyOutput.builder().build();
+        deployOutput.setSucceeded(true);
+        deployOutput.setOutput(out);
+        return deployOutput;
     }
 
     @Override

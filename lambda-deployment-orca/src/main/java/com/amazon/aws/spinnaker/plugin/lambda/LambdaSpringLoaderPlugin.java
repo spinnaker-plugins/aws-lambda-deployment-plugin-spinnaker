@@ -66,7 +66,7 @@ public class LambdaSpringLoaderPlugin extends SpringLoaderPlugin {
                 Pair.of("simpleStrategy", SimpleDeploymentStrategy.class),
                 Pair.of("weightedStrategy", WeightedDeploymentStrategy.class),
                 Pair.of("blueGreenStrategy", BlueGreenDeploymentStrategy.class),
-                Pair.of("Aws.LambdaTrafficShaper", LambdaTrafficUpdaterStage.class));
+                Pair.of("Aws.LambdaTrafficShaper", LambdaTrafficRoutingStage.class));
         beanList.forEach( curr -> {
             BeanDefinition lazyLoadCredentialsRepositoryDefinition = primaryBeanDefinitionFor(curr.getRight());
             try {

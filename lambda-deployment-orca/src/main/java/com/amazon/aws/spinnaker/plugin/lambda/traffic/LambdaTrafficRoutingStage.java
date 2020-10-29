@@ -18,7 +18,6 @@
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
 import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.LambdaUpdateEventConfigurationTask;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaPublishVersionTask;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaPutConcurrencyTask;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.LambdaVerificationTask;
 import com.netflix.spinnaker.orca.api.pipeline.graph.StageDefinitionBuilder;
@@ -31,17 +30,17 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 
 @Component
-@StageDefinitionBuilder.Aliases({"Aws.LambdaTrafficShaper"})
-public class LambdaTrafficUpdaterStage implements StageDefinitionBuilder {
-    private static Logger logger = LoggerFactory.getLogger(LambdaTrafficUpdaterStage.class);
+@StageDefinitionBuilder.Aliases({"Aws.LambdaTrafficRoutingStage"})
+public class LambdaTrafficRoutingStage implements StageDefinitionBuilder {
+    private static Logger logger = LoggerFactory.getLogger(LambdaTrafficRoutingStage.class);
 
-    public LambdaTrafficUpdaterStage() {
-        logger.debug("Constructing Aws.LambdaTrafficUpdateStage");
+    public LambdaTrafficRoutingStage() {
+        logger.debug("Constructing Aws.LambdaTrafficRoutingStage");
     }
 
     @Override
     public void taskGraph(@Nonnull StageExecution stage, @Nonnull TaskNode.Builder builder) {
-        logger.debug("taskGraph for Aws.LambdaTrafficUpdateStage");
+        logger.debug("taskGraph for Aws.LambdaTrafficRoutingStage");
         builder.withTask("lambdaTrafficUpdateTask", LambdaTrafficUpdateTask.class);
         builder.withTask("lambdaTrafficUpdateVerificationTask", LambdaTrafficUpdateVerificationTask.class);
         builder.withTask("lambdaPutConcurrencyTask", LambdaPutConcurrencyTask.class);

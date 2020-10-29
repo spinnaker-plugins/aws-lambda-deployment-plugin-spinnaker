@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-
 package com.amazon.aws.spinnaker.plugin.lambda.traffic.model;
 
-import com.amazonaws.services.lambda.model.InvokeResult;
+import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
@@ -25,11 +24,8 @@ import lombok.Data;
 @Data
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LambdaCloudDriverInvokeOperationResults {
-    LambdaInvokeResult invokeResult;
-    String responseString;
-    int statusCode;
-    String body;
-    String errorMessage;
-    boolean hasErrors;
+public class LambdaDeploymentStrategyOutput {
+    LambdaCloudOperationOutput output;
+    private boolean succeeded;
+    private String errorMessage;
 }

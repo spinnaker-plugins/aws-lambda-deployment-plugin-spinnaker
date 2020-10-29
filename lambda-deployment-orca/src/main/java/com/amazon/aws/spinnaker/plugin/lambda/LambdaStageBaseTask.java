@@ -28,7 +28,7 @@ import java.util.Map;
 
 public interface LambdaStageBaseTask extends Task {
 
-    default boolean validateInput(StageExecution stage) {
+    default boolean validateInput(StageExecution stage, List<String> errors) {
         return true;
     }
 
