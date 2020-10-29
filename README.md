@@ -27,14 +27,14 @@ This plugin is currently only compatible with Spinnaker platform 1.23.x and up. 
       plugins:
         Aws.LambdaDeploymentPlugin:
           enabled: true
-          version: <<VERSION NUMBER>> 
+          version: <<VERSION_NUMBER>> 
           extensions:
             Aws.LambdaDeploymentStage:
               enabled: true
       repositories:
         awsLambdaDeploymentPluginRepo:
           id: awsLambdaDeploymentPluginRepo
-          url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.2/plugins.json
+          url: https://raw.githubusercontent.com/spinnaker-plugins/aws-lambda-deployment-plugin-spinnaker/master/plugins.json
 ```
 2. Add the following to `gate-local.yml` in the necessary [profile](https://spinnaker.io/reference/halyard/custom/#custom-profiles) to load the Deck frontend
 ```yaml
@@ -50,115 +50,32 @@ spinnaker:
         awsLambdaDeploymentPluginRepo:
           url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.2/plugins.json 
 ```
-3. Execute `hal deploy apply` to deploy the changes
+3. Execute `hal deploy apply` to deploy the changes.
+4. You should now be able to see 3 new stages provided by this plugin in the Deck UI when adding a new stage to your pipeline.
 
 
 ## Plugin Developers Guide
 
-<details>
-  <summary> Developing in 1.20.x Environment </summary>
 
-### Overview
+See the plugin developers guide [here](DeveloperGuide.md)
 
-There are 2 main components to this plugin.   
+## Releasing New Versions
 
-* Orca (in the directory `aws-lambda-deployment-orca`) 
-* Deck (in the directory `aws-lambda-deployment-deck`)
+* Releases are done from the master branch
+* Releases uses github actions. Scripts required for this are checked into the .github directory
+* To create a release, we tag the master branch commit with a release number (e.g. release-1.2.3) and push this tag
 
-The development process involves the following high level steps:
-
-1. Get orca and deck running on your development machine.
-2. Get other services running elsewhere (typically on another EC2 instance or a kubernetes cluster)
-3. Ensure your spinnaker instance is running fine - using your own local deck and orca instance.
-2. Clone this repo and build the plugin
-3. Configure your local deck to use your plugin.
-4. Configure your local orca to load and use your plugin. 
-5. Restart deck and orca, load the UI and make sure plugin is available.
-
-
-Steps 1, 2 and 3 are best covered in the spinnaker documentation.
-
-eg.
- 
-* [Test a Pipeline Stage Plugin](https://spinnaker.io/guides/developer/plugin-creators/deck-plugin)
-* [Plugin Creators Overview](https://spinnaker.io/guides/developer/plugin-creators/overview/)
-
-### Build
-
-* `cd` to the root of the repository
-* Build the plugin:
-
-```./gradlew releaseBundle```
-
-This should create the following files :
-
-* `lambda-deployment-orca/build/aws-lambda-deployment-plugin-orca.plugin-ref`
-*  `lambda-deployment-deck/build/dist/index.js`
-
-Verify the above files have been created at the end of the gradle command above.
-
-
-### Updating Orca
-
-* Create a plugins directory in your orca project
-* Copy the plugin-ref file from the build above to the plugins directory
-* Create a orca-local.yml file in ~/.spinnaker/ with the following contents:
-
-```yaml
-spinnaker:
-  extensibility:
-    plugins:
-      Aws.LambdaDeploymentPlugin:
-        enabled: true
-        version: 1.0.1
-        extensions:
-          Aws.LambdaDeploymentStage:
-            enabled: true
-            config:
-              defaultMaxWaitTime: 20
+```
+git tag 1.2.3
+git push --tag
 ```
 
-* Restart Orca (from your IntelliJ IDE)
-
-### Updating Deck 
-
-* Update the deck/plugin-manifest.json with the plugin information.
-
-```json
- [
-     {
-         "id": "Aws.LambdaDeploymentPlugin",
-         "url": "./plugins/index.js",
-         "version": "1.1.14"
-     }
- ]
-```
-
-* Create a deck/plugins directory 
-* Symlink `lambda-deployment-deck/build/dist/index.js` to deck/plugins/index.js like so:
-
-```bash
-cd <deck_root_dir>
-ln -s <full_path_to_this_plugin>/lambda-deployment-deck/build/dist/index.js plugins/index.js
-```
-
-### Restart Deck
-
-* Use this command:
-
-`yarn run`
-
-### Restart Orca
-
-* Load your Orca project in the IDE and restart from there. Details here:
-* [How to run Orca in IntelliJ](https://spinnaker.io/guides/developer/plugin-creators/deck-plugin/#run-orca-in-intellij)
-
-### Verification
-
-Load your deck UI typically `http://localhost:9000` and make sure your stage is available.   
-The stage will typically show up with the name `AWS Lambda Deployment`
-
-</details>
+* The scripts in the .github directory trigger a build when this tag is pushed
+* Once the build is successful, A new branch is created (called release-1.2.3) off this tag.
+* A new commit is added to this branch that updates the plugin.json with artifacts produced by this build
+* A PR is created for merging this commit to master. Merge this PR to master. 
+* Navigate to the releases page [Releases](https://github.com/spinnaker-plugins/aws-lambda-deployment-plugin-spinnaker/releases) to make sure the new release shows up.
+* Use the updated plugin.json in any new spinnaker deploys.
 
 ## Security
 
