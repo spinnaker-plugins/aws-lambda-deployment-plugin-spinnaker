@@ -190,6 +190,8 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
                 .artifactAccount(artifact.getArtifactAccount())
                 .type(artifact.getType())
                 .reference(artifact.getReference())
+                .version(artifact.getVersion())
+                .name(artifact.getName())
                 .build();
     }
 
