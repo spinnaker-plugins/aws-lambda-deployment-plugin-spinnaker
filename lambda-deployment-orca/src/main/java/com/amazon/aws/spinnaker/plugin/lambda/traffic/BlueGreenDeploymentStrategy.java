@@ -22,28 +22,45 @@ import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
+import com.netflix.spinnaker.kork.artifacts.model.Artifact;
+import com.netflix.spinnaker.kork.core.RetrySupport;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
+import com.netflix.spinnaker.orca.clouddriver.OortService;
+import com.netflix.spinnaker.orca.pipeline.util.ArtifactUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+import retrofit.client.Response;
+import com.google.common.io.CharStreams;
 
 import java.util.ArrayList;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.InputStreamReader;
+import java.io.InputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @Component
 public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBlueGreenStrategyInput> {
     private static final Logger logger = LoggerFactory.getLogger(BlueGreenDeploymentStrategy.class);
+    RetrySupport retrySupport = new RetrySupport();
+
     @Autowired
     private LambdaCloudDriverUtils utils;
 
     @Autowired
     CloudDriverConfigurationProperties props;
+
+    private final OortService oort;
 
     static String CLOUDDRIVER_INVOKE_LAMBDA_FUNCTION_PATH = "/aws/ops/invokeLambdaFunction";
 
@@ -69,7 +86,7 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
         int timeout = inp.getTimeout() * 1000;
         String url = output.getUrl();
         int sleepTime = 10000;
-        int count = 0;
+
         LambdaCloudDriverTaskResults taskResult = null;
         boolean done = false;
         while (timeout > 0) {
@@ -96,8 +113,8 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
         }
 
         LambdaCloudDriverInvokeOperationResults invokeResponse = utils.getLambdaInvokeResults(url);
-        String expected = inp.getLambdaOutput();
-        String actual = invokeResponse.getBody();
+        String expected = getPipelinesArtifactContent(inp.getOutputArtifact()).replaceAll("[\\n\\t ]", "");
+        String actual = invokeResponse.getResponseString().replaceAll("[\\n\\t ]", "");
         boolean comparison = ObjectUtils.defaultIfNull(expected, "").equals(actual);
         if (!comparison) {
             String err = String.format("BlueGreenDeployment failed: Comparison failed. expected : [%s], actual : [%s]", expected, actual);
@@ -129,13 +146,19 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
 
     @Override
     public LambdaBlueGreenStrategyInput setupInput(StageExecution stage) {
-
         LambdaTrafficUpdateInput aliasInp = utils.getInput(stage, LambdaTrafficUpdateInput.class);
         LambdaBlueGreenStrategyInput blueGreenInput = utils.getInput(stage, LambdaBlueGreenStrategyInput.class);
         aliasInp.setAppName(stage.getExecution().getApplication());
 
         blueGreenInput.setCredentials(aliasInp.getAccount());
         blueGreenInput.setAppName(stage.getExecution().getApplication());
+
+        blueGreenInput.setPayloadArtifact(
+                aliasInp.getPayloadArtifact().getArtifact()
+        );
+        blueGreenInput.setOutputArtifact(
+                aliasInp.getOutputArtifact().getArtifact()
+        );
 
         LambdaDefinition lf = null;
         lf = utils.findLambda(stage, true);
@@ -149,7 +172,7 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
     }
 
     private LambdaInvokeFunctionOutput invokeLambdaFunction(LambdaBlueGreenStrategyInput ldi) {
-        ldi.setPayload(ldi.getLambdaPayload());
+        //ldi.setPayload(ldi.getPayloadArtifact());
 
         String cloudDriverUrl = props.getCloudDriverBaseUrl();
         String endPoint = cloudDriverUrl + CLOUDDRIVER_INVOKE_LAMBDA_FUNCTION_PATH;
@@ -159,6 +182,38 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
         logger.debug("Posted to cloudDriver for blueGreenDeployment: " + url);
         LambdaInvokeFunctionOutput ldso = LambdaInvokeFunctionOutput.builder().url(url).build();
         return ldso;
+    }
+
+    private Artifact resolvePipelineArtifact(LambdaPipelineArtifact artifact) {
+        return Artifact.builder()
+                .uuid(artifact.getId())
+                .artifactAccount(artifact.getArtifactAccount())
+                .type(artifact.getType())
+                .reference(artifact.getReference())
+                .build();
+    }
+
+    private String getPipelinesArtifactContent(LambdaPipelineArtifact pipelineArtifact) {
+        return retrySupport.retry(
+                () -> {
+                    Response response = oort.fetchArtifact(
+                            resolvePipelineArtifact(pipelineArtifact)
+                    );
+                    InputStream artifactInputStream;
+                    try {
+                        artifactInputStream = response.getBody().in();
+                    } catch (IOException e) {
+                        throw new IllegalStateException(e); // forces a retry
+                    }
+                    try (InputStreamReader rd = new InputStreamReader(artifactInputStream)) {
+                        return CharStreams.toString(rd);
+                    } catch (IOException e) {
+                        throw new IllegalStateException(e); // forces a retry
+                    }
+                },
+                10,
+                200,
+                true);
     }
 
     @Override

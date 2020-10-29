@@ -48,8 +48,8 @@ public class LambdaTrafficUpdateInput extends LambdaBaseStrategyInput {
     private String minorFunctionVersion;
     private double weightToMinorFunctionVersion;
 
-    private String lambdaPayload;
-    private String lambdaOutput;
+    private LambdaHealthCheckArtifact payloadArtifact;
+    private LambdaHealthCheckArtifact outputArtifact;
     private int timeout;
 }
 

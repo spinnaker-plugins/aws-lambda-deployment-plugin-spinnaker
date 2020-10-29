@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Amazon.com, Inc. or its affiliates.
+ * Copyright 2020 Amazon.com, Inc. or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -14,35 +14,21 @@
  * limitations under the License.
  */
 
-
 package com.amazon.aws.spinnaker.plugin.lambda.traffic.model;
 
 import com.netflix.spinnaker.kork.artifacts.model.Artifact;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
+import java.util.Map;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
-public class LambdaBlueGreenStrategyInput extends LambdaBaseStrategyInput {
+public class LambdaHealthCheckArtifact {
+    String id;
+    String account;
+    LambdaPipelineArtifact artifact;
 
-    String credentials, account, region;
-    String appName;
-    String functionName;
-    String qualifier;
-    String latestVersionQualifier;
-    String payload;
-    String deploymentStrategy;
-    String aliasName;
-    String aliasDescription;
-
-    private String majorFunctionVersion;
-    private String minorFunctionVersion;
-    private double weightToMinorFunctionVersion;
-
-    private LambdaPipelineArtifact payloadArtifact;
-    private LambdaPipelineArtifact outputArtifact;
-    private int timeout;
 }
