@@ -11,6 +11,14 @@
         "sha512sum": "2f239673405e3b3ca789cc6d3052d0f8c251e5e68e2125ba63b44d8aa9e59248440eb93ef7cd9d555f1089365da988812599201c20a8a3f7662ad6ecd0806f40",
         "preferred": false,
         "url": "https://github.com/spinnaker-plugins/aws-lambda-deployment-plugin-spinnaker/releases/download/0.0.3/aws-lambda-deployment-plugin-spinnaker-0.0.3.zip"
+      },
+      {
+        "version": "0.0.4",
+        "date": "2020-10-30T16:26:34.235700Z",
+        "requires": "orca>=0.0.0,deck>=0.0.0",
+        "sha512sum": "40332da633570630425cb4247ee79701fc9458bda4a25ab36caaccd87ca86d94c53579f6806a4d95fa8a198ffdb65b72562b11d6637fba41624194fb46018e72",
+        "preferred": false,
+        "url": "https://github.com/spinnaker-plugins/aws-lambda-deployment-plugin-spinnaker/releases/download/0.0.4/aws-lambda-deployment-plugin-spinnaker-0.0.4.zip"
       }
     ]
   }
