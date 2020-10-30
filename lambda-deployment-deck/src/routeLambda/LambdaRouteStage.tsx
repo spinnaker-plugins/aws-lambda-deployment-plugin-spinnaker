@@ -28,8 +28,9 @@ export function RouteLambdaExecutionDetails(props: IExecutionDetailsSectionProps
     <ExecutionDetailsSection name={props.name} current={props.current}>
       <StageFailureMessage stage={stage} message={stage.outputs.failureMessage} />
       <div>
-        <p> Lambda Name: {stage.outputs.resourceId} </p>
-        <p> Function Url: {stage.outputs.url} </p>
+        <p> Function Name: {stage.outputs.functionName ? stage.outputs.functionName : "N/A"} </p>
+        <p> Deployed Alias: {stage.outputs["deployment:aliasDeployed"] ? stage.outputs["deployment:aliasDeployed"] : "N/A"} </p>
+        <p> Deployed Major Version: {stage.outputs["deployment:majorVersionDeployed"] ? stage.outputs["deployment:majorVersionDeployed"] : "N/A"} </p>
       </div>
     </ExecutionDetailsSection>
   );
