@@ -12,7 +12,8 @@ import {
 } from '@spinnaker/core';
 
 import './LambdaDeploymentStage.less';
-import { 
+import {
+  awsArnValidator, 
   s3BucketNameValidator, 
   iamRoleValidator,
   simpleStringValidator,
@@ -67,6 +68,17 @@ export function validate(stageConfig: IStage) {
     .field('role', 'Role ARN')
     .required()
     .withValidators(iamRoleValidator);
+
+  validator
+    .field('triggerArns', 'Trigger ARNs')
+    .optional()
+    .withValidators((value:any, label: string) => {
+        let tmp: any[]  = value.map((arn: string) => {
+          return awsArnValidator(arn, arn);
+        })
+        let ret: boolean = tmp.every((el) => el === undefined);
+        return ret ? undefined : "Invalid ARN. Event ARN must match regular expression: /^arn:aws[a-zA-Z-]?:[a-zA-Z_0-9.-]+:./"; 
+      }) 
 
   return validator.validateForm();
 }
