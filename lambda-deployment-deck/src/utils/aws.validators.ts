@@ -17,10 +17,10 @@ export const s3BucketNameValidator = (value: string, label: string) => {
 };
 
 export const awsArnValidator = (value: string, label: string) => {
-  const arn = value.match(/arn:aws[a-zA-Z-]?:[a-zA-Z_0-9.-]+:./);
+  const arn = value.match(/^arn:aws[a-zA-Z-]?:[a-zA-Z_0-9.-]+:./);
   return arn
     ? undefined
-    : `Invalid ARN.  ${label} must match regular expression: /arn:aws[a-zA-Z-]?:[a-zA-Z_0-9.-]+:./`;
+    : `Invalid ARN.  ${label} must match regular expression: /^arn:aws[a-zA-Z-]?:[a-zA-Z_0-9.-]+:./`;
 };
 
 export const simpleStringValidator = (value: string, label: string) => {

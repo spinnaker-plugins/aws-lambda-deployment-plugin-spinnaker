@@ -19,6 +19,10 @@ import {
 
 import './LambdaRouteStage.less';
 
+import {
+  awsArnValidator, 
+} from '../utils/aws.validators';
+
 import { RouteLambdaFunctionStageForm } from './RouteLambdaFunctionStageForm';
 
 export function RouteLambdaExecutionDetails(props: IExecutionDetailsSectionProps) {
@@ -72,10 +76,18 @@ export const initialize = () => {
 };
 
 function validate(stageConfig: IStage) {
-  const validator = new FormValidator(stageConfig);
+  const validator = new FormValidator(stageConfig); 
+
   validator
-    .field('trafficPercentA', 'Traffic Percent A')
-    .required()  
+    .field('triggerArns', 'Trigger ARNs')
+    .optional()
+    .withValidators((value:any, label: string) => {
+        let tmp: any[]  = value.map((arn: string) => {
+          return awsArnValidator(arn, arn);
+        })
+        let ret: boolean = tmp.every((el) => el === undefined);
+        return ret ? undefined : "Invalid ARN. Event ARN must match regular expression: /^arn:aws[a-zA-Z-]?:[a-zA-Z_0-9.-]+:./";
+      })
 
   return validator.validateForm();
 }

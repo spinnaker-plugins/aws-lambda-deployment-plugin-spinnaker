@@ -54,7 +54,7 @@ export function TriggerEventsForm( props: IFormikStageConfigInjectedProps ) {
           < NumberInput
             {...inputProps}
             min={1}
-            max={10} 
+            max={1000} 
           />
         )} 
       /> 
