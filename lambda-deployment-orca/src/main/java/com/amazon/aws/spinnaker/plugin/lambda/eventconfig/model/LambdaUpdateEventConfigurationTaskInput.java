@@ -31,5 +31,6 @@ public class LambdaUpdateEventConfigurationTaskInput {
     private List<String> triggerArns;
     private int batchsize;
     private String aliasName, qualifier;
+    private String startingPosition;
     private List<LambdaEventConfigurationDescription> eventConfigurationInputList;
 }

@@ -59,6 +59,7 @@ public class LambdaSpringLoaderPlugin extends SpringLoaderPlugin {
                 Pair.of("lambdaTrafficUpdateTask", LambdaTrafficUpdateTask.class),
                 Pair.of("lambdaUpdateAliasesTask",LambdaUpdateAliasesTask.class),
                 Pair.of("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class),
+                Pair.of("lambdaOutputTask", LambdaOutputTask.class),
                 Pair.of("lambdaPutConcurrencyTask", LambdaPutConcurrencyTask.class),
                 Pair.of("lambdaTrafficUpdateVerificationTask", LambdaTrafficUpdateVerificationTask.class),
                 Pair.of("lambdaUpdateEventConfigurationTask", LambdaUpdateEventConfigurationTask.class),
