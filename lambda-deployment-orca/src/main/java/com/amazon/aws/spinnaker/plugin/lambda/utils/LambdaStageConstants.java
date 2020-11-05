@@ -37,7 +37,14 @@ public class LambdaStageConstants {
     public static final String aliasTaskKey = "updateAliasesUrlList";
     public static final String lambdaObjectKey = "lambdaObject";
     public static final String originalRevisionIdKey = "originalRevisionId";
+    public static final String revisionIdKey = "revisionId";
+    public static final String allRevisionsKey = "allRevisions";
+    public static final String versionIdKey = "versionId";
     public static final String newRevisionIdKey = "newRevisionId";
+    public static final String functionARNKey = "functionARN";
+    public static final String resourceIdKey = "resourceId";
+    public static final String functionNameKey = "functionName";
+    public static final String urlKey = "url";
 
     public static List<String> allUrlKeys = List.of(createdUrlKey, updateCodeUrlKey, updateConfigUrlKey, updateEventUrlKey, publishVersionUrlKey, putConcurrencyUrlKey);
 }

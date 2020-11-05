@@ -71,6 +71,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
             functionArn = String.format("%s:%s", lf.getFunctionArn(), taskInput.getAliasName());
             taskInput.setQualifier(taskInput.getAliasName());
         }
+        taskInput.setStartingPosition("LATEST");
         return updateEventsForLambdaFunction(taskInput, lf, functionArn);
     }
 

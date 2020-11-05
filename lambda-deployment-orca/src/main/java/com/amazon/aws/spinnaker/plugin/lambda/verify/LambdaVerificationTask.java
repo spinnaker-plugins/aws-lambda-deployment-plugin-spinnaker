@@ -31,7 +31,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -103,14 +106,12 @@ public class LambdaVerificationTask implements LambdaStageBaseTask {
                 if (taskResult.getResults() != null) {
                     String arn = taskResult.getResults().getFunctionArn();
                     if (arn != null) {
-                        addToOutput(stage, "functionARN", arn);
-                        addToOutput(stage, "resourceId", arn);
-                        addToOutput(stage, "url", taskResult.getResults().getFunctionName());
-                        addToOutput(stage, "functionName", taskResult.getResults().getFunctionName());
+                        addToOutput(stage, LambdaStageConstants.functionARNKey, arn);
+                        addToOutput(stage, LambdaStageConstants.resourceIdKey, arn);
+                        addToOutput(stage, LambdaStageConstants.functionNameKey, taskResult.getResults().getFunctionName());
                     }
                 }
             });
-
             copyContextToOutput(stage);
             return taskComplete(stage);
         }
