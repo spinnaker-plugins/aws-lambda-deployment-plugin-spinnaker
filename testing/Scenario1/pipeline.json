@@ -1,4 +1,6 @@
 {
+  "application": "{}",
+  "name": "Scenario1-{}",
   "keepWaitingPipelines": false,
   "lastModifiedBy": "anonymous",
   "limitConcurrent": true,
