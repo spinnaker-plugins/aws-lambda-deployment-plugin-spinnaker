@@ -54,7 +54,7 @@ test('An invalid ARN is invalid', () => {
   const value = "arn:foo:bar:111122223333:foobar";
 
   expect(awsArnValidator(value, label)).toBe(
-    "Invalid ARN.  Test SQS must match regular expression: /arn:aws[a-zA-Z-]?:[a-zA-Z_0-9.-]+:./"
+    "Invalid ARN.  Test SQS must match regular expression: /^arn:aws[a-zA-Z-]?:[a-zA-Z_0-9.-]+:./"
   )
 });
 
