@@ -1,67 +1,69 @@
 {
-    "keepWaitingPipelines": false,
-    "lastModifiedBy": "anonymous",
-    "limitConcurrent": true,
-    "spelEvaluator": "v4",
-    "stages": [
-      {
-        "KMSKeyArn": "",
-        "account": "",
-        "aliases": ["test"],
-        "cloudProvider": "aws",
-        "credentials": "",
-        "deadLetterConfig": {
-          "targetArn": ""
-        },
-        "describeName": "functional",
-        "description": "Functional Test for Scenario 4.",
-        "kmskeyArn": "",
-        "envVariables": {
-          "scenario": "4"
-        },
-        "functionName": "{}-test-functional-scenario4",
-        "functionUid": "scenario4",
-        "handler": "lambda_func.handler",
-        "memorySize": 128, 
-        "name": "AWS Lambda Deployment",
-        "operation": "",
-        "publish": true,
-        "refId": "6",
-        "region": "us-east-1",
-        "requisiteStageRefIds": [],
-        "role": "arn:aws:iam::111122223333:role/spinnaker-lambda-role",
-        "runtime": "python3.7",
-        "s3bucket": "lambda-test-bucket-0900",
-        "s3key": "lambda_func.zip",
-        "securityGroupIds": [],
-        "stackName": "test",
-        "subnetIds": [],
-        "tags": {
-          "Project": "Autodesk"
-        },
-        "targetGroups": "",
-        "timeout": 100,
-        "tracingConfig": {
-          "mode": "PassThrough"
-        },
-        "type": "Aws.LambdaDeploymentStage",
-        "vpcId": ""
+  "application": "{}",
+  "name": "Scenario8-{}",
+  "keepWaitingPipelines": false,
+  "lastModifiedBy": "anonymous",
+  "limitConcurrent": true,
+  "spelEvaluator": "v4",
+  "stages": [
+    {
+      "KMSKeyArn": "",
+      "account": "",
+      "aliases": ["test"],
+      "cloudProvider": "aws",
+      "credentials": "",
+      "deadLetterConfig": {
+        "targetArn": ""
       },
-      {
-        "account": "",
-        "functionName": "{}-test-functional-scenario4",
-        "name": "AWS Lambda Destroy",
-        "refId": "7",
-        "region": "us-east-1",
-        "requisiteStageRefIds": [
-          "6"
-        ],
-        "type": "Aws.LambdaDeleteStage",
-        "version": "$PREVIOUS"
-      }
-    ],
-    "triggers": [],
-    "updateTs": "1600114650000"
-  }
+      "describeName": "functional",
+      "description": "Functional Test for Scenario 4.",
+      "kmskeyArn": "",
+      "envVariables": {
+        "scenario": "4"
+      },
+      "functionName": "{}-test-functional-scenario4",
+      "functionUid": "scenario4",
+      "handler": "lambda_func.handler",
+      "memorySize": 128, 
+      "name": "AWS Lambda Deployment",
+      "operation": "",
+      "publish": true,
+      "refId": "6",
+      "region": "us-east-1",
+      "requisiteStageRefIds": [],
+      "role": "arn:aws:iam::111122223333:role/spinnaker-lambda-role",
+      "runtime": "python3.7",
+      "s3bucket": "lambda-test-bucket-0900",
+      "s3key": "lambda_func.zip",
+      "securityGroupIds": [],
+      "stackName": "test",
+      "subnetIds": [],
+      "tags": {
+        "Project": "Autodesk"
+      },
+      "targetGroups": "",
+      "timeout": 100,
+      "tracingConfig": {
+        "mode": "PassThrough"
+      },
+      "type": "Aws.LambdaDeploymentStage",
+      "vpcId": ""
+    },
+    {
+      "account": "",
+      "functionName": "{}-test-functional-scenario4",
+      "name": "AWS Lambda Destroy",
+      "refId": "7",
+      "region": "us-east-1",
+      "requisiteStageRefIds": [
+        "6"
+      ],
+      "type": "Aws.LambdaDeleteStage",
+      "version": "$PREVIOUS"
+    }
+  ],
+  "triggers": [],
+  "updateTs": "1600114650000"
+}
     
   
