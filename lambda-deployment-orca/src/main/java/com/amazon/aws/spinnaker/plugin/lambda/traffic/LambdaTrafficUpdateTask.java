@@ -17,40 +17,37 @@
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
 
-import com.amazon.aws.spinnaker.plugin.lambda.*;
+import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaBaseStrategyInput;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaDeploymentStrategyOutput;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaDeploymentInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
-import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
-import org.apache.commons.lang3.ObjectUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import lombok.RequiredArgsConstructor;
 import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class LambdaTrafficUpdateTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaTrafficUpdateTask.class);
 
     private String cloudDriverUrl;
 
-    @Autowired
-    TrafficUpdateStrategyInjector injector;
+    private final TrafficUpdateStrategyInjector injector;
 
-    @Autowired
-    CloudDriverConfigurationProperties props;
+    private final CloudDriverConfigurationProperties props;
 
-    @Autowired
-    private LambdaCloudDriverUtils utils;
+    private final LambdaCloudDriverUtils utils;
 
     @NotNull
     @Override
@@ -100,7 +97,7 @@ public class LambdaTrafficUpdateTask implements LambdaStageBaseTask {
 
     @Nullable
     @Override
-    public TaskResult onTimeout(@NotNull StageExecution stage) {
+    public TaskResult onTimeout(@javax.validation.constraints.NotNull StageExecution stage) {
         return null;
     }
 

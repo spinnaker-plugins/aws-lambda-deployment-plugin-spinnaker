@@ -19,7 +19,6 @@ package com.amazon.aws.spinnaker.plugin.lambda.upsert;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
-import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.model.LambdaUpdateEventConfigurationTaskOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaUpdateAliasesInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
@@ -29,20 +28,21 @@ import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import lombok.RequiredArgsConstructor;
 import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class LambdaUpdateAliasesTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaUpdateAliasesTask.class);
     private static final ObjectMapper objMapper = new ObjectMapper();
@@ -50,12 +50,10 @@ public class LambdaUpdateAliasesTask implements LambdaStageBaseTask {
     private static final String DEFAULT_ALIAS_DESCRIPTION = "Created via Spinnaker";
     private static final String LATEST_VERSION_STRING = "$LATEST";
 
-    @Autowired
-    CloudDriverConfigurationProperties props;
+    private final CloudDriverConfigurationProperties props;
     private  String cloudDriverUrl;
 
-    @Autowired
-    private LambdaCloudDriverUtils utils;
+    private final LambdaCloudDriverUtils utils;
 
     @NotNull
     @Override

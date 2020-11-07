@@ -28,14 +28,17 @@ import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 @Component
+@RequiredArgsConstructor
 public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaUpdateCodeTask.class);
     private static final ObjectMapper objMapper = new ObjectMapper();
@@ -43,12 +46,10 @@ public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
     private static String CLOUDDRIVER_UPDATE_CODE_PATH = "/aws/ops/updateLambdaFunctionCode";
     private static String CLOUDDRIVER_UPDATE_CONFIG_PATH = "/aws/ops/updateLambdaFunctionConfiguration";
 
-    @Autowired
-    CloudDriverConfigurationProperties props;
+    private final CloudDriverConfigurationProperties props;
     private  String cloudDriverUrl;
 
-    @Autowired
-    private LambdaCloudDriverUtils utils;
+    private final LambdaCloudDriverUtils utils;
 
     @NotNull
     @Override

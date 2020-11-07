@@ -54,7 +54,7 @@ public class LambdaSpringLoaderPlugin extends SpringLoaderPlugin {
                 Pair.of("lambdaVerificationTask", LambdaVerificationTask.class),
                 Pair.of("lambdaDeleteTask", LambdaDeleteTask.class),
                 Pair.of("lambdaPublishVersionTask", LambdaPublishVersionTask.class),
-                Pair.of("lambdaDeleteVerificationTask", LambdaDeleteVerificationTask.class),
+                Pair.of("lambdaDeleteVerificationT1     ask", LambdaDeleteVerificationTask.class),
                 Pair.of("Aws.LambdaDeleteStage", LambdaDeleteStage.class),
                 Pair.of("lambdaTrafficUpdateTask", LambdaTrafficUpdateTask.class),
                 Pair.of("lambdaUpdateAliasesTask",LambdaUpdateAliasesTask.class),

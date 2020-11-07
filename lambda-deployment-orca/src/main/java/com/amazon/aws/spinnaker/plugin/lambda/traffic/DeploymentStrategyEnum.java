@@ -17,14 +17,6 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
-import javassist.Loader;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.Map;
-
 public enum DeploymentStrategyEnum {
     $WEIGHTED {
         @Override

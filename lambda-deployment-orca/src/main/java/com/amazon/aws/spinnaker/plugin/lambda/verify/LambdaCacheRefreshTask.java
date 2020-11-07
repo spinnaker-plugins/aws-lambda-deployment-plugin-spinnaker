@@ -18,35 +18,30 @@
 package com.amazon.aws.spinnaker.plugin.lambda.verify;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaPutConcurrencyTask;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
-import com.netflix.spinnaker.orca.api.pipeline.Task;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.CloudDriverCacheService;
-import com.netflix.spinnaker.orca.clouddriver.tasks.AbstractCloudProviderAwareTask;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import retrofit.client.Response;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaCacheRefreshTask.class);
     static final String REFRESH_TYPE = "Function";
 
-    @Autowired
-    private CloudDriverCacheService cacheService;
+    private final CloudDriverCacheService cacheService;
 
-    @Autowired
-    private LambdaCloudDriverUtils utils;
+    private final LambdaCloudDriverUtils utils;
 
     @Nonnull
     @Override

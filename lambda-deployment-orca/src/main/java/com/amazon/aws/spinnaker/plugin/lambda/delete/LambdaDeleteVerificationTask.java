@@ -19,29 +19,30 @@ package com.amazon.aws.spinnaker.plugin.lambda.delete;
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
-import com.netflix.spinnaker.orca.api.pipeline.Task;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
-import org.jetbrains.annotations.NotNull;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import javax.validation.constraints.NotNull;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class LambdaDeleteVerificationTask implements LambdaStageBaseTask {
 
     private static final Logger logger = LoggerFactory.getLogger(LambdaDeleteVerificationTask.class);
 
-    @Autowired
-    CloudDriverConfigurationProperties props;
+    private final CloudDriverConfigurationProperties props;
 
-    @Autowired
-    private LambdaCloudDriverUtils utils;
+    private final LambdaCloudDriverUtils utils;
 
     @NotNull
     @Override

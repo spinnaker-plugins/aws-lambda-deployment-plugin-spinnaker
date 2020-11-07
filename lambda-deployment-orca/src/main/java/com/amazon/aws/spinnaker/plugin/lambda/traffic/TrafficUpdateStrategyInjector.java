@@ -17,7 +17,7 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
-import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,22 +28,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class TrafficUpdateStrategyInjector {
     private static Logger logger = LoggerFactory.getLogger(TrafficUpdateStrategyInjector.class);
 
-    @Autowired
-    private SimpleDeploymentStrategy simpleStrat;
-    @Autowired
-    private WeightedDeploymentStrategy weightedStrat;
-    @Autowired
-    private BlueGreenDeploymentStrategy blueGreenStrat;
+    private final SimpleDeploymentStrategy simpleStrat;
+    private final WeightedDeploymentStrategy weightedStrat;
+    private final BlueGreenDeploymentStrategy blueGreenStrat;
 
     private Map<DeploymentStrategyEnum, BaseDeploymentStrategy> factoryMap = new HashMap<>();
-
-    public TrafficUpdateStrategyInjector() {
-        logger.debug("Start strategy injector");
-    }
-
     public BaseDeploymentStrategy getStrategy(DeploymentStrategyEnum inp) {
         return factoryMap.get(inp);
     }

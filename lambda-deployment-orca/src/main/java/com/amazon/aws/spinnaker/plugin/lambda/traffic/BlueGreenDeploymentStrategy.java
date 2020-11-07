@@ -24,26 +24,23 @@ import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBlueGreenStrategyInput> {
     private static final Logger logger = LoggerFactory.getLogger(BlueGreenDeploymentStrategy.class);
-    @Autowired
-    private LambdaCloudDriverUtils utils;
+    private final LambdaCloudDriverUtils utils;
 
-    @Autowired
-    CloudDriverConfigurationProperties props;
+    final CloudDriverConfigurationProperties props;
 
     static String CLOUDDRIVER_INVOKE_LAMBDA_FUNCTION_PATH = "/aws/ops/invokeLambdaFunction";
 

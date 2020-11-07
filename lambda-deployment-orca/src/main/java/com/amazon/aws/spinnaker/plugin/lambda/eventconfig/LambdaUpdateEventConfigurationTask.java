@@ -22,24 +22,28 @@ import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.model.LambdaDeleteEven
 import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.model.LambdaEventConfigurationDescription;
 import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.model.LambdaUpdateEventConfigurationTaskInput;
 import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.model.LambdaUpdateEventConfigurationTaskOutput;
-import com.amazon.aws.spinnaker.plugin.lambda.utils.*;
+import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
+import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
+import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
+import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaStageConstants;
 import com.amazonaws.services.lambda.model.EventSourceMappingConfiguration;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
 import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
     private static final Logger logger = LoggerFactory.getLogger(LambdaUpdateEventConfigurationTask.class);
     private static final String CLOUDDRIVER_UPDATE_EVENT_CONFIGURATION_LAMBDA_PATH = "/aws/ops/upsertLambdaFunctionEventMapping";
@@ -47,11 +51,9 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
 
     String cloudDriverUrl;
 
-    @Autowired
-    CloudDriverConfigurationProperties props;
+    private final CloudDriverConfigurationProperties props;
 
-    @Autowired
-    LambdaCloudDriverUtils utils;
+    private final LambdaCloudDriverUtils utils;
 
     @NotNull
     @Override

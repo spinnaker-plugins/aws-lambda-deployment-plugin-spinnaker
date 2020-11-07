@@ -24,20 +24,19 @@ import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaWeightedStrate
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class WeightedDeploymentStrategy extends BaseDeploymentStrategy<LambdaWeightedStrategyInput> {
 
-    @Autowired
-    private LambdaCloudDriverUtils utils;
+    private final LambdaCloudDriverUtils utils;
 
-    @Autowired
-    CloudDriverConfigurationProperties props;
+    private final CloudDriverConfigurationProperties props;
 
     @Override
     public LambdaDeploymentStrategyOutput deploy(LambdaWeightedStrategyInput inp) {

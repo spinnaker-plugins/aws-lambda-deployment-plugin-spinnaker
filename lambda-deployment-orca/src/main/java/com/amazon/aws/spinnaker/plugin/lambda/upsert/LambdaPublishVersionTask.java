@@ -26,25 +26,25 @@ import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+
 @Component
+@RequiredArgsConstructor
 public class LambdaPublishVersionTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaPublishVersionTask.class);
     private static final ObjectMapper objMapper = new ObjectMapper();
     private static final String CLOUDDRIVER_PUBLISH_VERSION_PATH = "/aws/ops/publishLambdaFunctionVersion";
 
-    @Autowired
-    CloudDriverConfigurationProperties props;
-    private  String cloudDriverUrl;
+    private final CloudDriverConfigurationProperties props;
+    private String cloudDriverUrl;
 
-    @Autowired
-    private LambdaCloudDriverUtils utils;
+    private final LambdaCloudDriverUtils utils;
 
     @NotNull
     @Override
