@@ -19,9 +19,9 @@ package com.amazon.aws.spinnaker.plugin.lambda.utils;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaCloudDriverInvokeOperationResults;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaDeploymentInput;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverErrorObject;
+import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverResultObject;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaVerificationStatusOutput;
-import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverResultObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,8 +30,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.netflix.spinnaker.config.DefaultServiceEndpoint;
+import com.netflix.spinnaker.config.okhttp3.DefaultOkHttpClientBuilderProvider;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -41,10 +45,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@Data
 public class LambdaCloudDriverUtils {
     private static final Logger logger = LoggerFactory.getLogger(LambdaCloudDriverUtils.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -54,8 +60,15 @@ public class LambdaCloudDriverUtils {
         objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
     }
 
+    private final CloudDriverConfigurationProperties props;
+
+    private final OkHttpClient client;
+
     @Autowired
-    CloudDriverConfigurationProperties props;
+    public LambdaCloudDriverUtils(DefaultOkHttpClientBuilderProvider clientProvider, CloudDriverConfigurationProperties props) {
+        this.props = props;
+        this.client = clientProvider.get(new DefaultServiceEndpoint("clouddriver", props.getCloudDriverBaseUrl())).build();
+    }
 
     public LambdaCloudDriverResponse postToCloudDriver(String endPointUrl, String jsonString) {
         RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonString);
@@ -63,7 +76,6 @@ public class LambdaCloudDriverUtils {
                 .url(endPointUrl)
                 .post(body)
                 .build();
-        OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         try {
             Response response = call.execute();
@@ -147,7 +159,6 @@ public class LambdaCloudDriverUtils {
                 .url(endPoint)
                 .get()
                 .build();
-        OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         try {
             Response response = call.execute();
@@ -182,7 +193,6 @@ public class LambdaCloudDriverUtils {
         httpBuilder.addQueryParameter("account", acc);
         httpBuilder.addQueryParameter("functionName", fName);
         Request request = new Request.Builder().url(httpBuilder.build()).build();
-        OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         try {
             Response response = call.execute();
