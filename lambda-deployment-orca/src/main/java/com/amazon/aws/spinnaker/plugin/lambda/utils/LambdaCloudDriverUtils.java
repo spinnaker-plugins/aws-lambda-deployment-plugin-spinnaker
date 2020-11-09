@@ -17,11 +17,12 @@
 package com.amazon.aws.spinnaker.plugin.lambda.utils;
 
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaCloudDriverInvokeOperationResults;
+import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaPipelineArtifact;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaDeploymentInput;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverErrorObject;
+import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverResultObject;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaVerificationStatusOutput;
-import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverResultObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,7 +31,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.google.common.io.CharStreams;
+import com.netflix.spinnaker.kork.artifacts.model.Artifact;
+import com.netflix.spinnaker.kork.core.RetrySupport;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
+import com.netflix.spinnaker.orca.clouddriver.OortService;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import okhttp3.*;
 import org.apache.commons.lang3.ObjectUtils;
@@ -41,7 +46,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -89,7 +98,7 @@ public class LambdaCloudDriverUtils {
             JsonNode jsonResults = objectMapper.readTree(respString);
             JsonNode statusNode = jsonResults.get("status");
             ArrayNode resultsNode = (ArrayNode)jsonResults.get("resultObjects");
-            if ((resultsNode != null) && resultsNode.isArray()) {
+            if ((resultsNode != null) && resultsNode.isArray() && resultsNode.size() > 0) {
                 respObject =objectMapper.convertValue(resultsNode.get(0), LambdaCloudDriverInvokeOperationResults.class);
                 JsonNode respStringNode = objectMapper.readTree(respObject.getResponseString());
                 if (respStringNode.has("statusCode")) {
@@ -114,7 +123,7 @@ public class LambdaCloudDriverUtils {
             return respObject;
         }
         catch (Exception e) {
-            logger.error(String.format("Failed verifying task at {}", endPoint), e);
+            logger.error(String.format("Failed getLambdaInvokeResults task at {}", endPoint), e);
             return respObject;
         }
     }
@@ -361,4 +370,45 @@ public class LambdaCloudDriverUtils {
             logger.error("Error during await of lambda ", e);
         }
     }
+
+    private Artifact resolvePipelineArtifact(LambdaPipelineArtifact artifact) {
+        return Artifact.builder()
+                .uuid(artifact.getId())
+                .artifactAccount(artifact.getArtifactAccount())
+                .type(artifact.getType())
+                .reference(artifact.getReference())
+                .version(artifact.getVersion())
+                .name(artifact.getName())
+                .build();
+    }
+
+
+    @Autowired
+    OortService oort;
+
+    public String getPipelinesArtifactContent(LambdaPipelineArtifact pipelineArtifact) {
+        RetrySupport retrySupport = new RetrySupport();
+
+        return retrySupport.retry(
+                () -> {
+                    retrofit.client.Response response = oort.fetchArtifact(
+                            resolvePipelineArtifact(pipelineArtifact)
+                    );
+                    InputStream artifactInputStream;
+                    try {
+                        artifactInputStream = response.getBody().in();
+                    } catch (IOException e) {
+                        throw new IllegalStateException(e); // forces a retry
+                    }
+                    try (InputStreamReader rd = new InputStreamReader(artifactInputStream)) {
+                        return CharStreams.toString(rd);
+                    } catch (IOException e) {
+                        throw new IllegalStateException(e); // forces a retry
+                    }
+                },
+                10,
+                200,
+                true);
+    }
+
 }
