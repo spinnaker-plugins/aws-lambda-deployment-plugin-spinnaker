@@ -63,7 +63,8 @@ See the plugin developers guide [here](DeveloperGuide.md)
 
 * Releases are done from the master branch
 * Releases uses github actions. Scripts required for this are checked into the .github directory
-* To create a release, we tag the master branch commit with a release number (e.g. release-1.2.3) and push this tag
+* First update the version in gradle.properties and get that change merged to master.
+* Then, to create a release, we tag the master branch commit with a release number (e.g. release-1.2.3) and push this tag
 
 ```
 git tag 1.2.3
