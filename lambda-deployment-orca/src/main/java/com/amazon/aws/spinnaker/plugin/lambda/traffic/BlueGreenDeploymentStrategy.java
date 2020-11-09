@@ -82,8 +82,7 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
             try {
                 utils.await();
                 timeout -= sleepTime;
-            }
-            catch (Throwable e) {
+            } catch (Throwable e) {
                 logger.error("Error waiting for blue green test to complete");
                 continue;
             }
@@ -98,7 +97,10 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
 
         LambdaCloudDriverInvokeOperationResults invokeResponse = utils.getLambdaInvokeResults(url);
         String expected = utils.getPipelinesArtifactContent(inp.getOutputArtifact()).replaceAll("[\\n\\t ]", "");
-        String actual = invokeResponse.getResponseString().replaceAll("[\\n\\t ]", "");
+        String actual = null;
+        if (invokeResponse != null && invokeResponse.getBody() != null) {
+            actual = invokeResponse.getBody().replaceAll("[\\n\\t ]", "");
+        }
         boolean comparison = ObjectUtils.defaultIfNull(expected, "").equals(actual);
         if (!comparison) {
             String err = String.format("BlueGreenDeployment failed: Comparison failed. expected : [%s], actual : [%s]", expected, actual);
