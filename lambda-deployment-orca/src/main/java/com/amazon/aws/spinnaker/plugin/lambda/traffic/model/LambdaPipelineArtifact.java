@@ -31,4 +31,8 @@ public class LambdaPipelineArtifact {
     String artifactAccount;
     String type;
     String reference;
+    String name;
+    String version;
+    String location;
+    String provenance;
 }
