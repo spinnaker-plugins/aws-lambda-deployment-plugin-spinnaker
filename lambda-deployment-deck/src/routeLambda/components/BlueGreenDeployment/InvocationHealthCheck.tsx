@@ -75,21 +75,7 @@ export function InvokeLambdaHealthCheck(props: IFormikStageConfigInjectedProps) 
         label="Timeout"
         input={props => <NumberInput {...props} min={0} max={900} />}
       />
-      <FormikFormField
-        name="lambdaPayload"
-        label="Payload"
-        input={(inputProps: IFormInputProps) => (
-          <JsonEditor value={values.lambdaPayload} onChange={onPayloadChange} />
-        )}
-      />
-      <FormikFormField
-        name="lambdaOutput"
-        label="Expected Output"
-        input={(inputProps: IFormInputProps) => (
-          <JsonEditor value={values.lambdaOutput} onChange={onOutputChange} />
-        )}
-      />
-      { /* 
+      
       <StageArtifactSelectorDelegate
         artifact={getInputArtifact(values, 'payloadArtifact').artifact}
         excludedArtifactTypePatterns={excludedArtifactTypes}
@@ -119,8 +105,7 @@ export function InvokeLambdaHealthCheck(props: IFormikStageConfigInjectedProps) 
         }
         pipeline={props.pipeline}
         stage={values}
-      />
-      */} 
+      /> 
 
     </div>
   )
