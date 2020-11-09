@@ -16,10 +16,14 @@
  */
 
 package com.amazon.aws.spinnaker.plugin.lambda;
+
 import com.amazon.aws.spinnaker.plugin.lambda.delete.LambdaDeleteStage;
 import com.amazon.aws.spinnaker.plugin.lambda.delete.LambdaDeleteTask;
 import com.amazon.aws.spinnaker.plugin.lambda.delete.LambdaDeleteVerificationTask;
 import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.LambdaUpdateEventConfigurationTask;
+import com.amazon.aws.spinnaker.plugin.lambda.invoke.LambdaInvokeStage;
+import com.amazon.aws.spinnaker.plugin.lambda.invoke.LambdaInvokeTask;
+import com.amazon.aws.spinnaker.plugin.lambda.invoke.LambdaInvokeVerificationTask;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.*;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.*;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
@@ -67,6 +71,9 @@ public class LambdaSpringLoaderPlugin extends SpringLoaderPlugin {
                 Pair.of("simpleStrategy", SimpleDeploymentStrategy.class),
                 Pair.of("weightedStrategy", WeightedDeploymentStrategy.class),
                 Pair.of("blueGreenStrategy", BlueGreenDeploymentStrategy.class),
+                Pair.of("Aws.LambdaInvokeStage", LambdaInvokeStage.class),
+                Pair.of("lambdaInvokeTask", LambdaInvokeTask.class),
+                Pair.of("lambdaInvokeVerifyTask", LambdaInvokeVerificationTask.class),
                 Pair.of("Aws.LambdaTrafficShaper", LambdaTrafficRoutingStage.class));
         beanList.forEach( curr -> {
             BeanDefinition lazyLoadCredentialsRepositoryDefinition = primaryBeanDefinitionFor(curr.getRight());

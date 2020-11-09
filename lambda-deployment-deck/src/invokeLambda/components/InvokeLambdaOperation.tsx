@@ -87,22 +87,6 @@ export function InvokeLambdaOperation(props: IFormikStageConfigInjectedProps) {
         pipeline={props.pipeline}
         stage={values}
       />
-      <StageArtifactSelectorDelegate
-        artifact={getInputArtifact(values, 'outputArtifact').artifact}
-        excludedArtifactTypePatterns={excludedArtifactTypes}
-        expectedArtifactId={getInputArtifact(values, 'outputArtifact').id}
-        label="Output Artifact"
-        onArtifactEdited={artifact => {
-          onTemplateArtifactEdited(artifact, 'outputArtifact');
-        }}
-        helpKey={''}
-        onExpectedArtifactSelected={(artifact: IExpectedArtifact) =>
-          onTemplateArtifactSelected(artifact.id, 'outputArtifact')
-        }
-        pipeline={props.pipeline}
-        stage={values}
-      />
-
     </div>
   )
 }
