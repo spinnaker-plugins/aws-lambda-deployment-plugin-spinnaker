@@ -48,7 +48,7 @@ spinnaker:
           version: <<VERSION NUMBER>>
       repositories:
         awsLambdaDeploymentPluginRepo:
-          url: https://raw.githubusercontent.com/awslabs/aws-lambda-deployment-plugin-spinnaker/release/0.0.2/plugins.json 
+          url: https://raw.githubusercontent.com/spinnaker-plugins/aws-lambda-deployment-plugin-spinnaker/master/plugins.json
 ```
 3. Execute `hal deploy apply` to deploy the changes.
 4. You should now be able to see 3 new stages provided by this plugin in the Deck UI when adding a new stage to your pipeline.
