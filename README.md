@@ -2,7 +2,7 @@
 
 This plugin provides support for AWS Lambda Deployment via Pipelines in Spinnaker
 
-## Version Compatibility
+### Version Compatibility
 | Plugin  | Spinnaker Platform |
 |:----------- | :--------- |
 | 1.0.x  |  1.23.x |
@@ -13,13 +13,12 @@ This plugin is currently only compatible with Spinnaker platform 1.23.x and up. 
 3. Checkout `master` branch for `spinnaker/clouddriver`
 4. Install the plugin
 
-## Requirements
+### Requirements
 1. This plugin requires Java 11
 2. AWS Lambda functions must be enabled in your spinnaker environment and for all required AWS accounts. Find more information [here](https://aws.amazon.com/blogs/opensource/how-to-integrate-aws-lambda-with-spinnaker/) or within [samples](samples/README.md).
  
-## Plugin Users Guide
+### Plugin Deployment Guide
 
-### Usage
 1. Add the following to the Halyard config (typically found at `~/.hal/config`) to load the Orca backend
 ```yaml
   spinnaker:
@@ -53,13 +52,19 @@ spinnaker:
 3. Execute `hal deploy apply` to deploy the changes.
 4. You should now be able to see 3 new stages provided by this plugin in the Deck UI when adding a new stage to your pipeline.
 
+### Plugin User Guide
 
-## Plugin Developers Guide
+See the plugin user guide [here](UserGuide.md)
 
+### Plugin TroubleShooting Guide
+
+See the plugin user guide for troubleshooting instructions [here](UserGuide.md)
+
+### Plugin Developer Guide
 
 See the plugin developers guide [here](DeveloperGuide.md)
 
-## Releasing New Versions
+### Releasing New Versions
 
 * Releases are done from the master branch
 * Releases uses github actions. Scripts required for this are checked into the .github directory
@@ -78,11 +83,11 @@ git push --tag
 * Navigate to the releases page [Releases](https://github.com/spinnaker-plugins/aws-lambda-deployment-plugin-spinnaker/releases) to make sure the new release shows up.
 * Use the updated plugin.json in any new spinnaker deploys.
 
-## Security
+### Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
 
-## License
+### License
 
 This project is licensed under the Apache-2.0 License.
 
