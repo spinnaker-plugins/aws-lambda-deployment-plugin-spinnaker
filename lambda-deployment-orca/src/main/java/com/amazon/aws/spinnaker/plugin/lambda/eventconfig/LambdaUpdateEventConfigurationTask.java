@@ -44,6 +44,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
     private static final Logger logger = LoggerFactory.getLogger(LambdaUpdateEventConfigurationTask.class);
     private static final String CLOUDDRIVER_UPDATE_EVENT_CONFIGURATION_LAMBDA_PATH = "/aws/ops/upsertLambdaFunctionEventMapping";
     private static final String CLOUDDRIVER_DELETE_EVENT_CONFIGURATION_LAMBDA_PATH = "/aws/ops/deleteLambdaFunctionEventMapping";
+    private static final String DYNAMO_EVENT_PREFIX = "arn:aws:dynamodb:";
 
     String cloudDriverUrl;
 
@@ -52,6 +53,8 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
 
     @Autowired
     LambdaCloudDriverUtils utils;
+
+    private static final String DEFAULT_STARTING_POSITION = "LATEST";
 
     @NotNull
     @Override
@@ -71,7 +74,6 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
             functionArn = String.format("%s:%s", lf.getFunctionArn(), taskInput.getAliasName());
             taskInput.setQualifier(taskInput.getAliasName());
         }
-        taskInput.setStartingPosition("LATEST");
         return updateEventsForLambdaFunction(taskInput, lf, functionArn);
     }
 
@@ -192,8 +194,13 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
                 .account(taskInput.getAccount()).credentials(taskInput.getCredentials()).appName(taskInput.getAppName())
                 .region(taskInput.getRegion()).functionName(taskInput.getFunctionName()).qualifier(taskInput.getQualifier()).
                         build();
+        if (curr.startsWith(DYNAMO_EVENT_PREFIX)) {
+            if (StringUtils.isNullOrEmpty(taskInput.getStartingPosition())) {
+                taskInput.setStartingPosition(DEFAULT_STARTING_POSITION);
+            }
+            singleEvent.setStartingPosition(taskInput.getStartingPosition());
+        }
         return singleEvent;
-
     }
 
     private LambdaCloudOperationOutput deleteLambdaEventConfig(LambdaDeleteEventTaskInput inp) {

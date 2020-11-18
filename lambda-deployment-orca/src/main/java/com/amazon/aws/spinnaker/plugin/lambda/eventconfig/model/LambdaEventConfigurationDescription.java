@@ -29,5 +29,6 @@ public class LambdaEventConfigurationDescription {
     boolean enabled;
     int batchsize;
     String qualifier;
+    String startingPosition;
 
 }
