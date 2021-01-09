@@ -17,15 +17,15 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.verify;
 
+import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
-import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaPutConcurrencyTask;
+import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCacheRefreshInput;
+import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
-import com.netflix.spinnaker.orca.api.pipeline.Task;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
-import com.netflix.spinnaker.orca.clouddriver.CloudDriverCacheService;
-import com.netflix.spinnaker.orca.clouddriver.tasks.AbstractCloudProviderAwareTask;
+import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,10 +40,11 @@ import java.util.Map;
 @Component
 public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaCacheRefreshTask.class);
-    static final String REFRESH_TYPE = "Function";
+    private static String CLOUDDRIVER_REFRESH_CACHE_PATH = "/cache/aws/function";
 
     @Autowired
-    private CloudDriverCacheService cacheService;
+    CloudDriverConfigurationProperties props;
+    private  String cloudDriverUrl;
 
     @Autowired
     private LambdaCloudDriverUtils utils;
@@ -52,12 +53,24 @@ public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
     @Override
     public TaskResult execute(@Nonnull StageExecution stage) {
         logger.debug("Executing LambdaCacheRefreshTask...");
+        cloudDriverUrl = props.getCloudDriverBaseUrl();
         prepareTask(stage);
-        Map<String, Object> task = new HashMap<>(stage.getContext());
-        task.put("appName", stage.getExecution().getApplication());
-        cacheService.forceCacheUpdate("aws", REFRESH_TYPE, task);
+        LambdaCloudOperationOutput output = forceCacheRefresh(stage);
         logger.debug("Going to wait for some seconds after requesting cache refresh...");
         utils.await();
-        return TaskResult.ofStatus(ExecutionStatus.SUCCEEDED);
+        return taskComplete(stage);
+    }
+
+    private LambdaCloudOperationOutput forceCacheRefresh(StageExecution stage) {
+        LambdaCacheRefreshInput inp = utils.getInput(stage, LambdaCacheRefreshInput.class);
+        inp.setAppName(stage.getExecution().getApplication());
+        inp.setCredentials(inp.getAccount());
+        String endPoint = cloudDriverUrl + CLOUDDRIVER_REFRESH_CACHE_PATH;
+        String rawString = utils.asString(inp);
+        LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
+        String url = cloudDriverUrl + respObj.getResourceUri();
+        logger.debug("Posted to cloudDriver for cache refresh: " + url);
+        LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
+        return operationOutput;
     }
 }
