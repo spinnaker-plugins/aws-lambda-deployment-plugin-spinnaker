@@ -77,7 +77,7 @@ public class LambdaCloudDriverUtils {
         try {
             Response response = call.execute();
             String respString = response.body().string();
-            if (200 != response.code()) {
+            if (200 != response.code() && 202 != response.code()) {
                 logger.error("Error calling cloud driver");
                 logger.error(respString);
                 throw new RuntimeException("Error calling cloud driver: " + respString);
