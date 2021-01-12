@@ -64,7 +64,8 @@ public class LambdaWaitForCachePublishTask implements LambdaStageBaseTask {
                 }
                 utils.await(10000);
             }
+            return this.formErrorTaskResult(stage, "Failed to update cache after PublishVersionTask");
         }
-        return this.formErrorTaskResult(stage, "Failed to update cache after PublishVersionTask");
+        return taskComplete(stage);
     }
 }
