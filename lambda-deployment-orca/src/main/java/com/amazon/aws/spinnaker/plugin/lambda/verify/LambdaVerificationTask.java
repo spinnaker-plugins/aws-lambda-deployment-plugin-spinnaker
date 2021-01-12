@@ -110,6 +110,10 @@ public class LambdaVerificationTask implements LambdaStageBaseTask {
                         addToOutput(stage, LambdaStageConstants.resourceIdKey, arn);
                         addToOutput(stage, LambdaStageConstants.functionNameKey, taskResult.getResults().getFunctionName());
                     }
+                    String version = taskResult.getResults().getVersion();
+                    if (version != null) {
+                        addToOutput(stage, LambdaStageConstants.versionIdKey, version);
+                    }
                 }
             });
             copyContextToOutput(stage);
