@@ -128,6 +128,23 @@ public class LambdaCloudDriverUtils {
         }
     }
 
+    public String getPublishedVersion(String endPoint) {
+        String respString = getFromCloudDriver(endPoint);
+        try {
+            JsonNode jsonResults = objectMapper.readTree(respString);
+            ArrayNode resultsNode = (ArrayNode) jsonResults.get("resultObjects");
+            if (resultsNode.isArray() && resultsNode.size() > 0) {
+                JsonNode result = resultsNode.get(0);
+                if (result.has("version")) {
+                    return result.get("version").textValue();
+                }
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Failed getPublishedVersion task at {}", endPoint), e);
+        }
+        return "$LATEST";
+    }
+
     public LambdaCloudDriverTaskResults verifyStatus(String endPoint) {
         String respString = getFromCloudDriver(endPoint);
         try {
@@ -362,9 +379,13 @@ public class LambdaCloudDriverUtils {
     }
 
     public void await() {
+        this.await(20000);
+    }
+
+    public void await(int duration) {
         try {
             logger.debug("Going to sleep during lambda");
-            Thread.sleep(20000);
+            Thread.sleep(duration);
         }
         catch (Throwable e) {
             logger.error("Error during await of lambda ", e);
