@@ -6,8 +6,9 @@ import { lambdaDeploymentStage, initialize } from './deployLambda';
 import { lambdaDeleteStage } from './deleteLambda';
 import { lambdaRouteStage} from './routeLambda';
 import { lambdaInvokeStage} from './invokeLambda';
+import { lambdaUpdateCodeStage} from "./updateCodeLambda";
 
 export const plugin: IDeckPlugin = {
   initialize,
-  stages: [lambdaDeploymentStage, lambdaDeleteStage, lambdaRouteStage, lambdaInvokeStage],
+  stages: [lambdaDeploymentStage, lambdaDeleteStage, lambdaRouteStage, lambdaInvokeStage, lambdaUpdateCodeStage],
 };

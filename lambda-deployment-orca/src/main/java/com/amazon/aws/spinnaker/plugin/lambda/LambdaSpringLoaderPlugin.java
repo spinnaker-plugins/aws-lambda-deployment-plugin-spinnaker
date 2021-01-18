@@ -25,6 +25,8 @@ import com.amazon.aws.spinnaker.plugin.lambda.invoke.LambdaInvokeStage;
 import com.amazon.aws.spinnaker.plugin.lambda.invoke.LambdaInvokeTask;
 import com.amazon.aws.spinnaker.plugin.lambda.invoke.LambdaInvokeVerificationTask;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.*;
+import com.amazon.aws.spinnaker.plugin.lambda.updatecode.LambdaUpdateCodeStage;
+import com.amazon.aws.spinnaker.plugin.lambda.updatecode.LambdaWaitForCacheCodeUpdateTask;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.*;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.LambdaCacheRefreshTask;
@@ -75,7 +77,10 @@ public class LambdaSpringLoaderPlugin extends SpringLoaderPlugin {
                 Pair.of("Aws.LambdaInvokeStage", LambdaInvokeStage.class),
                 Pair.of("lambdaInvokeTask", LambdaInvokeTask.class),
                 Pair.of("lambdaInvokeVerifyTask", LambdaInvokeVerificationTask.class),
-                Pair.of("Aws.LambdaTrafficShaper", LambdaTrafficRoutingStage.class));
+                Pair.of("Aws.LambdaTrafficShaper", LambdaTrafficRoutingStage.class),
+                Pair.of("Aws.LambdaUpdateCodeStage", LambdaUpdateCodeStage.class),
+                Pair.of("lambdaWaitForCacheCodeUpdateTask", LambdaWaitForCacheCodeUpdateTask.class)
+        );
         beanList.forEach( curr -> {
             BeanDefinition lazyLoadCredentialsRepositoryDefinition = primaryBeanDefinitionFor(curr.getRight());
             try {
@@ -98,6 +103,7 @@ public class LambdaSpringLoaderPlugin extends SpringLoaderPlugin {
                               "com.amazon.aws.spinnaker.plugin.lambda.upsert",
                               "com.amazon.aws.spinnaker.plugin.lambda.utils",
                               "com.amazon.aws.spinnaker.plugin.lambda.verify",
-                              "com.amazon.aws.spinnaker.plugin.lambda.traffic");
+                              "com.amazon.aws.spinnaker.plugin.lambda.traffic",
+                              "com.amazon.aws.spinnaker.plugins.lambda.updatecode");
     }
 }
