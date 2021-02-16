@@ -37,6 +37,8 @@ import com.netflix.spinnaker.kork.core.RetrySupport;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.OortService;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
+import com.netflix.spinnaker.security.AuthenticatedRequest;
+
 import okhttp3.*;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -70,6 +72,7 @@ public class LambdaCloudDriverUtils {
         RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonString);
         Request request = new Request.Builder()
                 .url(endPointUrl)
+                .headers(buildHeaders())
                 .post(body)
                 .build();
         OkHttpClient client = new OkHttpClient();
@@ -171,6 +174,7 @@ public class LambdaCloudDriverUtils {
     public String getFromCloudDriver(String endPoint) {
         Request request = new Request.Builder()
                 .url(endPoint)
+                .headers(buildHeaders())
                 .get()
                 .build();
         OkHttpClient client = new OkHttpClient();
@@ -184,6 +188,18 @@ public class LambdaCloudDriverUtils {
             logger.error("Exception verifying task", e);
             throw new RuntimeException(e);
         }
+    }
+
+    private Headers buildHeaders() {
+        Headers.Builder headersBuilder = new Headers.Builder();
+
+        AuthenticatedRequest.getAuthenticationHeaders().forEach((key, value) -> {
+            if(value.isPresent()) {
+                headersBuilder.add(key.toString(), value.get());
+            }
+        });
+
+        return headersBuilder.build();
     }
 
     public boolean lambdaExists(LambdaGetInput inp) {
@@ -207,7 +223,10 @@ public class LambdaCloudDriverUtils {
         httpBuilder.addQueryParameter("region", region);
         httpBuilder.addQueryParameter("account", acc);
         httpBuilder.addQueryParameter("functionName", fName);
-        Request request = new Request.Builder().url(httpBuilder.build()).build();
+        Request request = new Request.Builder()
+                .url(httpBuilder.build())
+                .headers(buildHeaders())
+                .build();
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         try {
