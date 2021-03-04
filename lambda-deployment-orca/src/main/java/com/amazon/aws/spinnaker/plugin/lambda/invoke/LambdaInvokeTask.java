@@ -18,7 +18,6 @@ package com.amazon.aws.spinnaker.plugin.lambda.invoke;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
 import com.amazon.aws.spinnaker.plugin.lambda.invoke.model.LambdaInvokeStageInput;
-import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaTrafficUpdateInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
