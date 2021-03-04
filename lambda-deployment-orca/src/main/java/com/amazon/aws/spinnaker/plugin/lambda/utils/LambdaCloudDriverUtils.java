@@ -32,13 +32,13 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.io.CharStreams;
+import com.netflix.spinnaker.config.OkHttp3ClientConfiguration;
 import com.netflix.spinnaker.kork.artifacts.model.Artifact;
 import com.netflix.spinnaker.kork.core.RetrySupport;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.OortService;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import com.netflix.spinnaker.security.AuthenticatedRequest;
-
 import okhttp3.*;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -65,9 +65,14 @@ public class LambdaCloudDriverUtils {
         objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
     }
 
-    @Autowired
     CloudDriverConfigurationProperties props;
+    OkHttpClient okHttpClient;
 
+    @Autowired
+    LambdaCloudDriverUtils(CloudDriverConfigurationProperties props, OkHttp3ClientConfiguration okHttp3ClientConfiguration) {
+        this.props = props;
+        okHttpClient = okHttp3ClientConfiguration.create().build();
+    }
     public LambdaCloudDriverResponse postToCloudDriver(String endPointUrl, String jsonString) {
         RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonString);
         Request request = new Request.Builder()
@@ -75,8 +80,8 @@ public class LambdaCloudDriverUtils {
                 .headers(buildHeaders())
                 .post(body)
                 .build();
-        OkHttpClient client = new OkHttpClient();
-        Call call = client.newCall(request);
+
+        Call call = okHttpClient.newCall(request);
         try {
             Response response = call.execute();
             String respString = response.body().string();
@@ -227,8 +232,7 @@ public class LambdaCloudDriverUtils {
                 .url(httpBuilder.build())
                 .headers(buildHeaders())
                 .build();
-        OkHttpClient client = new OkHttpClient();
-        Call call = client.newCall(request);
+        Call call = okHttpClient.newCall(request);
         try {
             Response response = call.execute();
             if (200 != response.code()) {
@@ -252,8 +256,7 @@ public class LambdaCloudDriverUtils {
             return ldi;
         }
         catch (Throwable e) {
-            e.printStackTrace();
-            logger.error("Could not convert value");
+            logger.error("Could not convert value", e);
         }
         return null;
     }
@@ -268,8 +271,7 @@ public class LambdaCloudDriverUtils {
             return someClassList.get(0);
         }
         catch (Throwable e) {
-            e.printStackTrace();
-            logger.error("Could not convert value");
+            logger.error("Could not convert value", e);
         }
         return null;
     }
@@ -282,8 +284,7 @@ public class LambdaCloudDriverUtils {
             return ldi;
         }
         catch (Throwable e) {
-            e.printStackTrace();
-            logger.error("Could not convert value");
+            logger.error("Could not convert value", e);
         }
         return null;
     }

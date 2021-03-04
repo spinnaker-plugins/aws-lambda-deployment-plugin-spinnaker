@@ -62,8 +62,6 @@ public class LambdaInvokeTask  implements LambdaStageBaseTask {
             return this.formErrorTaskResult(stage, "No such lambda found.");
         }
         LambdaInvokeStageInput ldi = utils.getInput(stage, LambdaInvokeStageInput.class);
-        LambdaTrafficUpdateInput tui = utils.getInput(stage, LambdaTrafficUpdateInput.class);
-        ldi.setPayloadArtifact(tui.getPayloadArtifact().getArtifact());
         ldi.setQualifier(StringUtils.isNullOrEmpty(ldi.getAliasName()) ? "$LATEST" : ldi.getAliasName());
         ldi.setAppName(stage.getExecution().getApplication());
         ldi.setCredentials(ldi.getAccount());
