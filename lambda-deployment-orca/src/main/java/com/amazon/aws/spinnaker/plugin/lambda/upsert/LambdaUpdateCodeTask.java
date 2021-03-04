@@ -38,7 +38,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaUpdateCodeTask.class);
-    private static final ObjectMapper objMapper = new ObjectMapper();
     private static String CLOUDDRIVER_CREATE_PATH = "/aws/ops/createLambdaFunction";
     private static String CLOUDDRIVER_UPDATE_CODE_PATH = "/aws/ops/updateLambdaFunctionCode";
     private static String CLOUDDRIVER_UPDATE_CONFIG_PATH = "/aws/ops/updateLambdaFunctionConfiguration";

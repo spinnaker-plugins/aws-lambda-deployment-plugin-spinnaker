@@ -37,7 +37,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaPutConcurrencyTask.class);
-    private static final ObjectMapper objMapper = new ObjectMapper();
     private static String CLOUDDRIVER_PROVISIONED_CONCURRENCY_PATH = "/aws/ops/putLambdaProvisionedConcurrency";
     private static String CLOUDDRIVER_RESERVED_CONCURRENCY_PATH = "/aws/ops/putLambdaReservedConcurrency";
 

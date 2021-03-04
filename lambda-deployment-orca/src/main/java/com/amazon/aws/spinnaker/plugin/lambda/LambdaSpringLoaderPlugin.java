@@ -51,6 +51,7 @@ public class LambdaSpringLoaderPlugin extends SpringLoaderPlugin {
 
     @Override
     public void registerBeanDefinitions(BeanDefinitionRegistry registry) {
+        logger.info("Registering AWS Lambda deployment plugin");
         List<Pair<String, Class>> beanList =  Arrays.asList(
                 Pair.of("Aws.LambdaDeploymentStage", LambdaDeploymentStage.class),
                 Pair.of("lambdaCloudDriverUtils", LambdaCloudDriverUtils.class),

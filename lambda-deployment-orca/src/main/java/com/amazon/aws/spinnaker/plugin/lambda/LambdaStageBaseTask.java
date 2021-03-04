@@ -15,11 +15,15 @@
  */
 
 package com.amazon.aws.spinnaker.plugin.lambda;
+import com.amazon.aws.spinnaker.plugin.lambda.invoke.LambdaInvokeTask;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.spinnaker.orca.api.pipeline.Task;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,6 +31,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface LambdaStageBaseTask extends Task {
+    Logger logger = LoggerFactory.getLogger(LambdaStageBaseTask.class);
+    ObjectMapper objMapper = new ObjectMapper();
+
 
     default boolean validateInput(StageExecution stage, List<String> errors) {
         return true;
@@ -70,8 +77,7 @@ public interface LambdaStageBaseTask extends Task {
     }
 
     default void logException(StageExecution stage, Throwable e) {
-        //TODO: Print the entire stage context etc.
-        e.printStackTrace();
+        logger.error("Error executing stage " + stage.getName(), e);
     }
 
     default void addExceptionToOutput(StageExecution stage, Throwable e) {

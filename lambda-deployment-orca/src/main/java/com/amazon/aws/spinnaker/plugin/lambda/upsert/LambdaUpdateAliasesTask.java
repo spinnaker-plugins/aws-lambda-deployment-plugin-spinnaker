@@ -45,7 +45,6 @@ import java.util.Map;
 @Component
 public class LambdaUpdateAliasesTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaUpdateAliasesTask.class);
-    private static final ObjectMapper objMapper = new ObjectMapper();
     private static String CLOUDDRIVER_UPDATE_ALIAS_PATH = "/aws/ops/upsertLambdaFunctionAlias";
     private static final String DEFAULT_ALIAS_DESCRIPTION = "Created via Spinnaker";
     private static final String LATEST_VERSION_STRING = "$LATEST";

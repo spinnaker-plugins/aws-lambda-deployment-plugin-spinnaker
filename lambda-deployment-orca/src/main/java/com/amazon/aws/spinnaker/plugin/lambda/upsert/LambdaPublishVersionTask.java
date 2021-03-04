@@ -36,7 +36,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class LambdaPublishVersionTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaPublishVersionTask.class);
-    private static final ObjectMapper objMapper = new ObjectMapper();
     private static final String CLOUDDRIVER_PUBLISH_VERSION_PATH = "/aws/ops/publishLambdaFunctionVersion";
 
     @Autowired

@@ -41,7 +41,6 @@ import java.util.List;
 @Component
 public class LambdaUpdateConfigurationTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaUpdateConfigurationTask.class);
-    private static final ObjectMapper objMapper = new ObjectMapper();
     private static String CLOUDDRIVER_UPDATE_CONFIG_PATH = "/aws/ops/updateLambdaFunctionConfiguration";
 
     @Autowired
