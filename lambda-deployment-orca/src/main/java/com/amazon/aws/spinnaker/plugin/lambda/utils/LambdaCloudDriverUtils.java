@@ -182,8 +182,7 @@ public class LambdaCloudDriverUtils {
                 .headers(buildHeaders())
                 .get()
                 .build();
-        OkHttpClient client = new OkHttpClient();
-        Call call = client.newCall(request);
+        Call call = okHttpClient.newCall(request);
         try {
             Response response = call.execute();
             String respString = response.body().string();
