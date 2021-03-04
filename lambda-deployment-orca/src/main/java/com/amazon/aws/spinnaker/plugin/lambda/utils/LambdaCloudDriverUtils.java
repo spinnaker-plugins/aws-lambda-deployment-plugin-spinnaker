@@ -67,12 +67,18 @@ public class LambdaCloudDriverUtils {
 
     CloudDriverConfigurationProperties props;
     OkHttpClient okHttpClient;
+    OortService oort;
 
     @Autowired
-    LambdaCloudDriverUtils(CloudDriverConfigurationProperties props, OkHttp3ClientConfiguration okHttp3ClientConfiguration) {
+    LambdaCloudDriverUtils(CloudDriverConfigurationProperties props,
+                           OkHttp3ClientConfiguration okHttp3ClientConfiguration,
+                           OortService oortService) {
         this.props = props;
+        this.oort = oortService;
         okHttpClient = okHttp3ClientConfiguration.create().build();
+
     }
+
     public LambdaCloudDriverResponse postToCloudDriver(String endPointUrl, String jsonString) {
         RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonString);
         Request request = new Request.Builder()
@@ -422,9 +428,6 @@ public class LambdaCloudDriverUtils {
                 .build();
     }
 
-
-    @Autowired
-    OortService oort;
 
     public String getPipelinesArtifactContent(LambdaPipelineArtifact pipelineArtifact) {
         RetrySupport retrySupport = new RetrySupport();
