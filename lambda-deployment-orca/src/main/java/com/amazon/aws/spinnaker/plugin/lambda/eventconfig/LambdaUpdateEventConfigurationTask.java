@@ -45,6 +45,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
     private static final String CLOUDDRIVER_UPDATE_EVENT_CONFIGURATION_LAMBDA_PATH = "/aws/ops/upsertLambdaFunctionEventMapping";
     private static final String CLOUDDRIVER_DELETE_EVENT_CONFIGURATION_LAMBDA_PATH = "/aws/ops/deleteLambdaFunctionEventMapping";
     private static final String DYNAMO_EVENT_PREFIX = "arn:aws:dynamodb:";
+    private static final String KINESIS_EVENT_PREFIX = "arn:aws:kinesis";
 
     String cloudDriverUrl;
 
@@ -194,7 +195,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
                 .account(taskInput.getAccount()).credentials(taskInput.getCredentials()).appName(taskInput.getAppName())
                 .region(taskInput.getRegion()).functionName(taskInput.getFunctionName()).qualifier(taskInput.getQualifier()).
                         build();
-        if (curr.startsWith(DYNAMO_EVENT_PREFIX)) {
+        if (curr.startsWith(DYNAMO_EVENT_PREFIX) || curr.startsWith(KINESIS_EVENT_PREFIX)) {
             if (StringUtils.isNullOrEmpty(taskInput.getStartingPosition())) {
                 taskInput.setStartingPosition(DEFAULT_STARTING_POSITION);
             }
