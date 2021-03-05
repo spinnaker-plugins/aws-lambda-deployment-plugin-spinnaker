@@ -34,6 +34,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Component
@@ -158,7 +159,9 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
     }
 
     private LambdaInvokeFunctionOutput invokeLambdaFunction(LambdaBlueGreenStrategyInput ldi) {
-        // ldi.setPayload(utils.getPipelinesArtifactContent(ldi.getPayloadArtifact()));
+        if (!Objects.isNull(ldi.getPayloadArtifact())) {
+            ldi.setPayload(utils.getPipelinesArtifactContent(ldi.getPayloadArtifact()));
+        }
         String cloudDriverUrl = props.getCloudDriverBaseUrl();
         String endPoint = cloudDriverUrl + CLOUDDRIVER_INVOKE_LAMBDA_FUNCTION_PATH;
         String rawString = utils.asString(ldi);

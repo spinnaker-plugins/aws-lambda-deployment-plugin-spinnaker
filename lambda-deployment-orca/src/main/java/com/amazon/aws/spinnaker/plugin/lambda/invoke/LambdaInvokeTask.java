@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class LambdaInvokeTask  implements LambdaStageBaseTask {
@@ -63,7 +64,10 @@ public class LambdaInvokeTask  implements LambdaStageBaseTask {
         }
         LambdaInvokeStageInput ldi = utils.getInput(stage, LambdaInvokeStageInput.class);
         LambdaTrafficUpdateInput tui = utils.getInput(stage, LambdaTrafficUpdateInput.class);
-        ldi.setPayloadArtifact(tui.getPayloadArtifact().getArtifact());
+        if (!Objects.isNull(ldi.getPayloadArtifact())) {
+            ldi.setPayloadArtifact(tui.getPayloadArtifact().getArtifact());
+            ldi.setPayload(utils.getPipelinesArtifactContent(ldi.getPayloadArtifact()));
+        }
         ldi.setQualifier(StringUtils.isNullOrEmpty(ldi.getAliasName()) ? "$LATEST" : ldi.getAliasName());
         ldi.setAppName(stage.getExecution().getApplication());
         ldi.setCredentials(ldi.getAccount());
