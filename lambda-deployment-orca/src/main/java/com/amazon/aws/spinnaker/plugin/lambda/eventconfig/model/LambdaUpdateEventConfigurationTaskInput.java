@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Map;
 import java.util.List;
 
 @Data
@@ -29,7 +30,14 @@ public class LambdaUpdateEventConfigurationTaskInput {
     private boolean clearExisting;
     private String appName, credentials, account, functionName, region;
     private List<String> triggerArns;
+    private Map<String, String> destinationConfig;
     private int batchsize;
+    private Boolean bisectBatchOnError;
+    private Integer maxBatchingWindowSecs;
+    private Integer maxRecordAgeSecs;
+    private Integer maxRetryAttempts;
+    private Integer parallelizationFactor;
+    private Integer tumblingWindowSecs;
     private String aliasName, qualifier;
     private String startingPosition;
     private List<LambdaEventConfigurationDescription> eventConfigurationInputList;
