@@ -176,7 +176,6 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
 
         final List<String> existingEvents = getExistingEvents(lf, targetArn);
         taskInput.getTriggerArns().stream()
-               .filter(curr -> { return !existingEvents.contains(curr); })
                .forEach( curr -> {
                    LambdaEventConfigurationDescription singleEvent = formEventObject(curr, taskInput);
                    String rawString = utils.asString(singleEvent);
@@ -192,6 +191,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
 
     private LambdaEventConfigurationDescription formEventObject(String curr, LambdaUpdateEventConfigurationTaskInput taskInput) {
         LambdaEventConfigurationDescription singleEvent = LambdaEventConfigurationDescription.builder().eventSourceArn(curr).batchsize(taskInput.getBatchsize()).enabled(true)
+                .maxBatchingWindowSecs(taskInput.getMaxBatchingWindowSecs())
                 .account(taskInput.getAccount()).credentials(taskInput.getCredentials()).appName(taskInput.getAppName())
                 .region(taskInput.getRegion()).functionName(taskInput.getFunctionName()).qualifier(taskInput.getQualifier()).
                         build();
@@ -199,9 +199,46 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
             if (StringUtils.isNullOrEmpty(taskInput.getStartingPosition())) {
                 taskInput.setStartingPosition(DEFAULT_STARTING_POSITION);
             }
+
+            singleEvent.setBisectBatchOnError(taskInput.getBisectBatchOnError());
+            singleEvent.setDestinationConfig(formDestinationConfig(taskInput));
+            singleEvent.setMaxRecordAgeSecs(taskInput.getMaxRecordAgeSecs());
+            singleEvent.setMaxRetryAttempts(taskInput.getMaxRetryAttempts());
+            singleEvent.setParallelizationFactor(taskInput.getParallelizationFactor());
             singleEvent.setStartingPosition(taskInput.getStartingPosition());
+
+            if (taskInput.getTumblingWindowSecs() != null && taskInput.getTumblingWindowSecs() != -1) {
+                singleEvent.setTumblingWindowSecs(taskInput.getTumblingWindowSecs());
+            }
         }
         return singleEvent;
+    }
+
+    private Map<String, Object> formDestinationConfig(LambdaUpdateEventConfigurationTaskInput taskInput) {
+        Map<String, Object> destinationConfig = null;
+
+        if (taskInput.getDestinationConfig() != null) {
+            String onFailureArn = taskInput.getDestinationConfig().get("onFailureArn");
+            String onSuccessArn = taskInput.getDestinationConfig().get("onSuccessArn");
+
+            if(StringUtils.isNotNullOrEmpty(onFailureArn) || StringUtils.isNotNullOrEmpty(onSuccessArn)) {
+                destinationConfig = new HashMap<String, Object>();
+
+                if(StringUtils.isNotNullOrEmpty(onFailureArn)) {
+                    Map<String, String> onFailure = new HashMap<String, String>();
+                    onFailure.put("destination", onFailureArn);
+                    destinationConfig.put("onFailure", onFailure);
+                }
+
+                if(StringUtils.isNotNullOrEmpty(onSuccessArn)) {
+                    Map<String, String> onSuccess = new HashMap<String, String>();
+                    onSuccess.put("destination", onSuccessArn);
+                    destinationConfig.put("onSuccess", onSuccess);
+                }
+            }
+        }
+
+        return destinationConfig;
     }
 
     private LambdaCloudOperationOutput deleteLambdaEventConfig(LambdaDeleteEventTaskInput inp) {

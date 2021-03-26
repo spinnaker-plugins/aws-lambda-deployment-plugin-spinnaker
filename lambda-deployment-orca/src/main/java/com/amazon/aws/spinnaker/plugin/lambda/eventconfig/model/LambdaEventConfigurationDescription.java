@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Map;
+
 @Data
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -28,7 +30,13 @@ public class LambdaEventConfigurationDescription {
     String eventSourceArn;
     boolean enabled;
     int batchsize;
+    Boolean bisectBatchOnError;
+    Integer maxBatchingWindowSecs;
+    Integer maxRecordAgeSecs;
+    Integer maxRetryAttempts;
+    Integer parallelizationFactor;
+    Integer tumblingWindowSecs;
     String qualifier;
     String startingPosition;
-
+    Map<String, Object> destinationConfig;
 }
