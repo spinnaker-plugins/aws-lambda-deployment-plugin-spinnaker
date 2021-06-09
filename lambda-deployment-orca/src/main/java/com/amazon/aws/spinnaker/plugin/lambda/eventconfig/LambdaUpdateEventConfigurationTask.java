@@ -200,11 +200,24 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
                 taskInput.setStartingPosition(DEFAULT_STARTING_POSITION);
             }
 
-            singleEvent.setBisectBatchOnError(taskInput.getBisectBatchOnError());
+            if (taskInput.getBisectBatchOnError() != null) {
+                singleEvent.setBisectBatchOnError(taskInput.getBisectBatchOnError());
+            }
+
             singleEvent.setDestinationConfig(formDestinationConfig(taskInput));
-            singleEvent.setMaxRecordAgeSecs(taskInput.getMaxRecordAgeSecs());
-            singleEvent.setMaxRetryAttempts(taskInput.getMaxRetryAttempts());
-            singleEvent.setParallelizationFactor(taskInput.getParallelizationFactor());
+
+            if (taskInput.getMaxRecordAgeSecs() != null) {
+                singleEvent.setMaxRecordAgeSecs(taskInput.getMaxRecordAgeSecs());
+            }
+
+            if (taskInput.getMaxRetryAttempts() != null) {
+                singleEvent.setMaxRetryAttempts(taskInput.getMaxRetryAttempts());
+            }
+
+            if (taskInput.getParallelizationFactor() != null) {
+                singleEvent.setParallelizationFactor(taskInput.getParallelizationFactor());
+            }
+
             singleEvent.setStartingPosition(taskInput.getStartingPosition());
 
             if (taskInput.getTumblingWindowSecs() != null && taskInput.getTumblingWindowSecs() != -1) {
