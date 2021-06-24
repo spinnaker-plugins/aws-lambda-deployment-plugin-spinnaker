@@ -50,7 +50,7 @@ public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
     @Nonnull
     @Override
     public TaskResult execute(@Nonnull StageExecution stage) {
-        logger.debug("Executing LambdaWaitForFunctionToStabilizeTask...");
+        logger.debug("Executing LambdaWaitToStabilizeTask...");
         return waitForStableState(stage);
     }
 
@@ -59,7 +59,7 @@ public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
         while(true) {
             lf = utils.findLambda(stage);
             if (lf != null && lf.getState() != null) {
-                logger.info(String.format("lambda state %s", lf.getState()));
+                logger.debug(String.format("lambda state %s", lf.getState()));
                 if (lf.getState().equals(PENDING_STATE) && lf.getStateReasonCode() != null && lf.getStateReasonCode().equals(FUNCTION_CREATING)) {
                     utils.await(10000);
                     continue;
@@ -74,8 +74,8 @@ public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
                 stage,
                 String.format(
                         "Failed to stabilize function with state: %s and reason: %s",
-                        lf != null ? lf.getState() : "Unknown",
-                        lf != null ? lf.getStateReason() : "Unknown reason"
+                        lf != null && lf.getState() != null ? lf.getState() : "Unknown",
+                        lf != null && lf.getStateReason() != null ? lf.getStateReason() : "Unknown reason"
                 )
         );
     }
