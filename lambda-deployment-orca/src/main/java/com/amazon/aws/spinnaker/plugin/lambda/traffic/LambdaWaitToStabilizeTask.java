@@ -58,9 +58,9 @@ public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
         LambdaDefinition lf = null;
         while(true) {
             lf = utils.findLambda(stage);
-            if (lf != null) {
+            if (lf != null && lf.getState() != null) {
                 logger.info(String.format("lambda state %s", lf.getState()));
-                if (lf.getState().equals(PENDING_STATE) && lf.getStateReasonCode().equals(FUNCTION_CREATING)) {
+                if (lf.getState().equals(PENDING_STATE) && lf.getStateReasonCode() != null && lf.getStateReasonCode().equals(FUNCTION_CREATING)) {
                     utils.await(10000);
                     continue;
                 }
