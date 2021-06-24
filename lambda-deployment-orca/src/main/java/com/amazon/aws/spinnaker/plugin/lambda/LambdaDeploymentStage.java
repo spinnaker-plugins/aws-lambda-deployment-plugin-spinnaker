@@ -18,6 +18,7 @@
 package com.amazon.aws.spinnaker.plugin.lambda;
 
 import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.LambdaUpdateEventConfigurationTask;
+import com.amazon.aws.spinnaker.plugin.lambda.traffic.LambdaWaitToStabilizeTask;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.*;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.LambdaCacheRefreshTask;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.LambdaVerificationTask;
@@ -42,6 +43,7 @@ public class LambdaDeploymentStage implements StageDefinitionBuilder {
     @Override
     public void taskGraph(@Nonnull StageExecution stage, @Nonnull TaskNode.Builder builder) {
         logger.debug("taskGraph for Aws.LambdaDeploymentStage");
+        builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
         builder.withTask("lambdaCreateTask", LambdaCreateTask.class);
         builder.withTask("lambdaUpdateCodeTask", LambdaUpdateCodeTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
@@ -59,6 +61,7 @@ public class LambdaDeploymentStage implements StageDefinitionBuilder {
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
         builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
         builder.withTask("lambdaWaitForCachePublishTask", LambdaWaitForCachePublishTask.class);
+        builder.withTask("LambdaWaitToStabilizeTask", LambdaWaitToStabilizeTask.class);
         builder.withTask("lambdaOutputTask", LambdaOutputTask.class);
     }
 }

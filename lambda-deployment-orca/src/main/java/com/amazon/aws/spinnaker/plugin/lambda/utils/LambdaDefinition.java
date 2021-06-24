@@ -42,4 +42,7 @@ public class LambdaDefinition extends FunctionConfiguration {
     private FunctionCodeLocation code;
     private Map<String, String> tags;
     private List<String> targetGroups;
+    private String state;
+    private String stateReason;
+    private String stateReasonCode;
 }
