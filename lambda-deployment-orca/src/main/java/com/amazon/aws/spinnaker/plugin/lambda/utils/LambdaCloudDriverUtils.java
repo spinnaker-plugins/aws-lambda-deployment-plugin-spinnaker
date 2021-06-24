@@ -111,6 +111,9 @@ public class LambdaCloudDriverUtils {
                 if (respStringNode.has("body")) {
                     String body = ((TextNode) respStringNode.get("body")).textValue();
                     respObject.setBody(body);
+                }else if (respStringNode.has("payload")) {
+                    String body = ((TextNode) respStringNode.get("pyaload")).textValue();
+                    respObject.setBody(body);
                 }
                 if (respStringNode.has("errorMessage")) {
                     String errorMessage = ((TextNode) respStringNode.get("errorMessage")).textValue();
