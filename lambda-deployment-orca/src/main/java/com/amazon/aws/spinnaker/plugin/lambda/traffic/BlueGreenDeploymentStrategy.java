@@ -98,8 +98,12 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
         LambdaCloudDriverInvokeOperationResults invokeResponse = utils.getLambdaInvokeResults(url);
         String expected = utils.getPipelinesArtifactContent(inp.getOutputArtifact()).replaceAll("[\\n\\t ]", "");
         String actual = null;
-        if (invokeResponse != null && invokeResponse.getBody() != null) {
-            actual = invokeResponse.getBody().replaceAll("[\\n\\t ]", "");
+        if (invokeResponse != null) {
+            if (invokeResponse.getBody() != null) {
+                actual = invokeResponse.getBody().replaceAll("[\\n\\t ]", "");
+            } else if (invokeResponse.getResponseString() != null) {
+                actual = invokeResponse.getResponseString().replaceAll("[\\n\\t ]", "");
+            }
         }
         boolean comparison = ObjectUtils.defaultIfNull(expected, "").equals(actual);
         if (!comparison) {
