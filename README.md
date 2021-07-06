@@ -4,8 +4,9 @@ This plugin provides support for AWS Lambda Deployment via Pipelines in Spinnake
 
 ### Version Compatibility
 | Plugin  | Spinnaker Platform |
-|:----------- | :--------- |
-| 1.0.x  |  1.23.x |
+|:------------- | :--------- |
+| 1.0.5 <= |  1.23.x |
+| 1.0.6 >= |  1.26.x |
 
 This plugin is currently only compatible with Spinnaker platform 1.23.x and up. It is possible to run the plugin in an environment running an earlier release by making the following changes to your environment:
 1. Checkout `master` branch for `spinnaker/orca`
