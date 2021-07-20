@@ -31,7 +31,7 @@ rm -rf $TEMP_FILE,$TEMP_PLUGIN_FILE
 ./gradlew releaseBundle
 
 # update plugins.json
-cat $PLUGIN_PATH/plugin-info.json | jq -r '.releases |= map( . + '{\"url\":\"https://$BUCKET.$REGION.amazonaws.com/plugins/${PLUGIN_NAME}/${PLUGIN_NAME}-${version}.zip\"}')' > $TEMP_PLUGIN_FILE
+cat $PLUGIN_PATH/plugin-info.json | jq -r '.releases |= map( . + '{\"url\":\"https://$BUCKET.s3.$REGION.amazonaws.com/plugins/${PLUGIN_NAME}/${PLUGIN_NAME}-${version}.zip\"}')' > $TEMP_PLUGIN_FILE
 echo [] >> $PLUGIN_FILE;
 jq 'reduce inputs as $i (.; .[0] = $i)' "$PLUGIN_FILE" "$TEMP_PLUGIN_FILE" > "$TEMP_FILE";
 mv $TEMP_FILE $PLUGIN_FILE
