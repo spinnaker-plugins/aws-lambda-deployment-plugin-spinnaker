@@ -38,10 +38,8 @@ mv $TEMP_FILE $PLUGIN_FILE
 
 
 # upload artifacts to s3
-export AWS_PROFILE=prod
 aws s3 cp $PLUGIN_FILE s3://$BUCKET/plugins/${PLUGIN_NAME}/$PLUGIN_FILE_NAME --acl public-read
 aws s3 cp $PLUGIN_PATH/${PLUGIN_NAME}* s3://$BUCKET/plugins/${PLUGIN_NAME}/${PLUGIN_NAME}-${version}.zip --acl public-read
-export AWS_PROFILE=prod
 
 echo "This will be usable on... "
 cat<<EOF
