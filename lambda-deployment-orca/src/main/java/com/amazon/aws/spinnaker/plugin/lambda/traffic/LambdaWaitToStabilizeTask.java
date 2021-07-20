@@ -20,7 +20,6 @@ package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
-import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaStageConstants;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
@@ -31,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import java.util.Map;
 
 @Component
 public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
@@ -57,7 +55,7 @@ public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
     private TaskResult waitForStableState(@NotNull StageExecution stage) {
         LambdaDefinition lf = null;
         while(true) {
-            lf = utils.findLambda(stage);
+            lf = utils.findLambdaFromCache(stage, true);
             if (lf != null && lf.getState() != null) {
                 logger.debug(String.format("lambda state %s", lf.getState()));
                 if (lf.getState().equals(PENDING_STATE) && lf.getStateReasonCode() != null && lf.getStateReasonCode().equals(FUNCTION_CREATING)) {

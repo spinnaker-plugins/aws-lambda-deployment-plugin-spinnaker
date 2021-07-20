@@ -56,7 +56,7 @@ public class LambdaInvokeTask  implements LambdaStageBaseTask {
         logger.debug("Executing LambdaInvokeTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
         prepareTask(stage);
-        LambdaDefinition lf = utils.findLambda(stage, true);
+        LambdaDefinition lf = utils.findLambdaFromCache(stage, true);
         if (lf == null) {
             logger.error("Could not find lambda");
             return this.formErrorTaskResult(stage, "No such lambda found.");

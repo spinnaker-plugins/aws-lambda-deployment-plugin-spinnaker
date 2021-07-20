@@ -54,7 +54,7 @@ public class LambdaOutputTask implements LambdaStageBaseTask {
         cloudDriverUrl = props.getCloudDriverBaseUrl();
         prepareTask(stage);
         Boolean justCreated = (Boolean) stage.getContext().getOrDefault(LambdaStageConstants.lambaCreatedKey, false);
-        LambdaDefinition lf = utils.findLambda(stage, justCreated);
+        LambdaDefinition lf = utils.findLambdaFromCache(stage, justCreated);
         if (lf != null) {
             addToOutput(stage, LambdaStageConstants.revisionIdKey, lf.getRevisionId());
             addToOutput(stage, LambdaStageConstants.lambdaObjectKey, lf);

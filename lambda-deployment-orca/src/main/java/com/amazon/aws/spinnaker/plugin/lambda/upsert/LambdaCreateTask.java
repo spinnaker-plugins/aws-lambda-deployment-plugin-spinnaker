@@ -33,7 +33,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class LambdaCreateTask implements LambdaStageBaseTask {
@@ -61,7 +60,7 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
         ldi.setAppName(stage.getExecution().getApplication());
         LambdaGetInput lgi = utils.getInput(stage, LambdaGetInput.class);
         lgi.setAppName(stage.getExecution().getApplication());
-        LambdaDefinition lambdaDefinition = utils.retrieveLambda(lgi);
+        LambdaDefinition lambdaDefinition = utils.retrieveLambdaFromCache(lgi);
         if (lambdaDefinition != null) {
             logger.debug("noOp. Lambda already exists. only needs updating.");
             fillTaskContext(stage, lambdaDefinition);

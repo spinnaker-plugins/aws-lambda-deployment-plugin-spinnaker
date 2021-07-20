@@ -66,7 +66,7 @@ public class BaseDeploymentStrategy<T extends LambdaBaseStrategyInput> {
             return versionNumberProvided;
         }
 
-        LambdaDefinition lf = utils.findLambda(stage);
+        LambdaDefinition lf = utils.findLambdaFromCache(stage, true);
         return getUtils().getCanonicalVersion(lf, version, versionNumberProvided, 0);
     }
 }

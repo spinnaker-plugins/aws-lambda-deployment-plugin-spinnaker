@@ -205,12 +205,7 @@ public class LambdaCloudDriverUtils {
         return headersBuilder.build();
     }
 
-    public boolean lambdaExists(LambdaGetInput inp) {
-        LambdaDefinition thisLambda = retrieveLambda(inp);
-        return thisLambda != null;
-    }
-
-    public LambdaDefinition retrieveLambda(LambdaGetInput inp) {
+    public LambdaDefinition retrieveLambdaFromCache(LambdaGetInput inp) {
         //{{clouddriver_url}}/functions?functionName=a1-json_simple_lambda_222&region=us-west-2&account=aws-managed-1
         logger.debug("Retrieve Lambda");
         String cloudDriverUrl =  props.getCloudDriverBaseUrl();
@@ -348,19 +343,15 @@ public class LambdaCloudDriverUtils {
         return answers;
     }
 
-    public LambdaDefinition findLambda(StageExecution stage) {
-        return findLambda(stage, false);
-    }
-
-    public LambdaDefinition findLambda(StageExecution stage, boolean shouldRetry) {
+    public LambdaDefinition findLambdaFromCache(StageExecution stage, boolean shouldRetry) {
         LambdaGetInput lgi = this.getInput(stage, LambdaGetInput.class);
         lgi.setAppName(stage.getExecution().getApplication());
         //LambdaGetOutput lf = (LambdaGetOutput)stage.getContext().get(LambdaStageConstants.lambdaObjectKey);
-        LambdaDefinition lf = this.retrieveLambda(lgi);
+        LambdaDefinition lf = this.retrieveLambdaFromCache(lgi);
         int count = 0;
         while (lf == null && count < 5 && shouldRetry == true) {
             count++;
-            lf = this.retrieveLambda((lgi));
+            lf = this.retrieveLambdaFromCache((lgi));
             this.await();
         }
         return lf;

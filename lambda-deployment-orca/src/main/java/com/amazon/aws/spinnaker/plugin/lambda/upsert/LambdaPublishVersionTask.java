@@ -71,7 +71,7 @@ public class LambdaPublishVersionTask implements LambdaStageBaseTask {
             return false;
         LambdaGetInput lgi = utils.getInput(stage, LambdaGetInput.class);
         lgi.setAppName(stage.getExecution().getApplication());
-        LambdaDefinition lf = utils.retrieveLambda(lgi);
+        LambdaDefinition lf = utils.retrieveLambdaFromCache(lgi);
         String newRevisionId = lf.getRevisionId();
         String origRevisionId = (String)stage.getContext().get(LambdaStageConstants.originalRevisionIdKey);
         stage.getContext().put(LambdaStageConstants.newRevisionIdKey, newRevisionId);
