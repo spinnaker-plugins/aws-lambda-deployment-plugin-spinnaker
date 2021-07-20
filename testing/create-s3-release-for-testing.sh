@@ -54,7 +54,7 @@ spinnaker:
     repositories:
       PluginNameCamelCase:
         id: PluginNameCamelCase
-        url: https://$BUCKET.$REGION.amazonaws.com/plugins/${PLUGIN_NAME}/plugins.json
+        url: https://$BUCKET.s3.$REGION.amazonaws.com/plugins/${PLUGIN_NAME}/plugins.json
 EOF
 
 
