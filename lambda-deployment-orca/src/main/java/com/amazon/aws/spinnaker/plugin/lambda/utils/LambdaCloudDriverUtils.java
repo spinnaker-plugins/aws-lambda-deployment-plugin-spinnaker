@@ -395,7 +395,7 @@ public class LambdaCloudDriverUtils {
         this.await(20000);
     }
 
-    public void await(int duration) {
+    public void await(long duration) {
         try {
             logger.debug("Going to sleep during lambda");
             Thread.sleep(duration);

@@ -34,6 +34,7 @@ import retrofit.client.Response;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,7 +58,9 @@ public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
         prepareTask(stage);
         LambdaCloudOperationOutput output = forceCacheRefresh(stage);
         logger.debug("Going to wait for some seconds after requesting cache refresh...");
-        utils.await();
+        //TODO: Change to a live call to verify cache has FINISHED vs. a fixed wait time.  UNFORTUNATELY not implemented in:
+        // https://github.com/spinnaker/clouddriver/blob/master/clouddriver-lambda/src/main/java/com/netflix/spinnaker/clouddriver/lambda/provider/agent/LambdaCachingAgent.java#L349
+        utils.await(Duration.ofMinutes(5).toMillis());
         return taskComplete(stage);
     }
 

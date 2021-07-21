@@ -4,6 +4,7 @@ set -eux
 REGION="${1:-s3-us-west-2}"
 BUCKET="${2:-artifacts}"
 PLUGIN_NAME=${3:-aws-lambda-deployment-plugin-spinnaker}
+INCREMENT_VERSION=${4:-1}
 
 TEMP_PLUGIN_FILE="plugins-temp.json"
 PLUGIN_FILE_NAME="plugins.json"
@@ -14,13 +15,14 @@ TEMP_FILE="temp.json"
 increment_version() {
   local delimiter=.
   local array=($(echo "$1" | tr $delimiter '\n'))
-  array[$2]=$((array[$2]+1))
+  array[2]=$(expr ${array[2]} + ${INCREMENT_VERSION} )
   echo $(local IFS=$delimiter ; echo "${array[*]}")
 }
 
 tag=$(git describe --tags --abbrev=0)
 version=$(increment_version "${tag}" 2)
 
+echo "Building version $version"
 # build the plugin
 
 [ -d "$PLUGIN_PATH" ] || (echo "cannot find $PLUGIN_PATH. script needs to run in root plugin dir" && exit 1)
