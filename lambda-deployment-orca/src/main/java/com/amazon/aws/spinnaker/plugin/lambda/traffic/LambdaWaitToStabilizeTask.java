@@ -56,19 +56,25 @@ public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
 
     private TaskResult waitForStableState(@NotNull StageExecution stage) {
         LambdaDefinition lf = null;
+        int counter = 0;
         while(true) {
             lf = utils.findLambda(stage);
             if (lf != null && lf.getState() != null) {
-                logger.debug(String.format("lambda state %s", lf.getState()));
+                logger.info(String.format("%s lambda state %s", lf.getFunctionName(), lf.getState()));
                 if (lf.getState().equals(PENDING_STATE) && lf.getStateReasonCode() != null && lf.getStateReasonCode().equals(FUNCTION_CREATING)) {
                     utils.await(10000);
                     continue;
                 }
                 if (lf.getState().equals(ACTIVE_STATE)) {
+                    logger.info(lf.getFunctionName() + " is active");
                     return taskComplete(stage);
                 }
+            } else {
+                logger.info("waiting to stabilize ...");
+                utils.await(5000);
+                if (++counter > 5)
+                    break;
             }
-            break;
         }
         return this.formErrorTaskResult(
                 stage,
