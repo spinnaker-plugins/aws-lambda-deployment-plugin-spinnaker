@@ -50,9 +50,6 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
     String cloudDriverUrl;
 
     @Autowired
-    CloudDriverConfigurationProperties props;
-
-    @Autowired
     LambdaCloudDriverUtils utils;
 
     private static final String DEFAULT_STARTING_POSITION = "LATEST";
@@ -61,7 +58,6 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
         logger.debug("Executing LambdaUpdateEventConfigurationTask");
-        cloudDriverUrl = props.getCloudDriverBaseUrl();
         LambdaUpdateEventConfigurationTaskInput taskInput = utils.getInput(stage, LambdaUpdateEventConfigurationTaskInput.class);
         taskInput.setAppName(stage.getExecution().getApplication());
         Boolean justCreated = (Boolean) stage.getContext().getOrDefault(LambdaStageConstants.lambaCreatedKey, false);

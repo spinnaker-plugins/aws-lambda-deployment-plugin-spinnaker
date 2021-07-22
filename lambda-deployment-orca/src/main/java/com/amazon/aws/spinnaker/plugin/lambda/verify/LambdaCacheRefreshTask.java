@@ -22,6 +22,8 @@ import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCacheRefreshInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
@@ -35,6 +37,7 @@ import retrofit.client.Response;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,6 +67,9 @@ public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
         return taskComplete(stage);
     }
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+
     private LambdaCloudOperationOutput forceCacheRefresh(StageExecution stage) {
         LambdaCacheRefreshInput inp = utils.getInput(stage, LambdaCacheRefreshInput.class);
         inp.setAppName(stage.getExecution().getApplication());
@@ -74,6 +80,16 @@ public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
         String url = cloudDriverUrl + respObj.getResourceUri();
         logger.debug("Posted to cloudDriver for cache refresh: " + url);
         LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
+
+
+        //WAIT for cache refresh to finish...
+        try {
+            String response = utils.getFromCloudDriver(cloudDriverUrl + CLOUDDRIVER_REFRESH_CACHE_PATH + "?id=" + respObj.getId());
+            Collection<Map<?,?>> onDemands = objectMapper.readValue(, Map.of(String.class, Object.class));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
         return operationOutput;
     }
 }

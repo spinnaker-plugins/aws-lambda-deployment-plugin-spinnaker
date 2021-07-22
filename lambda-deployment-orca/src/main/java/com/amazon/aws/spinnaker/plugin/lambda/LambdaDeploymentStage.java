@@ -45,31 +45,27 @@ public class LambdaDeploymentStage implements StageDefinitionBuilder {
         logger.debug("taskGraph for Aws.LambdaDeploymentStage");
         builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
         builder.withTask("lambdaCreateTask", LambdaCreateTask.class);
-
-        //This doesn't need to fire a cache refresh as it trusts the create tasks "Messaging" using the context to control behavior
         builder.withTask("lambdaUpdateCodeTask", LambdaUpdateCodeTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
-        builder.withTask("lambdaUpdateConfigTask", LambdaUpdateConfigurationTask.class);
-        builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
-        builder.withTask("lambdaPutConcurrencyTask", LambdaPutConcurrencyTask.class);
-        builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
-        // wait to stabilizie does a read
-        builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
         builder.withTask("LambdaWaitToStabilizeTask", LambdaWaitToStabilizeTask.class);
-
+        builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
+        builder.withTask("lambdaUpdateConfigTask", LambdaUpdateConfigurationTask.class);
+//        builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
+//        builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
+        builder.withTask("lambdaPutConcurrencyTask", LambdaPutConcurrencyTask.class);
+//        builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
         builder.withTask("lambdaEventConfigurationTask", LambdaUpdateEventConfigurationTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
         builder.withTask("lambdaUpdateAliasesTask", LambdaUpdateAliasesTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
-        //need to read cache before this fires to get version information...
-        builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
+        //has to happen so we see that there's a new version needing published.... otherwise publish will get from the cache
+        // and realize it's the same version that it got from the cache in the create task, and not think it needs to
+        // publish a new version.  Where-as if it's an existing lambda, it may very well BE the first version...
+        builder.withTask("lambdaCacheRefreshTask", .class);
         builder.withTask("lambdaPublishVersionTask", LambdaPublishVersionTask.class);
-
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
-        // Queries cache for versions...
         builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
         builder.withTask("lambdaWaitForCachePublishTask", LambdaWaitForCachePublishTask.class);
-
         builder.withTask("lambdaOutputTask", LambdaOutputTask.class);
     }
 }

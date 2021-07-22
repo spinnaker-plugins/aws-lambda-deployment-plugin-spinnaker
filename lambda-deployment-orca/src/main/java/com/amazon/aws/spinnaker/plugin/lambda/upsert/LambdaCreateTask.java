@@ -63,9 +63,12 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
         LambdaDefinition lambdaDefinition = utils.retrieveLambdaFromCache(lgi);
         if (lambdaDefinition != null) {
             logger.debug("noOp. Lambda already exists. only needs updating.");
-            fillTaskContext(stage, lambdaDefinition);
-            addToOutput(stage, LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
             addToTaskContext(stage, LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
+            addToTaskContext(stage, LambdaStageConstants.lambdaObjectKey, lambdaDefinition);
+            addToTaskContext(stage, LambdaStageConstants.originalRevisionIdKey, lambdaDefinition.getRevisionId());
+            addToTaskContext(stage, LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
+
+            addToOutput(stage, LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
             addToOutput(stage, LambdaStageConstants.originalRevisionIdKey, lambdaDefinition.getRevisionId());
             return taskComplete(stage);
         }
@@ -87,12 +90,6 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
         logger.debug("Posted to cloudDriver for createLambda: " + url);
         LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
         return operationOutput;
-    }
-
-    private void fillTaskContext(StageExecution stage, LambdaDefinition lf) {
-        addToTaskContext(stage, LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
-        addToTaskContext(stage, LambdaStageConstants.lambdaObjectKey, lf);
-        addToTaskContext(stage, LambdaStageConstants.originalRevisionIdKey, lf.getRevisionId());
     }
 
     @Nullable

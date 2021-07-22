@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import java.time.Duration;
 
 @Component
 public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
@@ -54,19 +55,25 @@ public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
 
     private TaskResult waitForStableState(@NotNull StageExecution stage) {
         LambdaDefinition lf = null;
+        int counter = 0;
         while(true) {
             lf = utils.findLambdaFromCache(stage, true);
             if (lf != null && lf.getState() != null) {
-                logger.debug(String.format("lambda state %s", lf.getState()));
+                logger.info(String.format("%s lambda state from the cache %s", lf.getFunctionName(), lf.getState()));
                 if (lf.getState().equals(PENDING_STATE) && lf.getStateReasonCode() != null && lf.getStateReasonCode().equals(FUNCTION_CREATING)) {
-                    utils.await(10000);
+                    utils.await(Duration.ofSeconds(30).toMillis());
                     continue;
                 }
                 if (lf.getState().equals(ACTIVE_STATE)) {
+                    logger.info(lf.getFunctionName() + " is active");
                     return taskComplete(stage);
                 }
+            } else {
+                logger.info("waiting to stabilize ...");
+                utils.await(Duration.ofMinutes(10).toMillis());
+                if (++counter > 5)
+                    break;
             }
-            break;
         }
         return this.formErrorTaskResult(
                 stage,

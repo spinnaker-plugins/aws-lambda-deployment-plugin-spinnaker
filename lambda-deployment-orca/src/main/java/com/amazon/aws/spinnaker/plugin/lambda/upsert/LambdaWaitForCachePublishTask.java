@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import java.time.Duration;
 import java.util.Map;
 
 @Component
@@ -54,7 +55,7 @@ public class LambdaWaitForCachePublishTask implements LambdaStageBaseTask {
         if (stage.getContext().containsKey(LambdaStageConstants.publishVersionUrlKey)) {
             String publishUrl = (String) stage.getContext().get(LambdaStageConstants.publishVersionUrlKey);
             String version = utils.getPublishedVersion(publishUrl);
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < Duration.ofMinutes(15).toSeconds() / 30; i++) {
                 LambdaDefinition lf = utils.findLambdaFromCache(stage, true);
                 if (lf != null) {
                     Map<String, String> revisions = lf.getRevisions();
@@ -62,9 +63,9 @@ public class LambdaWaitForCachePublishTask implements LambdaStageBaseTask {
                         return taskComplete(stage);
                     }
                 }
-                utils.await(10000);
+                utils.await(Duration.ofSeconds(30).toMillis());
             }
-            return this.formErrorTaskResult(stage, "Failed to update cache after PublishVersionTask");
+            return this.formErrorTaskResult(stage, "New version failed to appear in the cache after it was determined a publish was necessary");
         }
         return taskComplete(stage);
     }
