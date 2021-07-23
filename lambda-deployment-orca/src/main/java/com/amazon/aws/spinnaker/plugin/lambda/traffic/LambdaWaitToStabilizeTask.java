@@ -57,7 +57,7 @@ public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
         LambdaDefinition lf = null;
         int counter = 0;
         while(true) {
-            lf = utils.findLambdaFromCache(stage, true);
+            lf = utils.retrieveLambdaFromCache(stage, true);
             if (lf != null && lf.getState() != null) {
                 logger.info(String.format("%s lambda state from the cache %s", lf.getFunctionName(), lf.getState()));
                 if (lf.getState().equals(PENDING_STATE) && lf.getStateReasonCode() != null && lf.getStateReasonCode().equals(FUNCTION_CREATING)) {
@@ -69,9 +69,9 @@ public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
                     return taskComplete(stage);
                 }
             } else {
-                logger.info("waiting to stabilize ...");
-                utils.await(Duration.ofMinutes(10).toMillis());
-                if (++counter > 5)
+                logger.info("waiting for up to 10 minutes for it to show up in the cache... requires a full cache refresh cycle");
+                utils.await(Duration.ofMinutes(1).toMillis());
+                if (++counter > 10)
                     break;
             }
         }

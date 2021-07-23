@@ -56,7 +56,7 @@ public class LambdaWaitForCacheCodeUpdateTask implements LambdaStageBaseTask {
             String codeUpdateUrl = (String) stage.getContext().get(LambdaStageConstants.updateCodeUrlKey);
             String version = utils.getPublishedVersion(codeUpdateUrl);
             for (int i = 0; i < 10; i++) {
-                LambdaDefinition lf = utils.findLambdaFromCache(stage, true);
+                LambdaDefinition lf = utils.retrieveLambdaFromCache(stage, true);
                 if (lf != null) {
                     Map<String, String> revisions = lf.getRevisions();
                     if (revisions.containsValue(version)) {

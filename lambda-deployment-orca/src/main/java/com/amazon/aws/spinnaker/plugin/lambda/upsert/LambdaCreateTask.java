@@ -36,6 +36,7 @@ import java.util.List;
 
 @Component
 public class LambdaCreateTask implements LambdaStageBaseTask {
+    long startTime = System.currentTimeMillis();
     private static Logger logger = LoggerFactory.getLogger(LambdaCreateTask.class);
     private static String CLOUDDRIVER_CREATE_PATH = "/aws/ops/createLambdaFunction";
 
@@ -60,7 +61,7 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
         ldi.setAppName(stage.getExecution().getApplication());
         LambdaGetInput lgi = utils.getInput(stage, LambdaGetInput.class);
         lgi.setAppName(stage.getExecution().getApplication());
-        LambdaDefinition lambdaDefinition = utils.retrieveLambdaFromCache(lgi);
+        LambdaDefinition lambdaDefinition = utils.retrieveLambdaFromCache(stage, false);
         if (lambdaDefinition != null) {
             logger.debug("noOp. Lambda already exists. only needs updating.");
             addToTaskContext(stage, LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);

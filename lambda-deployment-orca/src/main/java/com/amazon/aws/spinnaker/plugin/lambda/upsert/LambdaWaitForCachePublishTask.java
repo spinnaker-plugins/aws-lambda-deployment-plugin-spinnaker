@@ -55,8 +55,8 @@ public class LambdaWaitForCachePublishTask implements LambdaStageBaseTask {
         if (stage.getContext().containsKey(LambdaStageConstants.publishVersionUrlKey)) {
             String publishUrl = (String) stage.getContext().get(LambdaStageConstants.publishVersionUrlKey);
             String version = utils.getPublishedVersion(publishUrl);
-            for (int i = 0; i < Duration.ofMinutes(15).toSeconds() / 30; i++) {
-                LambdaDefinition lf = utils.findLambdaFromCache(stage, true);
+            for (int i = 0; i < 10; i++) {
+                LambdaDefinition lf = utils.retrieveLambdaFromCache(stage, true);
                 if (lf != null) {
                     Map<String, String> revisions = lf.getRevisions();
                     if (revisions.containsValue(version)) {

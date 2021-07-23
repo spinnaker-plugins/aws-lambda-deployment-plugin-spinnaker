@@ -27,7 +27,6 @@ import com.amazonaws.services.lambda.model.EventSourceMappingConfiguration;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
-import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.pf4j.util.StringUtils;
@@ -61,7 +60,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
         LambdaUpdateEventConfigurationTaskInput taskInput = utils.getInput(stage, LambdaUpdateEventConfigurationTaskInput.class);
         taskInput.setAppName(stage.getExecution().getApplication());
         Boolean justCreated = (Boolean) stage.getContext().getOrDefault(LambdaStageConstants.lambaCreatedKey, false);
-        LambdaDefinition lf = utils.findLambdaFromCache(stage, justCreated);
+        LambdaDefinition lf = utils.retrieveLambdaFromCache(stage, justCreated);
         if (lf == null) {
             return formErrorTaskResult(stage, String.format("Could not find lambda to update event config for"));
         }
