@@ -337,12 +337,8 @@ public class LambdaCloudDriverUtils {
     public List<String> getSortedRevisions(LambdaDefinition lf) {
         List<String> revisions = lf.getRevisions().values().stream().collect(Collectors.toList());
         List<Integer> revInt = revisions.stream()
-                .filter(x -> {
-                    return NumberUtils.isCreatable(x);
-                })
-                .map(x -> {
-                    return Integer.valueOf(x);
-                })
+                .filter(x -> { return NumberUtils.isCreatable(x); })
+                .map(x -> { return Integer.valueOf(x); })
                 .collect(Collectors.toList());
         revInt = revInt.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
         List<String> answers = revInt.stream().map(x -> {

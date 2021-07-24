@@ -144,6 +144,7 @@ public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
                                 logger.info("Caching should be completed for " + id);
                                 return true;
                             } else {
+                                // This short circuits the loop and triggers a retry after 15 seconds, to see if processedCount is finished yet...
                                 throw new RuntimeException("No cache data has been processed... retrying...");
                             }
                         }
