@@ -46,6 +46,9 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
     private static final String CLOUDDRIVER_DELETE_EVENT_CONFIGURATION_LAMBDA_PATH = "/aws/ops/deleteLambdaFunctionEventMapping";
     private static final String DYNAMO_EVENT_PREFIX = "arn:aws:dynamodb:";
     private static final String KINESIS_EVENT_PREFIX = "arn:aws:kinesis";
+
+    String cloudDriverUrl;
+
     @Autowired
     CloudDriverConfigurationProperties props;
 
@@ -58,6 +61,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
         logger.debug("Executing LambdaUpdateEventConfigurationTask");
+        cloudDriverUrl = props.getCloudDriverBaseUrl();
         LambdaUpdateEventConfigurationTaskInput taskInput = utils.getInput(stage, LambdaUpdateEventConfigurationTaskInput.class);
         taskInput.setAppName(stage.getExecution().getApplication());
         Boolean justCreated = (Boolean) stage.getContext().getOrDefault(LambdaStageConstants.lambaCreatedKey, false);
@@ -168,7 +172,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
         LambdaUpdateEventConfigurationTaskOutput ans = LambdaUpdateEventConfigurationTaskOutput.builder().build();
         ans.setEventOutputs(new ArrayList<LambdaCloudOperationOutput>());
         taskInput.setCredentials(taskInput.getAccount());
-        String endPoint = props.getCloudDriverBaseUrl() + CLOUDDRIVER_UPDATE_EVENT_CONFIGURATION_LAMBDA_PATH;
+        String endPoint = cloudDriverUrl + CLOUDDRIVER_UPDATE_EVENT_CONFIGURATION_LAMBDA_PATH;
 
         final List<String> existingEvents = getExistingEvents(lf, targetArn);
         taskInput.getTriggerArns().stream()
@@ -176,7 +180,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
                    LambdaEventConfigurationDescription singleEvent = formEventObject(curr, taskInput);
                    String rawString = utils.asString(singleEvent);
                    LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
-                   String url = props.getCloudDriverBaseUrl() + respObj.getResourceUri();
+                   String url = cloudDriverUrl + respObj.getResourceUri();
                    logger.debug("Posted to cloudDriver for updateEventConfiguration: " + url);
                    LambdaCloudOperationOutput z = LambdaCloudOperationOutput.builder().url(url).resourceId(respObj.getResourceUri()).build();
                    ans.getEventOutputs().add(z);
@@ -252,10 +256,10 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
 
     private LambdaCloudOperationOutput deleteLambdaEventConfig(LambdaDeleteEventTaskInput inp) {
         inp.setCredentials(inp.getAccount());
-        String endPoint = props.getCloudDriverBaseUrl() + CLOUDDRIVER_DELETE_EVENT_CONFIGURATION_LAMBDA_PATH;
+        String endPoint = cloudDriverUrl + CLOUDDRIVER_DELETE_EVENT_CONFIGURATION_LAMBDA_PATH;
         String rawString = utils.asString(inp);
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
-        String url = props.getCloudDriverBaseUrl() + respObj.getResourceUri();
+        String url = cloudDriverUrl + respObj.getResourceUri();
         logger.debug("Posted to cloudDriver for deleteLambdaEventConfig: " + url);
         LambdaCloudOperationOutput resp = LambdaCloudOperationOutput.builder().url(url).build();
         return resp;
