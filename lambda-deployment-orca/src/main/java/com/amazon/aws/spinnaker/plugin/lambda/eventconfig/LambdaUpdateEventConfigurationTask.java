@@ -65,7 +65,7 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
         LambdaUpdateEventConfigurationTaskInput taskInput = utils.getInput(stage, LambdaUpdateEventConfigurationTaskInput.class);
         taskInput.setAppName(stage.getExecution().getApplication());
         Boolean justCreated = (Boolean) stage.getContext().getOrDefault(LambdaStageConstants.lambaCreatedKey, false);
-        LambdaDefinition lf = utils.retrieveLambdaFromCache(stage, justCreated);
+        LambdaDefinition lf = utils.findLambda(stage, justCreated);
         if (lf == null) {
             return formErrorTaskResult(stage, String.format("Could not find lambda to update event config for"));
         }

@@ -39,8 +39,8 @@ public class LambdaDeleteStage implements StageDefinitionBuilder {
     @Override
     public void taskGraph(@Nonnull StageExecution stage, @Nonnull TaskNode.Builder builder) {
         logger.debug("taskGraph for Aws.LambdaDeleteStage");
-        builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
         builder.withTask("lambdaDeleteTask", LambdaDeleteTask.class);
         builder.withTask("lambdaDeleteVerificationTask", LambdaDeleteVerificationTask.class);
+        builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
     }
 }

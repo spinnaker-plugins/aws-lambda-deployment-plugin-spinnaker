@@ -151,7 +151,7 @@ public class BlueGreenDeploymentStrategy extends BaseDeploymentStrategy<LambdaBl
         );
 
         LambdaDefinition lf = null;
-        lf = utils.retrieveLambdaFromCache(stage, true);
+        lf = utils.findLambda(stage, true);
 
         String qual = utils.getCanonicalVersion(lf, "$LATEST", "", 1);
         blueGreenInput.setQualifier(qual);

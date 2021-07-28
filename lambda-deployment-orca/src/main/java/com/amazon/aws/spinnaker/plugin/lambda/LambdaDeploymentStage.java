@@ -46,19 +46,17 @@ public class LambdaDeploymentStage implements StageDefinitionBuilder {
         builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
         builder.withTask("lambdaCreateTask", LambdaCreateTask.class);
         builder.withTask("lambdaUpdateCodeTask", LambdaUpdateCodeTask.class);
-        builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
-        builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
         builder.withTask("LambdaWaitToStabilizeTask", LambdaWaitToStabilizeTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
         builder.withTask("lambdaUpdateConfigTask", LambdaUpdateConfigurationTask.class);
+        builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
+        builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
         builder.withTask("lambdaPutConcurrencyTask", LambdaPutConcurrencyTask.class);
+        builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
         builder.withTask("lambdaEventConfigurationTask", LambdaUpdateEventConfigurationTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
         builder.withTask("lambdaUpdateAliasesTask", LambdaUpdateAliasesTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
-        //has to happen so we see that there's a new version needing published.... otherwise publish will get from the cache
-        // and realize it's the same version that it got from the cache in the create task, and not think it needs to
-        // publish a new version.  Where-as if it's an existing lambda, it may very well BE the first version...
         builder.withTask("lambdaCacheRefreshTask", LambdaCacheRefreshTask.class);
         builder.withTask("lambdaPublishVersionTask", LambdaPublishVersionTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
