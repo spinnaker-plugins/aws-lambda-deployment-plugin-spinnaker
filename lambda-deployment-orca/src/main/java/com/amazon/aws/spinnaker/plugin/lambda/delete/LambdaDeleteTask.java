@@ -23,7 +23,6 @@ import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
-import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +58,7 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
 
         if (ldi.getVersion().equals("$ALL")) {
             addToTaskContext(stage, "deleteTask:deleteVersion", ldi.getVersion());
-            return formTaskResult(stage, deleteLambdaVersion(ldi), stage.getOutputs());
+            return formTaskResult(stage, deleteLambda(ldi), stage.getOutputs());
         }
 
         String versionToDelete = getVersion(stage, ldi);
@@ -72,7 +71,7 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
 
         if (!versionToDelete.contains(",")) {
             ldi.setQualifier(versionToDelete);
-            return formTaskResult(stage, deleteLambdaVersion(ldi), stage.getOutputs());
+            return formTaskResult(stage, deleteLambda(ldi), stage.getOutputs());
         }
 
         String[] allVersionsList = versionToDelete.split(",");
@@ -80,16 +79,11 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
 
         for (String currVersion : allVersionsList) {
             ldi.setQualifier((String) currVersion);
-            LambdaCloudOperationOutput ldso = deleteLambdaVersion(ldi);
+            LambdaCloudOperationOutput ldso = deleteLambda(ldi);
             urlList.add(ldso.getUrl());
         }
         addToTaskContext(stage, "urlList", urlList);
         return taskComplete(stage);
-    }
-
-    private LambdaCloudOperationOutput deleteLambdaVersion(LambdaDeleteStageInput ldi) {
-        LambdaCloudOperationOutput ldso = deleteLambda(ldi);
-        return ldso;
     }
 
     private String getVersion(StageExecution stage, LambdaDeleteStageInput ldi) {
@@ -104,7 +98,7 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
             return ldi.getVersionNumber();
         }
 
-        LambdaDefinition lf = utils.findLambda(stage);
+        LambdaDefinition lf = utils.retrieveLambdaFromCache(stage, true);
         if (lf != null) {
             return utils.getCanonicalVersion(lf, ldi.getVersion(), ldi.getVersionNumber(), ldi.getRetentionNumber());
         }
@@ -112,15 +106,13 @@ public class LambdaDeleteTask  implements LambdaStageBaseTask {
     }
 
     private LambdaCloudOperationOutput deleteLambda(LambdaDeleteStageInput inp) {
-        LambdaCloudOperationOutput ans = LambdaCloudOperationOutput.builder().build();
         inp.setCredentials(inp.getAccount());
         String endPoint = cloudDriverUrl + CLOUDDRIVER_DELETE_LAMBDA_PATH;
         String rawString = utils.asString(inp);
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
         logger.debug("Posted to cloudDriver for deleteLambda: " + url);
-        LambdaCloudOperationOutput resp = LambdaCloudOperationOutput.builder().url(url).build();
-        return resp;
+        return LambdaCloudOperationOutput.builder().url(url).build();
     }
 }
 

@@ -33,10 +33,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class LambdaCreateTask implements LambdaStageBaseTask {
+    long startTime = System.currentTimeMillis();
     private static Logger logger = LoggerFactory.getLogger(LambdaCreateTask.class);
     private static String CLOUDDRIVER_CREATE_PATH = "/aws/ops/createLambdaFunction";
 
@@ -61,12 +61,15 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
         ldi.setAppName(stage.getExecution().getApplication());
         LambdaGetInput lgi = utils.getInput(stage, LambdaGetInput.class);
         lgi.setAppName(stage.getExecution().getApplication());
-        LambdaDefinition lambdaDefinition = utils.retrieveLambda(lgi);
+        LambdaDefinition lambdaDefinition = utils.retrieveLambdaFromCache(stage, false);
         if (lambdaDefinition != null) {
             logger.debug("noOp. Lambda already exists. only needs updating.");
-            fillTaskContext(stage, lambdaDefinition);
-            addToOutput(stage, LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
             addToTaskContext(stage, LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
+            addToTaskContext(stage, LambdaStageConstants.lambdaObjectKey, lambdaDefinition);
+            addToTaskContext(stage, LambdaStageConstants.originalRevisionIdKey, lambdaDefinition.getRevisionId());
+            addToTaskContext(stage, LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
+
+            addToOutput(stage, LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
             addToOutput(stage, LambdaStageConstants.originalRevisionIdKey, lambdaDefinition.getRevisionId());
             return taskComplete(stage);
         }
@@ -88,12 +91,6 @@ public class LambdaCreateTask implements LambdaStageBaseTask {
         logger.debug("Posted to cloudDriver for createLambda: " + url);
         LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
         return operationOutput;
-    }
-
-    private void fillTaskContext(StageExecution stage, LambdaDefinition lf) {
-        addToTaskContext(stage, LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
-        addToTaskContext(stage, LambdaStageConstants.lambdaObjectKey, lf);
-        addToTaskContext(stage, LambdaStageConstants.originalRevisionIdKey, lf.getRevisionId());
     }
 
     @Nullable

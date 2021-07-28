@@ -17,24 +17,30 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.verify;
 
-import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
-import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCacheRefreshInput;
-import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
+import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCacheRefreshInput;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.spinnaker.kork.core.RetrySupport;
+import com.netflix.spinnaker.kork.web.exceptions.NotFoundException;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
+import lombok.Data;
+import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import retrofit.client.Response;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.HashMap;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -44,33 +50,109 @@ public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
 
     @Autowired
     CloudDriverConfigurationProperties props;
-    private  String cloudDriverUrl;
 
     @Autowired
     private LambdaCloudDriverUtils utils;
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Nonnull
     @Override
     public TaskResult execute(@Nonnull StageExecution stage) {
         logger.debug("Executing LambdaCacheRefreshTask...");
-        cloudDriverUrl = props.getCloudDriverBaseUrl();
         prepareTask(stage);
-        LambdaCloudOperationOutput output = forceCacheRefresh(stage);
-        logger.debug("Going to wait for some seconds after requesting cache refresh...");
-        utils.await();
-        return taskComplete(stage);
+        try {
+            forceCacheRefresh(stage, 15);
+            return taskComplete(stage);
+        } catch (Exception e) {
+            return TaskResult.builder(ExecutionStatus.TERMINAL).context(getTaskContext(stage)).outputs(stage.getOutputs()).build();
+        }
     }
 
-    private LambdaCloudOperationOutput forceCacheRefresh(StageExecution stage) {
+    @Data
+    public static class OnDemandResponse {
+        Map<String, List<String>> cachedIdentifiersByType;
+    }
+
+
+    /*
+    TWO try loops in here, ONE is embedded in the other.
+    - Retry until a force cache operation actually goes through
+    - AFTER that, retry until cache refresh finishes
+     */
+    private void forceCacheRefresh(StageExecution stage, int tries) {
         LambdaCacheRefreshInput inp = utils.getInput(stage, LambdaCacheRefreshInput.class);
         inp.setAppName(stage.getExecution().getApplication());
         inp.setCredentials(inp.getAccount());
-        String endPoint = cloudDriverUrl + CLOUDDRIVER_REFRESH_CACHE_PATH;
-        String rawString = utils.asString(inp);
-        LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
-        String url = cloudDriverUrl + respObj.getResourceUri();
-        logger.debug("Posted to cloudDriver for cache refresh: " + url);
-        LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
-        return operationOutput;
+
+        final RequestBody body = RequestBody.create(MediaType.parse("application/json"), utils.asString(inp));
+        final Request request = new Request.Builder()
+                .url(props.getCloudDriverBaseUrl() + CLOUDDRIVER_REFRESH_CACHE_PATH)
+                .headers(utils.buildHeaders())
+                .post(body)
+                .build();
+        long startTime = System.currentTimeMillis();
+        new RetrySupport().retry(
+                () -> {
+                    try {
+                        OkHttpClient client = new OkHttpClient();
+                        Call call = client.newCall(request);
+                        Response response = call.execute();
+                        String respString = response.body().string();
+                        OnDemandResponse onDemandRefreshResponse = null;
+                        switch (response.code()) {
+                            // 200 == usually a Delete operation... aka an eviction.
+                            case 200:
+                                return true;
+                            // Async processing... meaning we have to poll to see when the refresh finished....
+                            case 202:
+                                onDemandRefreshResponse = objectMapper.readValue(respString, OnDemandResponse.class);
+                                if (StringUtils.isEmpty(onDemandRefreshResponse.getCachedIdentifiersByType().get("onDemand").isEmpty())) {
+                                    throw new NotFoundException("Force cache refresh did not return the id of the cache to run.  We failed or cache refresh isn't working as expected");
+                                }
+                                String id = onDemandRefreshResponse.getCachedIdentifiersByType().get("onDemand").get(0);
+                                waitForCacheToComplete(id, startTime, props.getCloudDriverBaseUrl(), 30);
+                                return true;
+                            default:
+                                logger.warn("Failed to generate a force cache refresh with response code of " + response.code() + "... retrying.");
+                                throw new RuntimeException("Failed to process cache request due to an invalid response code... retrying...");
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException("Error communicating with clouddriver", e);
+                    }
+                }, tries, Duration.ofSeconds(15), false
+        );
+
+    }
+
+    /*
+        IF no data, trigger a force refresh
+        if processedCount > 0 && processedTime > stageStart
+            SUCCESS
+        ELSE
+            TRIGGER A REFRESH
+     */
+    private void waitForCacheToComplete(String id, long taskStartTime, String cloudDriverUrl, int retries) {
+
+        new RetrySupport().retry(
+                () -> {
+                    try {
+                        String response = utils.getFromCloudDriver(cloudDriverUrl + "/cache/aws/function?id=" + id);
+                        Collection<Map<String, Object>> onDemands = objectMapper.readValue(response, Collection.class);
+                        for (Map<String, Object> results : onDemands) {
+                            if ((int) results.getOrDefault("processedCount", 0) > 0 && (long) results.getOrDefault("cacheTime", 0) > taskStartTime) {
+                                logger.info("Caching should be completed for " + id);
+                                return true;
+                            } else {
+                                // This short circuits the loop and triggers a retry after 15 seconds, to see if processedCount is finished yet...
+                                throw new RuntimeException("No cache data has been processed... retrying...");
+                            }
+                        }
+                        logger.warn("No on demand cache refresh found for  " + id);
+                        throw new RuntimeException("No on demand cache refresh found for " + id);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                }, retries, Duration.ofSeconds(15), false);
     }
 }

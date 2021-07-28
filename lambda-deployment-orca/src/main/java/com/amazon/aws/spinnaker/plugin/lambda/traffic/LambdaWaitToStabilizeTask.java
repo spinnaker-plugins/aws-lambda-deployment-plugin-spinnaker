@@ -20,7 +20,6 @@ package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
-import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaStageConstants;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
@@ -31,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import java.util.Map;
+import java.time.Duration;
 
 @Component
 public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
@@ -56,19 +55,25 @@ public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
 
     private TaskResult waitForStableState(@NotNull StageExecution stage) {
         LambdaDefinition lf = null;
+        int counter = 0;
         while(true) {
-            lf = utils.findLambda(stage);
+            lf = utils.retrieveLambdaFromCache(stage, true);
             if (lf != null && lf.getState() != null) {
-                logger.debug(String.format("lambda state %s", lf.getState()));
+                logger.info(String.format("%s lambda state from the cache %s", lf.getFunctionName(), lf.getState()));
                 if (lf.getState().equals(PENDING_STATE) && lf.getStateReasonCode() != null && lf.getStateReasonCode().equals(FUNCTION_CREATING)) {
-                    utils.await(10000);
+                    utils.await(Duration.ofSeconds(30).toMillis());
                     continue;
                 }
                 if (lf.getState().equals(ACTIVE_STATE)) {
+                    logger.info(lf.getFunctionName() + " is active");
                     return taskComplete(stage);
                 }
+            } else {
+                logger.info("waiting for up to 10 minutes for it to show up in the cache... requires a full cache refresh cycle");
+                utils.await(Duration.ofMinutes(1).toMillis());
+                if (++counter > 10)
+                    break;
             }
-            break;
         }
         return this.formErrorTaskResult(
                 stage,
