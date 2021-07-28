@@ -19,12 +19,10 @@ package com.amazon.aws.spinnaker.plugin.lambda.upsert;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
-import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.model.LambdaUpdateEventConfigurationTaskOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaUpdateAliasesInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaStageConstants;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
@@ -45,8 +43,7 @@ import java.util.Map;
 @Component
 public class LambdaUpdateAliasesTask implements LambdaStageBaseTask {
     private static Logger logger = LoggerFactory.getLogger(LambdaUpdateAliasesTask.class);
-    private static final ObjectMapper objMapper = new ObjectMapper();
-    private static String CLOUDDRIVER_UPDATE_ALIAS_PATH = "/aws/ops/upsertLambdaFunctionAlias";
+    private static final String CLOUDDRIVER_UPDATE_ALIAS_PATH = "/aws/ops/upsertLambdaFunctionAlias";
     private static final String DEFAULT_ALIAS_DESCRIPTION = "Created via Spinnaker";
     private static final String LATEST_VERSION_STRING = "$LATEST";
 
