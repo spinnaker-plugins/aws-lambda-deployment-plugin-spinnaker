@@ -35,6 +35,13 @@ This plugin is currently only compatible with Spinnaker platform 1.23.x and up. 
         awsLambdaDeploymentPluginRepo:
           id: awsLambdaDeploymentPluginRepo
           url: https://raw.githubusercontent.com/spinnaker-plugins/aws-lambda-deployment-plugin-spinnaker/master/plugins.json
+
+  # you can also optionally configure cache refresh retries and timeouts
+  lambdaPluginConfig:
+    cloudDriverReadTimeout: 60 # defaults to 60 secs
+    cloudDriverConnectTimeout: 15 # defaults to 15 secs
+    cacheRefreshRetryWaitTime: 15 # defaults to 15 sec
+    cacheOnDemandRetryWaitTime: 15 # defaults to 15 sec
 ```
 2. Add the following to `gate-local.yml` in the necessary [profile](https://spinnaker.io/reference/halyard/custom/#custom-profiles) to load the Deck frontend
 ```yaml

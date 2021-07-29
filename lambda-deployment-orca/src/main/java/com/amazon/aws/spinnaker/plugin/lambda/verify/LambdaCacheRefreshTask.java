@@ -17,6 +17,7 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.verify;
 
+import com.amazon.aws.spinnaker.plugin.lambda.Config;
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCacheRefreshInput;
@@ -53,6 +54,9 @@ public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
 
     @Autowired
     private LambdaCloudDriverUtils utils;
+
+    @Autowired
+    Config config;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -95,7 +99,10 @@ public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
         new RetrySupport().retry(
                 () -> {
                     try {
-                        OkHttpClient client = new OkHttpClient();
+                        OkHttpClient client =  new OkHttpClient.Builder()
+                                .connectTimeout(Duration.ofSeconds(config.getCloudDriverConnectTimeout()))
+                                .readTimeout(Duration.ofSeconds(config.getCloudDriverReadTimeout()))
+                                .build();
                         Call call = client.newCall(request);
                         Response response = call.execute();
                         String respString = response.body().string();
@@ -103,9 +110,11 @@ public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
                         switch (response.code()) {
                             // 200 == usually a Delete operation... aka an eviction.
                             case 200:
+                                logger.debug("cache refresh responded with 200");
                                 return true;
                             // Async processing... meaning we have to poll to see when the refresh finished....
                             case 202:
+                                logger.debug("cache refresh responded with 202");
                                 onDemandRefreshResponse = objectMapper.readValue(respString, OnDemandResponse.class);
                                 if (StringUtils.isEmpty(onDemandRefreshResponse.getCachedIdentifiersByType().get("onDemand").isEmpty())) {
                                     throw new NotFoundException("Force cache refresh did not return the id of the cache to run.  We failed or cache refresh isn't working as expected");
@@ -118,9 +127,11 @@ public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
                                 throw new RuntimeException("Failed to process cache request due to an invalid response code... retrying...");
                         }
                     } catch (IOException e) {
+                        logger.error("cache- refresh failed: " + e.getMessage());
+                        logger.error(e.getStackTrace().toString());
                         throw new RuntimeException("Error communicating with clouddriver", e);
                     }
-                }, tries, Duration.ofSeconds(15), false
+                }, tries, Duration.ofSeconds(config.getCacheRefreshRetryWaitTime()), false
         );
 
     }
@@ -153,6 +164,6 @@ public class LambdaCacheRefreshTask implements LambdaStageBaseTask {
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
                     }
-                }, retries, Duration.ofSeconds(15), false);
+                }, retries, Duration.ofSeconds(config.getCacheOnDemandRetryWaitTime()), false);
     }
 }
