@@ -366,7 +366,7 @@ public class LambdaCloudDriverUtils {
                 return validateLambdaEdgeInput(inputLambda, errorMessages);
             }
         }
-        return false;
+        return true;
     }
 
     public boolean validateBasicLambdaDeploymentInput(LambdaDeploymentInput inputLambda, List<String> errorMessages) {
