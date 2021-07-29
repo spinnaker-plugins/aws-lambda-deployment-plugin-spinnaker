@@ -361,10 +361,42 @@ public class LambdaCloudDriverUtils {
     }
 
     public boolean validateUpsertLambdaInput(LambdaDeploymentInput inputLambda, List<String> errorMessages) {
-        if (!ObjectUtils.defaultIfNull(inputLambda.getEnableLambdaAtEdge(), Boolean.FALSE)) {
-            return true;
+        if(validateBasicLambdaDeploymentInput(inputLambda, errorMessages)){
+            if (ObjectUtils.defaultIfNull(inputLambda.getEnableLambdaAtEdge(), Boolean.FALSE)) {
+                return validateLambdaEdgeInput(inputLambda, errorMessages);
+            }
         }
-        return validateLambdaEdgeInput(inputLambda, errorMessages);
+        return false;
+    }
+
+    public boolean validateBasicLambdaDeploymentInput(LambdaDeploymentInput inputLambda, List<String> errorMessages) {
+        int numErrors = errorMessages.size();
+
+        if (StringUtils.isNullOrEmpty(inputLambda.getAccount())) {
+            errorMessages.add("Account is required");
+        }
+        if (StringUtils.isNullOrEmpty(inputLambda.getRegion())) {
+            errorMessages.add("Region is required");
+        }
+        if (StringUtils.isNullOrEmpty(inputLambda.getFunctionName())) {
+            errorMessages.add("Function Name is required");
+        }
+        if (StringUtils.isNullOrEmpty(inputLambda.getRuntime())) {
+            errorMessages.add("Runtime is required");
+        }
+        if (StringUtils.isNullOrEmpty(inputLambda.getS3bucket())) {
+            errorMessages.add("S3 Bucket is required");
+        }
+        if (StringUtils.isNullOrEmpty(inputLambda.getS3key())) {
+            errorMessages.add("S3 Key is required");
+        }
+        if (StringUtils.isNullOrEmpty(inputLambda.getHandler())) {
+            errorMessages.add("Handler is required");
+        }
+        if (StringUtils.isNullOrEmpty(inputLambda.getRole())) {
+            errorMessages.add("Role ARN is required");
+        }
+        return errorMessages.size() == numErrors;
     }
 
     public boolean validateLambdaEdgeInput(LambdaDeploymentInput inputLambda, List<String> errorMessages) {
