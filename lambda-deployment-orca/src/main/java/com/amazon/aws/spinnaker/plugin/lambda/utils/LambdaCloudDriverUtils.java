@@ -365,8 +365,9 @@ public class LambdaCloudDriverUtils {
             if (ObjectUtils.defaultIfNull(inputLambda.getEnableLambdaAtEdge(), Boolean.FALSE)) {
                 return validateLambdaEdgeInput(inputLambda, errorMessages);
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     public boolean validateBasicLambdaDeploymentInput(LambdaDeploymentInput inputLambda, List<String> errorMessages) {
