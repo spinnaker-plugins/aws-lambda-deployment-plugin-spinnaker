@@ -16,6 +16,7 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.utils;
 
+import com.amazon.aws.spinnaker.plugin.lambda.Config;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaCloudDriverInvokeOperationResults;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaPipelineArtifact;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaDeploymentInput;
@@ -69,6 +70,9 @@ public class LambdaCloudDriverUtils {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
     }
+
+    @Autowired
+    Config config;
 
     @Autowired
     CloudDriverConfigurationProperties props;
@@ -188,7 +192,10 @@ public class LambdaCloudDriverUtils {
                 .headers(buildHeaders())
                 .get()
                 .build();
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(Duration.ofSeconds(config.getCloudDriverConnectTimeout()))
+                .readTimeout(Duration.ofSeconds(config.getCloudDriverReadTimeout()))
+                .build();
         Call call = client.newCall(request);
         try {
             Response response = call.execute();
