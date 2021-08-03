@@ -51,6 +51,7 @@ dependencies {
   testCompile group: 'org.mockito', name: 'mockito-core', version: '2.19.0'
   testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.19.0'
   testCompile (group: 'com.netflix.spinnaker.orca', name: 'orca-clouddriver', version: "${orcaVersion}")
+  testCompile (group: 'com.netflix.spinnaker.orca', name: 'orca-core', version: "${orcaVersion}")
 
   testRuntime "org.junit.jupiter:junit-jupiter-engine:5.4.0"
   testRuntime "org.junit.platform:junit-platform-launcher:1.4.0"

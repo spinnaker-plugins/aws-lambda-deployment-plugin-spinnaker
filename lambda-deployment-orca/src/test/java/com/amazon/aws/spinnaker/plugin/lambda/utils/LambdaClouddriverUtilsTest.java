@@ -23,9 +23,14 @@ import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTask
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.google.common.collect.ImmutableMap;
 import com.netflix.spinnaker.kork.artifacts.model.Artifact;
+import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionType;
+import com.netflix.spinnaker.orca.api.pipeline.models.PipelineExecution;
+import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.OortService;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
+import com.netflix.spinnaker.orca.pipeline.model.PipelineExecutionImpl;
 import okhttp3.Headers;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -419,7 +424,7 @@ public class LambdaClouddriverUtilsTest {
     }
 
     @Test
-    public void verifyStatus_Test() {
+    public void verifyStatus_getTheStatus_ShouldNotBeNull() {
         ResponseDefinitionBuilder mockResponse = new ResponseDefinitionBuilder()
                 .withStatus(200)
                 .withBody("{\"status\":{\"complete\":true,\"completed\":true,\"retryable\":false,\"failed\":false,\"phase\":\"phase\",\"status\":\"status\"},\"resultObjects\":[{\"version\":\"1\",\"functionName\":\"functionName\",\"eventSourceArn\":\"arn:aws:dynamodb:us-east-1:123456789012\",\"functionArn\":\"arn:aws:lambda:region:AccountID:function:function_name\",\"uuid\":\"32dc501c-f3d5-11eb-9a03-0242ac130003\",\"state\":\"completed\"}]}");
@@ -480,6 +485,30 @@ public class LambdaClouddriverUtilsTest {
             ioException.printStackTrace();
         }
         assertEquals("InputStream", lambdaCloudDriverUtils.getPipelinesArtifactContent(lambdaPipelineArtifact));
+    }
+
+    @Test
+    public void retrieveLambdaFromCache_ShouldNotBeNull(){
+        Mockito.when(propsMock.getCloudDriverBaseUrl()).thenReturn("http://localhost:7002");
+        ResponseDefinitionBuilder mockFunctionResponse = new ResponseDefinitionBuilder()
+                .withStatus(200)
+                .withBody("[{\"account\":\"account1\",\"aliasConfigurations\":[],\"code\":{\"location\":\"https:\\/\\/awslambda-us-west-2-tasks.s3.us-west-2.amazonaws.com\\/snapshots\\/569630529054\\/hello-world-9d719f9e\",\"repositoryType\":\"S3\"},\"codeSha256\":\"gEfN8j47XTW9VAGo6+dTbppFm3HZRnsOFI3\\/C6v05Xs=\",\"codeSize\":343,\"description\":\"A starter AWS Lambda function.\",\"eventSourceMappings\":[],\"fileSystemConfigs\":[],\"functionArn\":\"arn:aws:lambda:us-west-2:569630529054:function:hello-world\",\"functionName\":\"function-test\",\"handler\":\"lambda_function.lambda_handler\",\"lastModified\":\"2021-04-19T22:58:03.358+0000\",\"layers\":[],\"memorySize\":128,\"packageType\":\"Zip\",\"region\":\"us-west-2\",\"revisionId\":\"dc635189-fb73-4bd7-93d5-3b955568101e\",\"revisions\":{\"dc635189-fb73-4bd7-93d5-3b955568101e\":\"$LATEST\"},\"role\":\"arn:aws:iam::569630529054:role\\/service-role\\/hello-world-role-ff9v8sy0\",\"runtime\":\"python3.7\",\"state\":\"Active\",\"tags\":{\"lambda-console:blueprint\":\"hello-world-python\"},\"targetGroups\":[],\"timeout\":3,\"tracingConfig\":{\"mode\":\"PassThrough\"},\"version\":\"$LATEST\"}]");
+
+        WireMock.stubFor(
+                WireMock.get("/functions?region=us-west-2&account=account1&functionName=lambdaApp-function-test")
+                        .willReturn(mockFunctionResponse)
+        );
+        StageExecution stageExecution = Mockito.mock(StageExecution.class);
+        Map<String, Object> lambdaGetInput = ImmutableMap.of(
+                "region", "us-west-2",
+                "account", "account1",
+                "functionName", "function-test");
+        Mockito.when(stageExecution.getContext()).thenReturn(lambdaGetInput);
+        PipelineExecution pipelineExecution = new PipelineExecutionImpl(ExecutionType.PIPELINE,"lambdaApp");
+        Mockito.when(stageExecution.getExecution()).thenReturn(pipelineExecution);
+        LambdaDefinition lambdaDefinition = lambdaCloudDriverUtils.retrieveLambdaFromCache(stageExecution, false);
+        assertNotNull(lambdaDefinition);
+        assertEquals("account1",lambdaDefinition.getAccount());
     }
 
 }
