@@ -25,18 +25,15 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.spinnaker.kork.artifacts.model.Artifact;
-import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionType;
 import com.netflix.spinnaker.orca.api.pipeline.models.PipelineExecution;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.OortService;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
-import com.netflix.spinnaker.orca.pipeline.model.PipelineExecutionImpl;
 import okhttp3.Headers;
 import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -44,6 +41,8 @@ import org.mockito.MockitoAnnotations;
 import retrofit.client.Header;
 import retrofit.client.Response;
 import retrofit.mime.TypedInput;
+import ru.lanwen.wiremock.ext.WiremockResolver;
+import ru.lanwen.wiremock.ext.WiremockUriResolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -54,32 +53,28 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith({WiremockResolver.class, WiremockUriResolver.class})
 public class LambdaClouddriverUtilsTest {
 
-    private static WireMockServer server = new WireMockServer(7002);
+    WireMockServer wireMockServer;
+
+    String CLOUDDRIVER_BASE_URL;
+
     @InjectMocks
     private LambdaCloudDriverUtils lambdaCloudDriverUtils;
+
     @Mock
     private CloudDriverConfigurationProperties propsMock;
+
     @Mock
     private OortService oortMock;
 
-    @BeforeAll
-    public static void setup() {
-        server.start();
-        WireMock.configureFor("localhost", 7002);
-    }
-
-    @AfterAll
-    public static void teardown() {
-        if (null != server && server.isRunning()) {
-            server.shutdownServer();
-        }
-    }
-
     @BeforeEach
-    void init() {
+    void init(@WiremockResolver.Wiremock WireMockServer wireMockServer, @WiremockUriResolver.WiremockUri String uri) {
+        this.wireMockServer = wireMockServer;
+        CLOUDDRIVER_BASE_URL = uri;
         MockitoAnnotations.initMocks(this);
+        Mockito.when(propsMock.getCloudDriverBaseUrl()).thenReturn(uri);
     }
 
     @Test
@@ -296,15 +291,15 @@ public class LambdaClouddriverUtilsTest {
                 .withStatus(200)
                 .withBody("Success");
 
-        WireMock.stubFor(
+        this.wireMockServer.stubFor(
                 WireMock.get("/healthcheck")
                         .willReturn(mockResponse)
         );
         LambdaCloudDriverUtils lambdaCloudDriverUtilsMock = Mockito.mock(LambdaCloudDriverUtils.class);
         Mockito.when(lambdaCloudDriverUtilsMock.buildHeaders())
                 .thenReturn(Headers.of("Content-Disposition", "form-data; name=\"fs_exp\""));
-        Mockito.when(lambdaCloudDriverUtilsMock.getFromCloudDriver("http://localhost:7002/healthcheck")).thenCallRealMethod();
-        assertEquals("Success", lambdaCloudDriverUtilsMock.getFromCloudDriver("http://localhost:7002/healthcheck"));
+        Mockito.when(lambdaCloudDriverUtilsMock.getFromCloudDriver(Mockito.any())).thenCallRealMethod();
+        assertEquals("Success", lambdaCloudDriverUtilsMock.getFromCloudDriver(CLOUDDRIVER_BASE_URL.concat("/healthcheck")));
     }
 
     @Test
@@ -313,13 +308,13 @@ public class LambdaClouddriverUtilsTest {
                 .withStatus(200)
                 .withBody("[{\"account\":\"account1\",\"aliasConfigurations\":[],\"code\":{\"location\":\"https:\\/\\/awslambda-us-west-2-tasks.s3.us-west-2.amazonaws.com\\/snapshots\\/569630529054\\/hello-world-9d719f9e\",\"repositoryType\":\"S3\"},\"codeSha256\":\"gEfN8j47XTW9VAGo6+dTbppFm3HZRnsOFI3\\/C6v05Xs=\",\"codeSize\":343,\"description\":\"A starter AWS Lambda function.\",\"eventSourceMappings\":[],\"fileSystemConfigs\":[],\"functionArn\":\"arn:aws:lambda:us-west-2:569630529054:function:hello-world\",\"functionName\":\"function-test\",\"handler\":\"lambda_function.lambda_handler\",\"lastModified\":\"2021-04-19T22:58:03.358+0000\",\"layers\":[],\"memorySize\":128,\"packageType\":\"Zip\",\"region\":\"us-west-2\",\"revisionId\":\"dc635189-fb73-4bd7-93d5-3b955568101e\",\"revisions\":{\"dc635189-fb73-4bd7-93d5-3b955568101e\":\"$LATEST\"},\"role\":\"arn:aws:iam::569630529054:role\\/service-role\\/hello-world-role-ff9v8sy0\",\"runtime\":\"python3.7\",\"state\":\"Active\",\"tags\":{\"lambda-console:blueprint\":\"hello-world-python\"},\"targetGroups\":[],\"timeout\":3,\"tracingConfig\":{\"mode\":\"PassThrough\"},\"version\":\"$LATEST\"}]");
 
-        WireMock.stubFor(
+        this.wireMockServer.stubFor(
                 WireMock.get("/functions?region=us-west-2&account=account1&functionName=app-test-function-test")
                         .willReturn(mockFunctionResponse)
         );
 
         LambdaGetInput lambdaGetInput = new LambdaGetInput("us-west-2", "account1", "function-test", "app-test");
-        Mockito.when(propsMock.getCloudDriverBaseUrl()).thenReturn("http://localhost:7002");
+
         assertNotNull(lambdaCloudDriverUtils.retrieveLambdaFromCache(lambdaGetInput));
     }
 
@@ -329,13 +324,12 @@ public class LambdaClouddriverUtilsTest {
                 .withStatus(204)
                 .withBody("[]");
 
-        WireMock.stubFor(
+        this.wireMockServer.stubFor(
                 WireMock.get("/functions?region=us-west-2&account=account2&functionName=app-test-function-test")
                         .willReturn(mockFunctionNotFoundResponse)
         );
 
         LambdaGetInput lambdaGetInput = new LambdaGetInput("us-west-2", "account2", "function-test", "app-test");
-        Mockito.when(propsMock.getCloudDriverBaseUrl()).thenReturn("http://localhost:7002");
         assertNull(lambdaCloudDriverUtils.retrieveLambdaFromCache(lambdaGetInput));
     }
 
@@ -345,11 +339,11 @@ public class LambdaClouddriverUtilsTest {
                 .withStatus(200)
                 .withBody("{\"id\":\"id-123456789\",\"resourceUri\":\"http://resourceUri\"}");
 
-        WireMock.stubFor(
+        this.wireMockServer.stubFor(
                 WireMock.post("/post")
                         .willReturn(mockPostToCloudDriverResponse)
         );
-        assertNotNull(lambdaCloudDriverUtils.postToCloudDriver("http://localhost:7002/post", "{\"spinnaker\":\"test\"}"));
+        assertNotNull(lambdaCloudDriverUtils.postToCloudDriver(CLOUDDRIVER_BASE_URL.concat("/post"), "{\"spinnaker\":\"test\"}"));
     }
 
     @Test
@@ -358,11 +352,11 @@ public class LambdaClouddriverUtilsTest {
                 .withStatus(204)
                 .withBody("Error");
 
-        WireMock.stubFor(
+        this.wireMockServer.stubFor(
                 WireMock.post("/post")
                         .willReturn(mockPostToCloudDriverResponse)
         );
-        assertThrows(RuntimeException.class, () -> lambdaCloudDriverUtils.postToCloudDriver("http://localhost:7002/post", "{\"spinnaker\":\"test\"}"));
+        assertThrows(RuntimeException.class, () -> lambdaCloudDriverUtils.postToCloudDriver(CLOUDDRIVER_BASE_URL.concat("/post"), "{\"spinnaker\":\"test\"}"));
     }
 
     @Test
@@ -371,11 +365,11 @@ public class LambdaClouddriverUtilsTest {
                 .withStatus(200)
                 .withBody("{\"status\":{\"complete\":true,\"completed\":true,\"retryable\":false,\"failed\":false,\"phase\":\"phase\",\"status\":\"status\"},\"resultObjects\":[{\"responseString\":\"{\\\"statusCode\\\": 200, \\\"body\\\": \\\"something\\\"}\",\"statusCode\":\"200\",\"body\":\"something\",\"errorMessage\":\"errorMessage\",\"hasErrors\":false}]}");
 
-        WireMock.stubFor(
+        this.wireMockServer.stubFor(
                 WireMock.get("/lambdaInvokeResults")
                         .willReturn(mockResponse)
         );
-        LambdaCloudDriverInvokeOperationResults results = lambdaCloudDriverUtils.getLambdaInvokeResults("http://localhost:7002/lambdaInvokeResults");
+        LambdaCloudDriverInvokeOperationResults results = lambdaCloudDriverUtils.getLambdaInvokeResults(CLOUDDRIVER_BASE_URL.concat("/lambdaInvokeResults"));
         assertNotNull(results);
         assertEquals(200, results.getStatusCode());
     }
@@ -386,11 +380,11 @@ public class LambdaClouddriverUtilsTest {
                 .withStatus(200)
                 .withBody("{\"resultObjects\":[{\"version\":\"1\"}]}");
 
-        WireMock.stubFor(
+        this.wireMockServer.stubFor(
                 WireMock.get("/publishedVersion")
                         .willReturn(mockResponse)
         );
-        String publishedVersion = lambdaCloudDriverUtils.getPublishedVersion("http://localhost:7002/publishedVersion");
+        String publishedVersion = lambdaCloudDriverUtils.getPublishedVersion(CLOUDDRIVER_BASE_URL.concat("/publishedVersion"));
         assertNotNull(publishedVersion);
         assertEquals("1", publishedVersion);
     }
@@ -401,11 +395,11 @@ public class LambdaClouddriverUtilsTest {
                 .withStatus(200)
                 .withBody("{\"resultObjects\":[{}]}");
 
-        WireMock.stubFor(
+        this.wireMockServer.stubFor(
                 WireMock.get("/publishedVersion")
                         .willReturn(mockResponse)
         );
-        String publishedVersion = lambdaCloudDriverUtils.getPublishedVersion("http://localhost:7002/publishedVersion");
+        String publishedVersion = lambdaCloudDriverUtils.getPublishedVersion(CLOUDDRIVER_BASE_URL.concat("/publishedVersion"));
         assertNotNull(publishedVersion);
         assertEquals("$LATEST", publishedVersion);
     }
@@ -416,11 +410,11 @@ public class LambdaClouddriverUtilsTest {
                 .withStatus(200)
                 .withBody("{\"error\":[{}]}");
 
-        WireMock.stubFor(
+        this.wireMockServer.stubFor(
                 WireMock.get("/publishedVersion")
                         .willReturn(mockResponse)
         );
-        assertEquals("$LATEST", lambdaCloudDriverUtils.getPublishedVersion("http://localhost:7002/publishedVersion"));
+        assertEquals("$LATEST", lambdaCloudDriverUtils.getPublishedVersion(CLOUDDRIVER_BASE_URL.concat("/publishedVersion")));
     }
 
     @Test
@@ -429,11 +423,11 @@ public class LambdaClouddriverUtilsTest {
                 .withStatus(200)
                 .withBody("{\"status\":{\"complete\":true,\"completed\":true,\"retryable\":false,\"failed\":false,\"phase\":\"phase\",\"status\":\"status\"},\"resultObjects\":[{\"version\":\"1\",\"functionName\":\"functionName\",\"eventSourceArn\":\"arn:aws:dynamodb:us-east-1:123456789012\",\"functionArn\":\"arn:aws:lambda:region:AccountID:function:function_name\",\"uuid\":\"32dc501c-f3d5-11eb-9a03-0242ac130003\",\"state\":\"completed\"}]}");
 
-        WireMock.stubFor(
+        this.wireMockServer.stubFor(
                 WireMock.get("/verifyStatus")
                         .willReturn(mockResponse)
         );
-        LambdaCloudDriverTaskResults lambdaCloudDriverTaskResults = lambdaCloudDriverUtils.verifyStatus("http://localhost:7002/verifyStatus");
+        LambdaCloudDriverTaskResults lambdaCloudDriverTaskResults = lambdaCloudDriverUtils.verifyStatus(CLOUDDRIVER_BASE_URL.concat("/verifyStatus"));
         assertNotNull(lambdaCloudDriverTaskResults);
     }
 
@@ -489,24 +483,24 @@ public class LambdaClouddriverUtilsTest {
 
     @Test
     public void retrieveLambdaFromCache_ShouldNotBeNull(){
-        Mockito.when(propsMock.getCloudDriverBaseUrl()).thenReturn("http://localhost:7002");
         ResponseDefinitionBuilder mockFunctionResponse = new ResponseDefinitionBuilder()
                 .withStatus(200)
                 .withBody("[{\"account\":\"account1\",\"aliasConfigurations\":[],\"code\":{\"location\":\"https:\\/\\/awslambda-us-west-2-tasks.s3.us-west-2.amazonaws.com\\/snapshots\\/569630529054\\/hello-world-9d719f9e\",\"repositoryType\":\"S3\"},\"codeSha256\":\"gEfN8j47XTW9VAGo6+dTbppFm3HZRnsOFI3\\/C6v05Xs=\",\"codeSize\":343,\"description\":\"A starter AWS Lambda function.\",\"eventSourceMappings\":[],\"fileSystemConfigs\":[],\"functionArn\":\"arn:aws:lambda:us-west-2:569630529054:function:hello-world\",\"functionName\":\"function-test\",\"handler\":\"lambda_function.lambda_handler\",\"lastModified\":\"2021-04-19T22:58:03.358+0000\",\"layers\":[],\"memorySize\":128,\"packageType\":\"Zip\",\"region\":\"us-west-2\",\"revisionId\":\"dc635189-fb73-4bd7-93d5-3b955568101e\",\"revisions\":{\"dc635189-fb73-4bd7-93d5-3b955568101e\":\"$LATEST\"},\"role\":\"arn:aws:iam::569630529054:role\\/service-role\\/hello-world-role-ff9v8sy0\",\"runtime\":\"python3.7\",\"state\":\"Active\",\"tags\":{\"lambda-console:blueprint\":\"hello-world-python\"},\"targetGroups\":[],\"timeout\":3,\"tracingConfig\":{\"mode\":\"PassThrough\"},\"version\":\"$LATEST\"}]");
 
-        WireMock.stubFor(
+        this.wireMockServer.stubFor(
                 WireMock.get("/functions?region=us-west-2&account=account1&functionName=lambdaApp-function-test")
                         .willReturn(mockFunctionResponse)
         );
-        StageExecution stageExecution = Mockito.mock(StageExecution.class);
+        StageExecution stageExecutionMock = Mockito.mock(StageExecution.class);
         Map<String, Object> lambdaGetInput = ImmutableMap.of(
                 "region", "us-west-2",
                 "account", "account1",
                 "functionName", "function-test");
-        Mockito.when(stageExecution.getContext()).thenReturn(lambdaGetInput);
-        PipelineExecution pipelineExecution = new PipelineExecutionImpl(ExecutionType.PIPELINE,"lambdaApp");
-        Mockito.when(stageExecution.getExecution()).thenReturn(pipelineExecution);
-        LambdaDefinition lambdaDefinition = lambdaCloudDriverUtils.retrieveLambdaFromCache(stageExecution, false);
+        Mockito.when(stageExecutionMock.getContext()).thenReturn(lambdaGetInput);
+        PipelineExecution pipelineExecutionMock = Mockito.mock(PipelineExecution.class);
+        Mockito.when(pipelineExecutionMock.getApplication()).thenReturn("lambdaApp");
+        Mockito.when(stageExecutionMock.getExecution()).thenReturn(pipelineExecutionMock);
+        LambdaDefinition lambdaDefinition = lambdaCloudDriverUtils.retrieveLambdaFromCache(stageExecutionMock, false);
         assertNotNull(lambdaDefinition);
         assertEquals("account1",lambdaDefinition.getAccount());
     }
