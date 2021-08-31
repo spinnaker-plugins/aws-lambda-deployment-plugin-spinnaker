@@ -17,20 +17,16 @@
 package com.amazon.aws.spinnaker.plugin.lambda.utils;
 
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaCloudDriverInvokeOperationResults;
-import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaPipelineArtifact;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaDeploymentInput;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.ImmutableMap;
-import com.netflix.spinnaker.kork.artifacts.model.Artifact;
 import com.netflix.spinnaker.orca.api.pipeline.models.PipelineExecution;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
-import com.netflix.spinnaker.orca.clouddriver.OortService;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import okhttp3.Headers;
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,15 +34,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import retrofit.client.Header;
-import retrofit.client.Response;
-import retrofit.mime.TypedInput;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 import ru.lanwen.wiremock.ext.WiremockUriResolver;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,9 +54,6 @@ public class LambdaClouddriverUtilsTest {
 
     @Mock
     private CloudDriverConfigurationProperties propsMock;
-
-    @Mock
-    private OortService oortMock;
 
     @BeforeEach
     void init(@WiremockResolver.Wiremock WireMockServer wireMockServer, @WiremockUriResolver.WiremockUri String uri) {
@@ -429,56 +415,6 @@ public class LambdaClouddriverUtilsTest {
         );
         LambdaCloudDriverTaskResults lambdaCloudDriverTaskResults = lambdaCloudDriverUtils.verifyStatus(CLOUDDRIVER_BASE_URL.concat("/verifyStatus"));
         assertNotNull(lambdaCloudDriverTaskResults);
-    }
-
-    @Test
-    public void resolvePipelineArtifact_Test() {
-        LambdaPipelineArtifact lambdaPipelineArtifact = LambdaPipelineArtifact.builder()
-                .id("32dc501c-f3d5-11eb-9a03-0242ac130003")
-                .artifactAccount("artifactAccount")
-                .type("type")
-                .reference("reference")
-                .name("name")
-                .version("version")
-                .location("location")
-                .provenance("provenance")
-                .build();
-
-        Artifact artifact = Artifact.builder()
-                .uuid("32dc501c-f3d5-11eb-9a03-0242ac130003")
-                .artifactAccount("artifactAccount")
-                .type("type")
-                .reference("reference")
-                .version("version")
-                .name("name")
-                .build();
-        try {
-            InputStream stubInputStream =
-                    IOUtils.toInputStream("InputStream", "UTF-8");
-            final byte[] body = IOUtils.toByteArray(stubInputStream);
-            TypedInput typedInput = new TypedInput() {
-
-                @Override
-                public String mimeType() {
-                    return "application/json";
-                }
-
-                @Override
-                public long length() {
-                    return body.length;
-                }
-
-                @Override
-                public InputStream in() throws IOException {
-                    return new ByteArrayInputStream(body);
-                }
-            };
-            retrofit.client.Response response = new Response("url", 200, "reason", Arrays.asList(new Header("foo", "bar")), typedInput);
-            Mockito.when(oortMock.fetchArtifact(artifact)).thenReturn(response);
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
-        assertEquals("InputStream", lambdaCloudDriverUtils.getPipelinesArtifactContent(lambdaPipelineArtifact));
     }
 
     @Test
