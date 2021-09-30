@@ -63,13 +63,6 @@ public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
         logger.debug("Executing LambdaUpdateCodeTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
         prepareTask(stage);
-        logger.debug("Before LambdaUpdateCodeTask: the func is just created, no need to update:" + Arrays.toString(stage.getContext().entrySet().toArray()));
-
-        stage.ancestors().stream().forEach(it -> {
-            logger.debug("loop stage output:" + it.getName());
-            logger.debug(it.getOutputs().toString());
-        });
-
 
         StageContext stageContext = (StageContext) stage.getContext();
         Boolean justCreated = stageContext.containsKey(LambdaStageConstants.lambaCreatedKey) && (Boolean) stageContext.getOrDefault(LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
@@ -85,9 +78,7 @@ public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
 
     private LambdaCloudOperationOutput updateLambdaCode(StageExecution stage) {
         LambdaUpdateCodeInput inp = utils.getInput(stage, LambdaUpdateCodeInput.class);
-        logger.debug("Start to get tasks in this stage");
         List<TaskExecution> taskExecutions = stage.getTasks();
-        taskExecutions.stream().forEach(t -> logger.debug("task -->: " + t.getName() + " --status:" + t.getStatus()));
         Boolean deferPublish = taskExecutions.stream().anyMatch(t -> t.getName().equals("lambdaPublishVersionTask")
                 && t.getStatus().equals(ExecutionStatus.NOT_STARTED));
 
