@@ -16,6 +16,7 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.verify;
 
+import com.amazon.aws.spinnaker.plugin.lambda.Config;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCacheRefreshInput;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,8 +29,6 @@ import com.netflix.spinnaker.orca.api.pipeline.models.PipelineExecution;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import okhttp3.Headers;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +38,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 import ru.lanwen.wiremock.ext.WiremockUriResolver;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,6 +63,9 @@ public class LambdaCacheRefreshTaskTest {
 
     @Mock
     private LambdaCloudDriverUtils lambdaCloudDriverUtilsMock;
+
+    @Mock
+    private Config config;
 
     @BeforeEach
     void init(@WiremockResolver.Wiremock WireMockServer wireMockServer, @WiremockUriResolver.WiremockUri String uri) {
