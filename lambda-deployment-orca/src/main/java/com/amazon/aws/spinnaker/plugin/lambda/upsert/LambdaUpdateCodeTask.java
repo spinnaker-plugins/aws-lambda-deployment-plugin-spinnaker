@@ -27,13 +27,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
+import com.netflix.spinnaker.orca.api.pipeline.models.TaskExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
+import com.netflix.spinnaker.orca.pipeline.model.StageContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
@@ -56,7 +63,10 @@ public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
         logger.debug("Executing LambdaUpdateCodeTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
         prepareTask(stage);
-        Boolean justCreated = (Boolean)stage.getContext().getOrDefault(LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
+
+        StageContext stageContext = (StageContext) stage.getContext();
+        Boolean justCreated = stageContext.containsKey(LambdaStageConstants.lambaCreatedKey) && (Boolean) stageContext.getOrDefault(LambdaStageConstants.lambaCreatedKey, Boolean.FALSE);
+        logger.debug("justCreated GetCurrent:" + justCreated);
         if (justCreated) {
             return taskComplete(stage);
         }
@@ -68,6 +78,13 @@ public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
 
     private LambdaCloudOperationOutput updateLambdaCode(StageExecution stage) {
         LambdaUpdateCodeInput inp = utils.getInput(stage, LambdaUpdateCodeInput.class);
+        List<TaskExecution> taskExecutions = stage.getTasks();
+        Boolean deferPublish = taskExecutions.stream().anyMatch(t -> t.getName().equals("lambdaPublishVersionTask")
+                && t.getStatus().equals(ExecutionStatus.NOT_STARTED));
+
+        inp.setPublish(inp.isPublish() && !deferPublish);
+        logger.debug("Publish flag for UpdateCodeTask is set to " + (inp.isPublish() && !deferPublish));
+
         inp.setAppName(stage.getExecution().getApplication());
         inp.setCredentials(inp.getAccount());
         String endPoint = cloudDriverUrl + CLOUDDRIVER_UPDATE_CODE_PATH;
