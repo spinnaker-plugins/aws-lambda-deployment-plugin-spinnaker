@@ -16,6 +16,7 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.verify;
 
+import com.amazon.aws.spinnaker.plugin.lambda.Config;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCacheRefreshInput;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -93,6 +94,8 @@ public class LambdaCacheRefreshTaskTest {
                 WireMock.post("/cache/aws/function")
                         .willReturn(mockResponse)
         );
+
+        lambdaCacheRefreshTask.config = new Config();
     }
 
     @Test
@@ -105,7 +108,7 @@ public class LambdaCacheRefreshTaskTest {
                 WireMock.post("/cache/aws/function")
                         .willReturn(mockResponse)
         );
-        assertEquals(ExecutionStatus.SUCCEEDED,lambdaCacheRefreshTask.execute(stageExecution).getStatus());
+        assertEquals(ExecutionStatus.SUCCEEDED, lambdaCacheRefreshTask.execute(stageExecution).getStatus());
     }
 
     @Test
@@ -116,7 +119,7 @@ public class LambdaCacheRefreshTaskTest {
             map.put("cacheTime", Long.valueOf(System.currentTimeMillis() + 15 * 1000));
         String getFromCloudDriverJson = new ObjectMapper().writeValueAsString(Arrays.asList(map));
         Mockito.when(lambdaCloudDriverUtilsMock.getFromCloudDriver(Mockito.any())).thenReturn(getFromCloudDriverJson);
-        assertEquals(ExecutionStatus.SUCCEEDED,lambdaCacheRefreshTask.execute(stageExecution).getStatus());
+        assertEquals(ExecutionStatus.SUCCEEDED, lambdaCacheRefreshTask.execute(stageExecution).getStatus());
     }
 
     @Test
@@ -130,7 +133,7 @@ public class LambdaCacheRefreshTaskTest {
         Mockito.when(lambdaCloudDriverUtilsMock.getFromCloudDriver(Mockito.any()))
                 .thenReturn("[]")
                 .thenReturn(secondCallJson);
-        assertEquals(ExecutionStatus.SUCCEEDED,lambdaCacheRefreshTask.execute(stageExecution).getStatus());
+        assertEquals(ExecutionStatus.SUCCEEDED, lambdaCacheRefreshTask.execute(stageExecution).getStatus());
     }
 
     @Test
@@ -139,11 +142,10 @@ public class LambdaCacheRefreshTaskTest {
             mapSecondCall.put("processedCount", 1);
             mapSecondCall.put("cacheTime", Long.valueOf(System.currentTimeMillis() + 15 * 1000));
         String secondCallJson = new ObjectMapper().writeValueAsString(Arrays.asList(mapSecondCall));
-
         Mockito.when(lambdaCloudDriverUtilsMock.getFromCloudDriver(Mockito.any()))
                 .thenReturn("[{\"processedCount\":0}]")
                 .thenReturn(secondCallJson);
-        assertEquals(ExecutionStatus.SUCCEEDED,lambdaCacheRefreshTask.execute(stageExecution).getStatus());
+        assertEquals(ExecutionStatus.SUCCEEDED, lambdaCacheRefreshTask.execute(stageExecution).getStatus());
     }
 
 }
