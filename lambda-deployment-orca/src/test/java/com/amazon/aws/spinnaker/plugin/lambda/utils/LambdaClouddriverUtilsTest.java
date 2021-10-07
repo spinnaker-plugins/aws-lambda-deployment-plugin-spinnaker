@@ -16,6 +16,7 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.utils;
 
+import com.amazon.aws.spinnaker.plugin.lambda.Config;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaCloudDriverInvokeOperationResults;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaDeploymentInput;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
@@ -26,7 +27,6 @@ import com.google.common.collect.ImmutableMap;
 import com.netflix.spinnaker.orca.api.pipeline.models.PipelineExecution;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
-import okhttp3.Headers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,6 +54,9 @@ public class LambdaClouddriverUtilsTest {
 
     @Mock
     private CloudDriverConfigurationProperties propsMock;
+
+    @Mock
+    private Config config;
 
     @BeforeEach
     void init(@WiremockResolver.Wiremock WireMockServer wireMockServer, @WiremockUriResolver.WiremockUri String uri) {
@@ -281,11 +284,7 @@ public class LambdaClouddriverUtilsTest {
                 WireMock.get("/healthcheck")
                         .willReturn(mockResponse)
         );
-        LambdaCloudDriverUtils lambdaCloudDriverUtilsMock = Mockito.mock(LambdaCloudDriverUtils.class);
-        Mockito.when(lambdaCloudDriverUtilsMock.buildHeaders())
-                .thenReturn(Headers.of("Content-Disposition", "form-data; name=\"fs_exp\""));
-        Mockito.when(lambdaCloudDriverUtilsMock.getFromCloudDriver(Mockito.any())).thenCallRealMethod();
-        assertEquals("Success", lambdaCloudDriverUtilsMock.getFromCloudDriver(CLOUDDRIVER_BASE_URL.concat("/healthcheck")));
+        assertEquals("Success", lambdaCloudDriverUtils.getFromCloudDriver(CLOUDDRIVER_BASE_URL.concat("/healthcheck")));
     }
 
     @Test
