@@ -1,7 +1,5 @@
 pluginManagement {
   repositories {
-    mavenLocal()
-    maven { url "https://dl.bintray.com/spinnaker/gradle/" }
     gradlePluginPortal()
   }
 }

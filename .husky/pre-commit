@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# CHECK THIS FILE INTO SOURCE CONTROL!
+
+. "$(dirname "$0")/_/husky.sh"
+
+[[ -e lambda-deployment-deck/node_modules/.bin/lint-staged ]] && cd lambda-deployment-deck; ./node_modules/.bin/lint-staged -p false
