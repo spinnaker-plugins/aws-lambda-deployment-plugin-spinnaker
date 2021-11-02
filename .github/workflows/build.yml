@@ -22,7 +22,10 @@ on:
 jobs:
   build:
     name: Build the code
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
+    env:
+      ORG_GRADLE_PROJECT_artifactory_user: '${{secrets.ARTIFACTORY_USER}}'
+      ORG_GRADLE_PROJECT_artifactory_password: '${{secrets.ARTIFACTORY_TOKEN}}'
     steps:
       - name: checkout code
         uses: actions/checkout@v2

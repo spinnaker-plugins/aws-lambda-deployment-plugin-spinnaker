@@ -13,8 +13,13 @@ targetCompatibility = 1.11
 
 repositories {
   mavenCentral()
-  jcenter()
-  maven { url "http://dl.bintray.com/spinnaker/spinnaker/" }
+  maven {
+    url 'https://armory.jfrog.io/armory/gradle-dev-local/'
+    credentials {
+      username = "${artifactory_user}"
+      password = "${artifactory_password}"
+    }
+  }
 }
 
 spinnakerPlugin {
@@ -24,13 +29,15 @@ spinnakerPlugin {
 }
 
 dependencies {
-  compileOnly(group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}")
-  compileOnly (group: 'com.netflix.spinnaker.orca', name: 'orca-api', version: "${orcaVersion}")
-  compileOnly (group: 'com.netflix.spinnaker.orca', name: 'orca-clouddriver', version: "${orcaVersion}")
-  compileOnly (group: 'com.netflix.spinnaker.orca', name: 'orca-core', version: "${orcaVersion}")
+  compileOnly(group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}")  
+  compileOnly(enforcedPlatform("io.spinnaker.kork:kork-bom:${korkVersion}"))
+  compileOnly(enforcedPlatform("io.spinnaker.orca:orca-bom:${orcaVersion}"))
+  compileOnly (group: 'io.spinnaker.orca', name: 'orca-api')
+  compileOnly (group: 'io.spinnaker.orca', name: 'orca-clouddriver')
+  compileOnly (group: 'io.spinnaker.orca', name: 'orca-core')
   compileOnly ("org.projectlombok:lombok:1.18.12")
-  compileOnly (group: 'com.netflix.spinnaker.kork', name: 'kork-artifacts', version: "${korkVersion}")
-  compileOnly (group: 'com.netflix.spinnaker.kork', name: 'kork-plugins-spring-api', version: "${korkVersion}")
+  compileOnly (group: 'io.spinnaker.kork', name: 'kork-artifacts')
+  compileOnly (group: 'io.spinnaker.kork', name: 'kork-plugins-spring-api')
   implementation("com.amazonaws:aws-java-sdk:1.11.877")
   implementation("org.apache.commons:commons-lang3:3.8.1")
   implementation("com.github.ben-manes.caffeine:guava:2.8.5")
@@ -41,8 +48,10 @@ dependencies {
   implementation("com.squareup.okhttp3:okhttp-apache:3.13.1")
   annotationProcessor("org.pf4j:pf4j:3.2.0")
   annotationProcessor ("org.projectlombok:lombok:1.18.12")
-  testImplementation (group: 'com.netflix.spinnaker.orca', name: 'orca-api', version: "${orcaVersion}")
 
+  testImplementation(enforcedPlatform("io.spinnaker.kork:kork-bom:${korkVersion}"))
+  testImplementation(enforcedPlatform("io.spinnaker.orca:orca-bom:${orcaVersion}"))
+  testImplementation (group: 'io.spinnaker.orca', name: 'orca-api')
   testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.2"
   testImplementation group: 'io.strikt', name: 'strikt-core', version: '0.22.1'
   testImplementation group: 'dev.minutest', name: 'minutest', version: '1.10.0'
@@ -51,7 +60,7 @@ dependencies {
   testImplementation "ru.lanwen.wiremock:wiremock-junit5:1.3.1"
   testCompile group: 'org.mockito', name: 'mockito-core', version: '2.19.0'
   testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.19.0'
-  testCompile (group: 'com.netflix.spinnaker.orca', name: 'orca-clouddriver', version: "${orcaVersion}")
+  testCompile (group: 'io.spinnaker.orca', name: 'orca-clouddriver')
 
   testRuntime "org.junit.jupiter:junit-jupiter-engine:5.4.0"
   testRuntime "org.junit.platform:junit-platform-launcher:1.4.0"

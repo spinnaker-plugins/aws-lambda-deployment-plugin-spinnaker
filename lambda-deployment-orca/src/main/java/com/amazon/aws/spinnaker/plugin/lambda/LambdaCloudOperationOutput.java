@@ -18,7 +18,6 @@
 package com.amazon.aws.spinnaker.plugin.lambda;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.netflix.spinnaker.orca.api.simplestage.SimpleStageOutput;
 import lombok.Builder;
 import lombok.Data;
 
