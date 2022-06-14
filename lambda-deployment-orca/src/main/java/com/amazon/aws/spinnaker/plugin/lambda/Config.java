@@ -13,4 +13,6 @@ public class Config {
     private int cacheRefreshRetryWaitTime;
     @Value("${lambdaPluginConfig.cacheOnDemandRetryWaitTime:15}")
     private int cacheOnDemandRetryWaitTime;
+    @Value("${lambdaPluginConfig.cloudDriverPostRequestRetries:5}")
+    private int cloudDriverPostRequestRetries;
 }

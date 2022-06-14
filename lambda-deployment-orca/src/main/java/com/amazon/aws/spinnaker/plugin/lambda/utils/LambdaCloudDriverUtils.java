@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.io.CharStreams;
 import com.netflix.spinnaker.kork.artifacts.model.Artifact;
 import com.netflix.spinnaker.kork.core.RetrySupport;
+import com.netflix.spinnaker.kork.exceptions.SpinnakerException;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.OortService;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
@@ -78,7 +79,7 @@ public class LambdaCloudDriverUtils {
     CloudDriverConfigurationProperties props;
 
     public LambdaCloudDriverResponse postToCloudDriver(String endPointUrl, String jsonString) {
-        return postToCloudDriver(endPointUrl, jsonString, 0);
+        return postToCloudDriver(endPointUrl, jsonString, config.getCloudDriverPostRequestRetries());
     }
 
     public LambdaCloudDriverResponse postToCloudDriver(String endPointUrl, String jsonString, int retries) {
@@ -95,17 +96,22 @@ public class LambdaCloudDriverUtils {
                         Call call = client.newCall(request);
                         Response response = call.execute();
                         String respString = response.body().string();
-                        if (200 != response.code() && 202 != response.code()) {
-                            logger.error("Error calling cloud driver");
-                            logger.error(respString);
-                            throw new RuntimeException("Error calling cloud driver: " + respString);
+
+                        if (200 == response.code() || 202 == response.code()) {
+                            logger.debug(respString);
+                            return objectMapper.readValue(respString, LambdaCloudDriverResponse.class);
                         }
-                        logger.debug(respString);
-                        return objectMapper.readValue(respString, LambdaCloudDriverResponse.class);
+
+                        logger.error("Error calling cloud driver");
+                        logger.error(respString);
+
+                        throw new SpinnakerException("Error calling cloud driver: " + respString)
+                                .setRetryable(409 == response.code());
                     } catch (Exception e) {
-                        throw new RuntimeException(e);
+                        throw new SpinnakerException(e)
+                                .setRetryable(false);
                     }
-                } , retries, Duration.ofSeconds(30), false
+                }, retries, Duration.ofSeconds(30), false
         );
     }
 
