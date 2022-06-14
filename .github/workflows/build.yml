@@ -29,6 +29,8 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11.0.5'
-          java-package: jdk 
+          java-package: jdk
+      - name: install dependencies
+        run: sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
       - name: build
         run: ./gradlew releaseBundle
