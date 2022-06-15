@@ -1,9 +1,3 @@
-pluginManagement {
-  repositories {
-    mavenLocal()
-    gradlePluginPortal()
-  }
-}
 rootProject.name="aws-lambda-deployment-plugin-spinnaker"
 
 include "lambda-deployment-deck" , "lambda-deployment-orca" 
