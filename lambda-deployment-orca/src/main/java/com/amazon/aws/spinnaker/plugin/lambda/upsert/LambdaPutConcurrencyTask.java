@@ -56,9 +56,6 @@ public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
         prepareTask(stage);
         LambdaConcurrencyInput inp = utils.getInput(stage, LambdaConcurrencyInput.class);
         inp.setAppName(stage.getExecution().getApplication());
-        //TO-DO check changes for ProvisionedConcurrentExecutions or ReservedConcurrentExecutions
-        //addToOutput(stage, "LambdaPutConcurrencyTask" , "Lambda concurrency : nothing to update");
-        //return taskComplete(stage);
 
         LambdaCloudOperationOutput output = putConcurrency(inp);
         addCloudOperationToContext(stage, output, LambdaStageConstants.putConcurrencyUrlKey);
@@ -67,7 +64,7 @@ public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
 
     private LambdaCloudOperationOutput putConcurrency(LambdaConcurrencyInput inp) {
         inp.setCredentials(inp.getAccount());
-        if (inp.getProvisionedConcurrentExecutions() != 0 &&
+        if (inp.getProvisionedConcurrentExecutions() != null &&
                 StringUtils.isNotNullOrEmpty(inp.getAliasName())) {
             return putProvisionedConcurrency(inp);
         }
