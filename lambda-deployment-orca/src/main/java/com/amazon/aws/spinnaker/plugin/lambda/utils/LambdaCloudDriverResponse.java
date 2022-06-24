@@ -19,8 +19,6 @@ package com.amazon.aws.spinnaker.plugin.lambda.utils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Data
 @Builder

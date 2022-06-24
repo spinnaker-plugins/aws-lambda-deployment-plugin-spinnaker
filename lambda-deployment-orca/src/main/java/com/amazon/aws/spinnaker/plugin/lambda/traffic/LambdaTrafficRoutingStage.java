@@ -18,6 +18,7 @@
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
 import com.amazon.aws.spinnaker.plugin.lambda.eventconfig.LambdaUpdateEventConfigurationTask;
+import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaDeleteConcurrencyTask;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.LambdaPutConcurrencyTask;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.LambdaVerificationTask;
 import com.netflix.spinnaker.orca.api.pipeline.graph.StageDefinitionBuilder;
@@ -44,6 +45,7 @@ public class LambdaTrafficRoutingStage implements StageDefinitionBuilder {
         builder.withTask("lambdaTrafficUpdateTask", LambdaTrafficUpdateTask.class);
         builder.withTask("lambdaTrafficUpdateVerificationTask", LambdaTrafficUpdateVerificationTask.class);
         builder.withTask("lambdaPutConcurrencyTask", LambdaPutConcurrencyTask.class);
+        builder.withTask("lambdaDeleteConcurrencyTask", LambdaDeleteConcurrencyTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
         builder.withTask("lambdaEventConfigurationTask", LambdaUpdateEventConfigurationTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
