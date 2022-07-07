@@ -28,7 +28,6 @@ import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +36,12 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
-    private static Logger logger = LoggerFactory.getLogger(LambdaPutConcurrencyTask.class);
+public class LambdaDeleteConcurrencyTask implements LambdaStageBaseTask {
+    private static Logger logger = LoggerFactory.getLogger(LambdaDeleteConcurrencyTask.class);
     private static final ObjectMapper objMapper = new ObjectMapper();
-    private static String CLOUDDRIVER_PUT_PROVISIONED_CONCURRENCY_PATH = "/aws/ops/putLambdaProvisionedConcurrency";
-    private static String CLOUDDRIVER_PUT_RESERVED_CONCURRENCY_PATH = "/aws/ops/putLambdaReservedConcurrency";
 
+    private static String CLOUDDRIVER_DELETE_PROVISIONED_CONCURRENCY_PATH = "/aws/ops/deleteLambdaProvisionedConcurrency";
+    private static String CLOUDDRIVER_DELETE_RESERVED_CONCURRENCY_PATH = "/aws/ops/deleteLambdaReservedConcurrency";
 
     @Autowired
     CloudDriverConfigurationProperties props;
@@ -54,53 +53,42 @@ public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
     @NotNull
     @Override
     public TaskResult execute(@NotNull StageExecution stage) {
-        logger.debug("Executing LambdaPutConcurrencyTask...");
+        logger.debug("Executing LambdaDeleteConcurrencyTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
         prepareTask(stage);
         LambdaConcurrencyInput inp = utils.getInput(stage, LambdaConcurrencyInput.class);
         inp.setAppName(stage.getExecution().getApplication());
 
-        if (inp.getReservedConcurrentExecutions() == null && Optional.ofNullable(inp.getProvisionedConcurrentExecutions()).orElse(0) == 0)
-        {
-            addToOutput(stage, "LambdaPutConcurrencyTask" , "Lambda concurrency : nothing to update");
+        LambdaCloudOperationOutput output;
+        if (stage.getType().equals("Aws.LambdaDeploymentStage") && inp.getReservedConcurrentExecutions() == null) {
+            output = deleteReservedConcurrency(inp);
+        } else if (stage.getType().equals("Aws.LambdaTrafficRoutingStage") && Optional.ofNullable(inp.getProvisionedConcurrentExecutions()).orElse(0) == 0) {
+            output = deleteProvisionedConcurrency(inp);
+        } else {
+            addToOutput(stage, "LambdaDeleteConcurrencyTask" , "Lambda delete concurrency : nothing to delete");
             return taskComplete(stage);
         }
-
-        LambdaCloudOperationOutput output = putConcurrency(inp);
-        addCloudOperationToContext(stage, output, LambdaStageConstants.putConcurrencyUrlKey);
+        addCloudOperationToContext(stage, output, LambdaStageConstants.deleteConcurrencyUrlKey);
         return taskComplete(stage);
     }
 
-    private LambdaCloudOperationOutput putConcurrency(LambdaConcurrencyInput inp) {
-        inp.setCredentials(inp.getAccount());
-        if (inp.getProvisionedConcurrentExecutions() != null
-                && inp.getProvisionedConcurrentExecutions() != 0
-                && StringUtils.isNotNullOrEmpty(inp.getAliasName())) {
-            return putProvisionedConcurrency(inp);
-        }
-        if (inp.getReservedConcurrentExecutions() != null) {
-            return putReservedConcurrency(inp);
-        }
-        return LambdaCloudOperationOutput.builder().build();
-    }
-
-    private LambdaCloudOperationOutput putReservedConcurrency( LambdaConcurrencyInput inp) {
+    private LambdaCloudOperationOutput deleteProvisionedConcurrency(LambdaConcurrencyInput inp) {
+        inp.setQualifier(inp.getAliasName());
         String rawString = utils.asString(inp);
-        String endPoint = cloudDriverUrl + CLOUDDRIVER_PUT_RESERVED_CONCURRENCY_PATH;
+        String endPoint = cloudDriverUrl + CLOUDDRIVER_DELETE_PROVISIONED_CONCURRENCY_PATH;
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
-        logger.debug("Posted to cloudDriver for putReservedConcurrency: " + url);
+        logger.debug("Posted to cloudDriver for deleteProvisionedConcurrency: " + url);
         LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
         return operationOutput;
     }
 
-    private LambdaCloudOperationOutput putProvisionedConcurrency(LambdaConcurrencyInput inp) {
-        inp.setQualifier(inp.getAliasName());
+    private LambdaCloudOperationOutput deleteReservedConcurrency(LambdaConcurrencyInput inp) {
         String rawString = utils.asString(inp);
-        String endPoint = cloudDriverUrl + CLOUDDRIVER_PUT_PROVISIONED_CONCURRENCY_PATH;
+        String endPoint = cloudDriverUrl + CLOUDDRIVER_DELETE_RESERVED_CONCURRENCY_PATH;
         LambdaCloudDriverResponse respObj = utils.postToCloudDriver(endPoint, rawString);
         String url = cloudDriverUrl + respObj.getResourceUri();
-        logger.debug("Posted to cloudDriver for putProvisionedConcurrency: " + url);
+        logger.debug("Posted to cloudDriver for deleteReservedConcurrency: " + url);
         LambdaCloudOperationOutput operationOutput = LambdaCloudOperationOutput.builder().resourceId(respObj.getId()).url(url).build();
         return operationOutput;
     }
@@ -115,3 +103,4 @@ public class LambdaPutConcurrencyTask implements LambdaStageBaseTask {
     public void onCancel(@NotNull StageExecution stage) {
     }
 }
+

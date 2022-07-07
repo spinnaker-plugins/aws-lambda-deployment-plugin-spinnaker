@@ -7,7 +7,6 @@ import classNames from 'classnames';
 
 import { Option } from 'react-select';
 
-
 import {
   FormikFormField,
   HelpField,
@@ -27,6 +26,8 @@ import {
   NetworkForm,
   TriggerEventsForm,
 } from '.';
+
+import { NumberConcurrencyInput } from '../../utils/NumberConcurrencyInput';
 
 export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProps) {
   const { values, errors } = props.formik; 
@@ -112,7 +113,7 @@ export function AwsLambdaFunctionStageForm(props: IFormikStageConfigInjectedProp
         name="reservedConcurrentExecutions"
         label="Reserved Concurrency"
         help={<HelpField content="The total number of current executions of your Lambda function that can be instantiated at any time." />}
-        input={props => <NumberInput {...props} max={3000} />} 
+        input={props => <NumberConcurrencyInput {...props} min={0} max={3000} />}
       />
       <FormikFormField
         name="memorySize" 
