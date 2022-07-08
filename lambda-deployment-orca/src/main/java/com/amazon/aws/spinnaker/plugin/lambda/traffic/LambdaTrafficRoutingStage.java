@@ -42,10 +42,10 @@ public class LambdaTrafficRoutingStage implements StageDefinitionBuilder {
     @Override
     public void taskGraph(@Nonnull StageExecution stage, @Nonnull TaskNode.Builder builder) {
         logger.debug("taskGraph for Aws.LambdaTrafficRoutingStage");
-        builder.withTask("lambdaTrafficUpdateTask", LambdaTrafficUpdateTask.class);
-        builder.withTask("lambdaTrafficUpdateVerificationTask", LambdaTrafficUpdateVerificationTask.class);
         builder.withTask("lambdaPutConcurrencyTask", LambdaPutConcurrencyTask.class);
         builder.withTask("lambdaDeleteConcurrencyTask", LambdaDeleteConcurrencyTask.class);
+        builder.withTask("lambdaTrafficUpdateTask", LambdaTrafficUpdateTask.class);
+        builder.withTask("lambdaTrafficUpdateVerificationTask", LambdaTrafficUpdateVerificationTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
         builder.withTask("lambdaEventConfigurationTask", LambdaUpdateEventConfigurationTask.class);
         builder.withTask("lambdaVerificationTask", LambdaVerificationTask.class);
