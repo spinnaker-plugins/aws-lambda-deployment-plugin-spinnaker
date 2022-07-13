@@ -8,8 +8,8 @@ apply plugin: "io.spinnaker.plugin.service-extension"
 apply plugin: "maven-publish"
 apply plugin: "java"
 
-sourceCompatibility = 1.11
-targetCompatibility = 1.11
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
   mavenCentral()
@@ -28,7 +28,6 @@ dependencies {
   compileOnly (group: 'com.netflix.spinnaker.orca', name: 'orca-api', version: "${orcaVersion}")
   compileOnly (group: 'com.netflix.spinnaker.orca', name: 'orca-clouddriver', version: "${orcaVersion}")
   compileOnly (group: 'com.netflix.spinnaker.orca', name: 'orca-core', version: "${orcaVersion}")
-  compileOnly ("org.projectlombok:lombok:1.18.12")
   compileOnly (group: 'com.netflix.spinnaker.kork', name: 'kork-artifacts', version: "${korkVersion}")
   compileOnly (group: 'com.netflix.spinnaker.kork', name: 'kork-plugins-spring-api', version: "${korkVersion}")
   implementation("com.amazonaws:aws-java-sdk:1.11.877")
@@ -40,10 +39,11 @@ dependencies {
   implementation("com.squareup.okhttp3:okhttp:4.2.2")
   implementation("com.squareup.okhttp3:okhttp-apache:3.13.1")
   annotationProcessor("org.pf4j:pf4j:3.2.0")
-  annotationProcessor ("org.projectlombok:lombok:1.18.12")
   testImplementation (group: 'com.netflix.spinnaker.orca', name: 'orca-api', version: "${orcaVersion}")
+  testImplementation (group: 'com.netflix.spinnaker.orca', name: 'orca-api-tck', version: "${orcaVersion}")
+  testImplementation (group: 'com.netflix.spinnaker.orca', name: 'orca-queue', version: "${orcaVersion}")
+  testImplementation (group: 'com.netflix.spinnaker.kork', name: 'kork-plugins-tck', version: "${korkVersion}")
 
-  testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.2"
   testImplementation group: 'io.strikt', name: 'strikt-core', version: '0.22.1'
   testImplementation group: 'dev.minutest', name: 'minutest', version: '1.10.0'
   testImplementation group: 'io.mockk', name: 'mockk', version: '1.9.3'
@@ -53,9 +53,29 @@ dependencies {
   testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.19.0'
   testCompile (group: 'com.netflix.spinnaker.orca', name: 'orca-clouddriver', version: "${orcaVersion}")
 
-  testRuntime "org.junit.jupiter:junit-jupiter-engine:5.4.0"
-  testRuntime "org.junit.platform:junit-platform-launcher:1.4.0"
-  testRuntime "org.junit.platform:junit-platform-commons:1.5.2"
+  compileOnly ("org.projectlombok:lombok:1.18.12")
+  annotationProcessor ("org.projectlombok:lombok:1.18.12")
+  testCompile ("org.projectlombok:lombok:1.18.12")
+  testAnnotationProcessor("org.projectlombok:lombok:1.18.12")
+
+  testImplementation("com.fasterxml.jackson.core:jackson-core") {
+    version {
+      strictly '2.11.2'
+    }
+  }
+  testImplementation("com.fasterxml.jackson.core:jackson-annotations") {
+    version {
+      strictly '2.11.2'
+    }
+  }
+  testImplementation("com.fasterxml.jackson.core:jackson-databind") {
+    version {
+      strictly '2.11.2'
+    }
+  }
+
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
+  testImplementation("org.junit.platform:junit-platform-commons:1.4.0")
 }
 
 tasks.withType(Test) {
