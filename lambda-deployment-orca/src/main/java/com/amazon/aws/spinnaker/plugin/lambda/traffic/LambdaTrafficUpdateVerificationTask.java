@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask {
@@ -69,8 +70,8 @@ public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask 
         }
 
         if (!"$WEIGHTED".equals(stage.getContext().get("deploymentStrategy"))) {
-            boolean valid = validateWeights(stage);
-            if (!valid) {
+            boolean inValid = validateWeights(stage);
+            if (inValid) {
                 formErrorTaskResult(stage, "Could not update weights in time");
                 return TaskResult.builder(ExecutionStatus.TERMINAL).outputs(stage.getOutputs()).build();
             }
@@ -85,7 +86,7 @@ public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask 
         AliasRoutingConfiguration weights = null;
         long startTime = System.currentTimeMillis();
         LambdaTrafficUpdateInput inp = utils.getInput(stage, LambdaTrafficUpdateInput.class);
-        boolean status = true;
+        boolean status = false;
         do {
             utils.await(3000);
             LambdaDefinition lf = utils.retrieveLambdaFromCache(stage, false);
@@ -96,10 +97,10 @@ public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask 
                 weights = opt.orElse(null);
             }
             if ((System.currentTimeMillis()-startTime)>240000) {
-                logger.warn("validateWeights function is taking to much time");
-                status = false;
+                logger.warn("validateWeights function is taking too much time: " + TimeUnit.MILLISECONDS.toMinutes((System.currentTimeMillis()-startTime)) + " minutes plus" );
+                status = true;
             }
-        } while (null != weights && status);
+        } while (null != weights && !status);
         return status;
     }
 }

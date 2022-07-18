@@ -9,6 +9,7 @@ import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTask
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaVerificationStatusOutput;
 import com.amazonaws.services.lambda.model.AliasConfiguration;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.google.common.collect.ImmutableList;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.PipelineExecution;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
@@ -23,7 +24,6 @@ import org.mockito.MockitoAnnotations;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 import ru.lanwen.wiremock.ext.WiremockUriResolver;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -81,6 +81,7 @@ public class LambdaTrafficUpdateVerificationTaskTest {
 
     @Test
     public void execute_UpdateVerification_verifyStatus_ERROR(){
+        String taskVerifyError = "clouddriver task not found error";
         LambdaCloudDriverTaskResults lambdaCloudDriverTaskResults = LambdaCloudDriverTaskResults.builder()
                 .status(LambdaVerificationStatusOutput.builder()
                         .completed(true)
@@ -88,21 +89,20 @@ public class LambdaTrafficUpdateVerificationTaskTest {
                         .status("TERMINAL")
                         .build())
                 .errors(LambdaCloudDriverErrorObject.builder()
-                        .message("clouddriver task not found error")
+                        .message(taskVerifyError)
                         .build())
                 .build();
         Mockito.when(lambdaCloudDriverUtilsMock
                 .verifyStatus(Mockito.any())).thenReturn(lambdaCloudDriverTaskResults);
 
         assertEquals(ExecutionStatus.TERMINAL, lambdaTrafficUpdateVerificationTask.execute(stageExecution).getStatus());
-        assertEquals("clouddriver task not found error", stageExecution.getOutputs().get("failureMessage"));
+        assertEquals(taskVerifyError, stageExecution.getOutputs().get("failureMessage"));
     }
 
     @Test
     public void execute_UpdateVerification_validateWeights(){
-        List<AliasConfiguration> aliasConfigurationList = new ArrayList<>();
         //RoutingConfig() will be null ending while loop
-        aliasConfigurationList.add(new AliasConfiguration().withName("develop"));
+        List<AliasConfiguration> aliasConfigurationList = ImmutableList.of(new AliasConfiguration().withName("develop"));
 
         LambdaCloudDriverTaskResults lambdaCloudDriverTaskResults = LambdaCloudDriverTaskResults.builder()
                 .status(LambdaVerificationStatusOutput.builder()
