@@ -20,7 +20,6 @@ import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Singular;
 
 import java.util.List;
 

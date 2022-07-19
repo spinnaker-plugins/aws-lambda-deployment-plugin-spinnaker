@@ -31,16 +31,13 @@ dependencies {
   compileOnly ("org.projectlombok:lombok:1.18.12")
   compileOnly (group: 'com.netflix.spinnaker.kork', name: 'kork-artifacts', version: "${korkVersion}")
   compileOnly (group: 'com.netflix.spinnaker.kork', name: 'kork-plugins-spring-api', version: "${korkVersion}")
-  implementation("com.amazonaws:aws-java-sdk:1.11.877")
-  implementation("org.apache.commons:commons-lang3:3.8.1")
-  implementation("com.github.ben-manes.caffeine:guava:2.8.5")
-  implementation("com.netflix.awsobjectmapper:awsobjectmapper:1.11.877")
-  implementation("org.apache.httpcomponents:httpclient:4.5.9")
-  implementation("org.apache.httpcomponents:httpcore:4.4.11")
-  implementation("com.squareup.okhttp3:okhttp:4.2.2")
-  implementation("com.squareup.okhttp3:okhttp-apache:3.13.1")
+
+  implementation(enforcedPlatform("com.netflix.spinnaker.kork:kork-bom:$korkVersion"))
+  implementation("com.netflix.awsobjectmapper:awsobjectmapper:1.11.802")
+
   annotationProcessor("org.pf4j:pf4j:3.2.0")
   annotationProcessor ("org.projectlombok:lombok:1.18.12")
+
   testImplementation (group: 'com.netflix.spinnaker.orca', name: 'orca-api', version: "${orcaVersion}")
 
   testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.2"

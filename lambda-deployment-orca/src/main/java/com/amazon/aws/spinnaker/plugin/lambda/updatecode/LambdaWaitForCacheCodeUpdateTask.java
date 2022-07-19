@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package com.amazon.aws.spinnaker.plugin.lambda.updatecode;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
@@ -24,13 +23,13 @@ import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaStageConstants;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 @Component

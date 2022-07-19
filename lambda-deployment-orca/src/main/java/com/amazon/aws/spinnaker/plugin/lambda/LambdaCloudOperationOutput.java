@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package com.amazon.aws.spinnaker.plugin.lambda;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

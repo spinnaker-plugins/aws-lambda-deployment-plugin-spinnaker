@@ -30,17 +30,14 @@ import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.api.pipeline.models.TaskExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import com.netflix.spinnaker.orca.pipeline.model.StageContext;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
