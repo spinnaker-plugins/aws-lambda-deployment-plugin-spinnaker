@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import java.time.Duration;
 
 @Component
@@ -53,7 +53,7 @@ public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
         return waitForStableState(stage);
     }
 
-    private TaskResult waitForStableState(@NotNull StageExecution stage) {
+    private TaskResult waitForStableState(@Nonnull StageExecution stage) {
         LambdaDefinition lf = null;
         int counter = 0;
         while(true) {

@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import java.util.Map;
 
 @Component
@@ -49,7 +49,7 @@ public class LambdaWaitForCacheCodeUpdateTask implements LambdaStageBaseTask {
         return waitForCacheUpdate(stage);
     }
 
-    private TaskResult waitForCacheUpdate(@NotNull StageExecution stage) {
+    private TaskResult waitForCacheUpdate(@Nonnull StageExecution stage) {
         Boolean requiresPublishFlag = (Boolean)stage.getContext().getOrDefault("publish", Boolean.FALSE);
         if (requiresPublishFlag && stage.getContext().containsKey(LambdaStageConstants.updateCodeUrlKey)) {
             String codeUpdateUrl = (String) stage.getContext().get(LambdaStageConstants.updateCodeUrlKey);

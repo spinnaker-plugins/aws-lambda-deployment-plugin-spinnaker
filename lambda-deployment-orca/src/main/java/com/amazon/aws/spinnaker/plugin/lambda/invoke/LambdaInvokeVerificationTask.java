@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,9 +49,9 @@ public class LambdaInvokeVerificationTask implements LambdaStageBaseTask {
 
     private  String cloudDriverUrl;
 
-    @NotNull
+    @Nonnull
     @Override
-    public TaskResult execute(@NotNull StageExecution stage) {
+    public TaskResult execute(@Nonnull StageExecution stage) {
         logger.debug("Executing LambdaInvokeVerificationTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
         prepareTask(stage);
@@ -66,7 +66,7 @@ public class LambdaInvokeVerificationTask implements LambdaStageBaseTask {
         }
     }
 
-    public TaskResult doVerify(@NotNull StageExecution stage) {
+    public TaskResult doVerify(@Nonnull StageExecution stage) {
         prepareTask(stage);
         Map<String, Object> stageContext = stage.getContext();
         List<String> urlList = (List<String>)stageContext.get("urlList");

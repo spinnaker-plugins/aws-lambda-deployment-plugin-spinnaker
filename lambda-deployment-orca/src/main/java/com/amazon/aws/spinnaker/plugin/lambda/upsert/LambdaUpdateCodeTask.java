@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import java.util.List;
 
 @Component
@@ -54,9 +54,9 @@ public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
     @Autowired
     private LambdaCloudDriverUtils utils;
 
-    @NotNull
+    @Nonnull
     @Override
-    public TaskResult execute(@NotNull StageExecution stage) {
+    public TaskResult execute(@Nonnull StageExecution stage) {
         logger.debug("Executing LambdaUpdateCodeTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
         prepareTask(stage);
@@ -95,12 +95,12 @@ public class LambdaUpdateCodeTask implements LambdaStageBaseTask {
 
     @Nullable
     @Override
-    public TaskResult onTimeout(@NotNull StageExecution stage) {
+    public TaskResult onTimeout(@Nonnull StageExecution stage) {
         return TaskResult.builder(ExecutionStatus.SKIPPED).build();
     }
 
     @Override
-    public void onCancel(@NotNull StageExecution stage) {
+    public void onCancel(@Nonnull StageExecution stage) {
     }
 
 }

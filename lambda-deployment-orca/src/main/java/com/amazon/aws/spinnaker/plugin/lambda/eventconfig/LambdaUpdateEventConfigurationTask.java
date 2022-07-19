@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,9 +57,9 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
 
     private static final String DEFAULT_STARTING_POSITION = "LATEST";
 
-    @NotNull
+    @Nonnull
     @Override
-    public TaskResult execute(@NotNull StageExecution stage) {
+    public TaskResult execute(@Nonnull StageExecution stage) {
         logger.debug("Executing LambdaUpdateEventConfigurationTask");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
         LambdaUpdateEventConfigurationTaskInput taskInput = utils.getInput(stage, LambdaUpdateEventConfigurationTaskInput.class);
