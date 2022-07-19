@@ -24,20 +24,21 @@ spinnakerPlugin {
 }
 
 dependencies {
-  compileOnly(group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}")
+  implementation(enforcedPlatform("io.spinnaker.kork:kork-bom:$korkVersion"))
+  implementation("com.amazonaws:aws-java-sdk")
+  implementation("com.netflix.awsobjectmapper:awsobjectmapper")
+  implementation("org.apache.commons:commons-lang3")
+  implementation("com.squareup.okhttp3:okhttp")
+
+  compileOnly(group: 'org.pf4j', name: 'pf4j')
   compileOnly (group: 'com.netflix.spinnaker.orca', name: 'orca-api', version: "${orcaVersion}")
   compileOnly (group: 'com.netflix.spinnaker.orca', name: 'orca-clouddriver', version: "${orcaVersion}")
   compileOnly (group: 'com.netflix.spinnaker.orca', name: 'orca-core', version: "${orcaVersion}")
-  compileOnly platform("io.spinnaker.kork:kork-bom:$korkVersion")
   compileOnly ("org.projectlombok:lombok")
   compileOnly (group: 'io.spinnaker.kork', name: 'kork-artifacts')
   compileOnly (group: 'io.spinnaker.kork', name: 'kork-plugins-spring-api')
 
-  implementation(enforcedPlatform("io.spinnaker.kork:kork-bom:$korkVersion"))
-  implementation("com.amazonaws:aws-java-sdk")
-  implementation("com.netflix.awsobjectmapper:awsobjectmapper")
-
-  annotationProcessor("org.pf4j:pf4j:${pf4jVersion}")
+  annotationProcessor("org.pf4j:pf4j")
 
   annotationProcessor platform("io.spinnaker.kork:kork-bom:$korkVersion")
   annotationProcessor ("org.projectlombok:lombok")
