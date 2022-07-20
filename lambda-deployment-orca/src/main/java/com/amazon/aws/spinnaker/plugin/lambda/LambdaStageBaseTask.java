@@ -15,6 +15,7 @@
  */
 
 package com.amazon.aws.spinnaker.plugin.lambda;
+
 import com.netflix.spinnaker.orca.api.pipeline.Task;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;

@@ -27,14 +27,14 @@ import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,9 +54,9 @@ public class LambdaUpdateAliasesTask implements LambdaStageBaseTask {
     @Autowired
     private LambdaCloudDriverUtils utils;
 
-    @NotNull
+    @Nonnull
     @Override
-    public TaskResult execute(@NotNull StageExecution stage) {
+    public TaskResult execute(@Nonnull StageExecution stage) {
         logger.debug("Executing LambdaUpdateAliasesTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
         prepareTask(stage);
@@ -120,12 +120,12 @@ public class LambdaUpdateAliasesTask implements LambdaStageBaseTask {
 
     @Nullable
     @Override
-    public TaskResult onTimeout(@NotNull StageExecution stage) {
+    public TaskResult onTimeout(@Nonnull StageExecution stage) {
         return TaskResult.builder(ExecutionStatus.SKIPPED).build();
     }
 
     @Override
-    public void onCancel(@NotNull StageExecution stage) {
+    public void onCancel(@Nonnull StageExecution stage) {
     }
 
 }

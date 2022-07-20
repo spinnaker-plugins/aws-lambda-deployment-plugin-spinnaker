@@ -23,12 +23,12 @@ import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nonnull;
 import java.time.Duration;
 
@@ -53,7 +53,7 @@ public class LambdaWaitToStabilizeTask implements LambdaStageBaseTask {
         return waitForStableState(stage);
     }
 
-    private TaskResult waitForStableState(@NotNull StageExecution stage) {
+    private TaskResult waitForStableState(@Nonnull StageExecution stage) {
         LambdaDefinition lf = null;
         int counter = 0;
         while(true) {

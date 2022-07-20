@@ -16,7 +16,6 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.utils;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;

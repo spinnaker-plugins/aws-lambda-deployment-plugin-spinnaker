@@ -17,8 +17,6 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.traffic.model;
 
-import java.util.HashMap;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
