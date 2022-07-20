@@ -42,7 +42,6 @@ dependencies {
   annotationProcessor ("org.projectlombok:lombok")
   annotationProcessor("org.pf4j:pf4j")
 
-  testImplementation (platform("io.spinnaker.orca:orca-bom:${orcaVersion}"))
   testImplementation group: 'io.spinnaker.orca', name: 'orca-api'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
   testImplementation group: 'io.strikt', name: 'strikt-core'
