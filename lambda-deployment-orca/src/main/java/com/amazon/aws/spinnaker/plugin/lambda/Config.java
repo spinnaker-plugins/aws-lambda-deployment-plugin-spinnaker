@@ -15,4 +15,8 @@ public class Config {
     private int cacheOnDemandRetryWaitTime;
     @Value("${lambdaPluginConfig.cloudDriverPostRequestRetries:5}")
     private int cloudDriverPostRequestRetries;
+    @Value("${lambdaPluginConfig.cloudDriverRetrieveNewPublishedLambdaWait:40}")
+    private int cloudDriverRetrieveNewPublishedLambdaWait;
+    @Value("${lambdaPluginConfig.cloudDriverRetrieveMaxValidateWeightsTime:240}")
+    private int cloudDriverRetrieveMaxValidateWeightsTime;
 }

@@ -1,5 +1,6 @@
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
+import com.amazon.aws.spinnaker.plugin.lambda.Config;
 import com.amazon.aws.spinnaker.plugin.lambda.traffic.model.LambdaTrafficUpdateInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
@@ -48,6 +49,9 @@ public class LambdaTrafficUpdateVerificationTaskTest {
 
     @Mock
     private PipelineExecution pipelineExecution;
+
+    @Mock
+    private Config config;
 
     @BeforeEach
     void init(@WiremockResolver.Wiremock WireMockServer wireMockServer, @WiremockUriResolver.WiremockUri String uri) {
@@ -115,6 +119,12 @@ public class LambdaTrafficUpdateVerificationTaskTest {
         LambdaDefinition lambdaDefinition = LambdaDefinition.builder()
                 .aliasConfigurations(aliasConfigurationList)
                 .build();
+        Mockito.when(config
+                .getCloudDriverRetrieveNewPublishedLambdaWait()).thenReturn(40);
+        Mockito.when(config
+                .getCacheRefreshRetryWaitTime()).thenReturn(15);
+        Mockito.when(config
+                .getCloudDriverRetrieveMaxValidateWeightsTime()).thenReturn(240);
         Mockito.when(lambdaCloudDriverUtilsMock
                 .retrieveLambdaFromCache(stageExecution, false)).thenReturn(lambdaDefinition);
 
