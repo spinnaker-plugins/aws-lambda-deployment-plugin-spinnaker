@@ -32,7 +32,7 @@ import java.io.File;
 
 @TestPropertySource(properties = {
         "spinnaker.extensibility.plugins.Aws.LambdaDeploymentPlugin.enabled=true",
-        "spinnaker.extensibility.plugins-root-path=build/plugins"
+        "spinnaker.extensibility.plugins-root-path=build/tmp/plugins"
 })
 @AutoConfigureMockMvc
 public class OrcaPluginsFixture extends OrcaFixture {
@@ -42,11 +42,12 @@ public class OrcaPluginsFixture extends OrcaFixture {
     @Autowired
     MockMvc mockMvc;
 
-    ObjectMapper mapper =  new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    @Autowired
+    ObjectMapper mapper;
 
     OrcaPluginsFixture() {
         String pluginId = "Aws.LambdaDeploymentPlugin";
-        File plugins = new File("build/plugins");
+        File plugins = new File("build/tmp/plugins");
         FileUtils.deleteQuietly(plugins);
         plugins.mkdir();
 
