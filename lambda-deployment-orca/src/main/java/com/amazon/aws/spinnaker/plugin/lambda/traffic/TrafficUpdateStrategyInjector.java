@@ -17,7 +17,6 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.traffic;
 
-import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

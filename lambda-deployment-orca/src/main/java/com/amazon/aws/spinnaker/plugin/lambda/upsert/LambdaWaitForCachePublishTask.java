@@ -24,12 +24,12 @@ import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaStageConstants;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nonnull;
 import java.time.Duration;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class LambdaWaitForCachePublishTask implements LambdaStageBaseTask {
         return waitForCacheUpdate(stage);
     }
 
-    private TaskResult waitForCacheUpdate(@NotNull StageExecution stage) {
+    private TaskResult waitForCacheUpdate(@Nonnull StageExecution stage) {
         if (stage.getContext().containsKey(LambdaStageConstants.publishVersionUrlKey)) {
             String publishUrl = (String) stage.getContext().get(LambdaStageConstants.publishVersionUrlKey);
             String version = utils.getPublishedVersion(publishUrl);

@@ -25,13 +25,13 @@ import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaDefinition;
 import com.netflix.spinnaker.orca.api.pipeline.TaskResult;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
-import org.jetbrains.annotations.NotNull;
 import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,9 +50,9 @@ public class LambdaInvokeTask  implements LambdaStageBaseTask {
 
     static String CLOUDDRIVER_INVOKE_LAMBDA_FUNCTION_PATH = "/aws/ops/invokeLambdaFunction";
 
-    @NotNull
+    @Nonnull
     @Override
-    public TaskResult execute(@NotNull StageExecution stage) {
+    public TaskResult execute(@Nonnull StageExecution stage) {
         logger.debug("Executing LambdaInvokeTask...");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
         prepareTask(stage);

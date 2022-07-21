@@ -17,7 +17,6 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda.traffic.model;
 
-import com.amazonaws.services.lambda.model.InvokeResult;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;

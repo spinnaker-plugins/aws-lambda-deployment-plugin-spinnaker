@@ -29,13 +29,13 @@ import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
 import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,9 +57,9 @@ public class LambdaUpdateEventConfigurationTask implements LambdaStageBaseTask {
 
     private static final String DEFAULT_STARTING_POSITION = "LATEST";
 
-    @NotNull
+    @Nonnull
     @Override
-    public TaskResult execute(@NotNull StageExecution stage) {
+    public TaskResult execute(@Nonnull StageExecution stage) {
         logger.debug("Executing LambdaUpdateEventConfigurationTask");
         cloudDriverUrl = props.getCloudDriverBaseUrl();
         LambdaUpdateEventConfigurationTaskInput taskInput = utils.getInput(stage, LambdaUpdateEventConfigurationTaskInput.class);
