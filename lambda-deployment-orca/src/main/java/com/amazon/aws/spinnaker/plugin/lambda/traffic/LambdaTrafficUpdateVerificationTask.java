@@ -90,12 +90,12 @@ public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask 
      * so alias - provisioned concurrency can be updated
      * </p>
      * @param stage The runtime execution state of a stage.
-     * @return The boolean value if your alias-weights were moved before max time specified in lambdaPluginConfig.cloudDriverRetrieveMaxValidateWeightsTime
+     * @return The boolean value if your alias-weights failed to be moved before max time specified in lambdaPluginConfig.cloudDriverRetrieveMaxValidateWeightsTime
      * @see <a href="https://github.com/spinnaker-plugins/aws-lambda-deployment-plugin-spinnaker/pull/119">PR-119</a>
      * @since 1.0.11
      */
     private boolean validateWeights(StageExecution stage) {
-        utils.await(TimeUnit.SECONDS.toMillis(config.getCloudDriverRetrieveNewPublishedLambdaWait()));
+        utils.await(TimeUnit.SECONDS.toMillis(config.getCloudDriverRetrieveNewPublishedLambdaWaitSeconds()));
         AliasRoutingConfiguration weights = null;
         long startTime = System.currentTimeMillis();
         LambdaTrafficUpdateInput inp = utils.getInput(stage, LambdaTrafficUpdateInput.class);
@@ -109,7 +109,7 @@ public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask 
                 Optional<AliasRoutingConfiguration> opt = Optional.ofNullable(aliasConfiguration.get().getRoutingConfig());
                 weights = opt.orElse(null);
             }
-            if ((System.currentTimeMillis()-startTime)>TimeUnit.SECONDS.toMillis(config.getCloudDriverRetrieveMaxValidateWeightsTime())) {
+            if ((System.currentTimeMillis()-startTime)>TimeUnit.SECONDS.toMillis(config.getCloudDriverRetrieveMaxValidateWeightsTimeSeconds())) {
                 logger.warn("validateWeights function is taking too much time: " + TimeUnit.MILLISECONDS.toMinutes((System.currentTimeMillis()-startTime)) + " minutes plus" );
                 status = true;
             }

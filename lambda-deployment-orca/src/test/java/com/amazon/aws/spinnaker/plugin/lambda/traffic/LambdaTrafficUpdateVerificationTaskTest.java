@@ -120,11 +120,11 @@ public class LambdaTrafficUpdateVerificationTaskTest {
                 .aliasConfigurations(aliasConfigurationList)
                 .build();
         Mockito.when(config
-                .getCloudDriverRetrieveNewPublishedLambdaWait()).thenReturn(40);
+                .getCloudDriverRetrieveNewPublishedLambdaWaitSeconds()).thenReturn(40);
         Mockito.when(config
                 .getCacheRefreshRetryWaitTime()).thenReturn(15);
         Mockito.when(config
-                .getCloudDriverRetrieveMaxValidateWeightsTime()).thenReturn(240);
+                .getCloudDriverRetrieveMaxValidateWeightsTimeSeconds()).thenReturn(240);
         Mockito.when(lambdaCloudDriverUtilsMock
                 .retrieveLambdaFromCache(stageExecution, false)).thenReturn(lambdaDefinition);
 
