@@ -7,6 +7,8 @@ This plugin provides support for AWS Lambda Deployment via Pipelines in Spinnake
 |:------------- | :--------- |
 | 1.0.5 <= |  1.23.x |
 | 1.0.6 >= |  1.26.x |
+| 1.0.11 >= |  1.29.x |
+
 
 This plugin is currently only compatible with Spinnaker platform 1.23.x and up. It is possible to run the plugin in an environment running an earlier release by making the following changes to your environment:
 1. Checkout `master` branch for `spinnaker/orca`
@@ -42,6 +44,8 @@ This plugin is currently only compatible with Spinnaker platform 1.23.x and up. 
     cloudDriverConnectTimeout: 15 # defaults to 15 secs
     cacheRefreshRetryWaitTime: 15 # defaults to 15 sec
     cacheOnDemandRetryWaitTime: 15 # defaults to 15 sec
+    cloudDriverRetrieveNewPublishedLambdaWaitSeconds: 40 # defaults to 15 sec
+    cloudDriverRetrieveMaxValidateWeightsTimeSeconds: 240 # defaults to 15 sec
 ```
 2. Add the following to `gate-local.yml` in the necessary [profile](https://spinnaker.io/reference/halyard/custom/#custom-profiles) to load the Deck frontend
 ```yaml
