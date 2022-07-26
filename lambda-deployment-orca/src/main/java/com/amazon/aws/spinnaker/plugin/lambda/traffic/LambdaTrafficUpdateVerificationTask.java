@@ -103,7 +103,8 @@ public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask 
         do {
             utils.await(TimeUnit.SECONDS.toMillis(config.getCacheRefreshRetryWaitTime()));
             LambdaDefinition lf = utils.retrieveLambdaFromCache(stage, false);
-            Optional<AliasConfiguration> aliasConfiguration = lf.getAliasConfigurations().stream().filter(al -> al.getName().equals(inp.getAliasName())).findFirst();
+            Optional<AliasConfiguration> aliasConfiguration = lf.getAliasConfigurations()
+                     .stream().filter(al -> al.getName().equals(inp.getAliasName())).findFirst();
 
             if (aliasConfiguration.isPresent()) {
                 Optional<AliasRoutingConfiguration> opt = Optional.ofNullable(aliasConfiguration.get().getRoutingConfig());
