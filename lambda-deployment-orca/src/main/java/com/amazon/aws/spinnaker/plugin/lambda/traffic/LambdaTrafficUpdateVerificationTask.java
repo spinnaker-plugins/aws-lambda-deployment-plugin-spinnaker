@@ -111,7 +111,10 @@ public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask 
                 weights = opt.orElse(null);
             }
             if ((System.currentTimeMillis() - startTime) > TimeUnit.SECONDS.toMillis(config.getCloudDriverRetrieveMaxValidateWeightsTimeSeconds())) {
-                logger.warn("validateWeights function is taking too much time: " + TimeUnit.MILLISECONDS.toMinutes((System.currentTimeMillis()-startTime)) + " minutes plus" );
+                logger.warn("alias weights did not update in {} seconds. waited {} seconds",
+                        config.getCloudDriverRetrieveMaxValidateWeightsTimeSeconds(),
+                        TimeUnit.MILLISECONDS.toSeconds((System.currentTimeMillis() - startTime))
+                );
                 status = true;
             }
         } while (null != weights && !status);
