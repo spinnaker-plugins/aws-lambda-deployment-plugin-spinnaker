@@ -20,8 +20,9 @@ public class Config {
     //and start moving the weights around and the fastest average is 30-35 seconds
     @Value("${lambdaPluginConfig.cloudDriverRetrieveNewPublishedLambdaWaitSeconds:40}")
     private int cloudDriverRetrieveNewPublishedLambdaWaitSeconds;
-    //it’s the max time a lambda takes to finish moving the weights
-    //it is about 3 min with 20 seconds so the default value is 240 seconds (4 min)
+    /*it’s the max time a lambda takes to finish moving the weights when it has provisioned concurrency
+    the longest time average is 3 minutes with 20 seconds so the default value is 240 seconds (4 min)
+    */
     @Value("${lambdaPluginConfig.cloudDriverRetrieveMaxValidateWeightsTimeSeconds:240}")
     private int cloudDriverRetrieveMaxValidateWeightsTimeSeconds;
 }

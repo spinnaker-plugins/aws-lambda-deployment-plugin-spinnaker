@@ -74,9 +74,10 @@ public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask 
         }
 
         if (!DeploymentStrategyEnum.$WEIGHTED.toString().equals(stage.getContext().get("deploymentStrategy"))) {
-            boolean inValid = validateWeights(stage);
-            if (inValid) {
-                formErrorTaskResult(stage, "Could not update weights in time");
+            boolean invalid = validateWeights(stage);
+            if (invalid) {
+                formErrorTaskResult(stage, "Could not update weights in time - waited "
+                                + config.getCloudDriverRetrieveMaxValidateWeightsTimeSeconds() + " seconds");
                 return TaskResult.builder(ExecutionStatus.TERMINAL).outputs(stage.getOutputs()).build();
             }
         }
