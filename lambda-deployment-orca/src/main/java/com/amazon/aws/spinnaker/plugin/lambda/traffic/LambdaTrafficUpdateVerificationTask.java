@@ -110,7 +110,7 @@ public class LambdaTrafficUpdateVerificationTask implements LambdaStageBaseTask 
                 Optional<AliasRoutingConfiguration> opt = Optional.ofNullable(aliasConfiguration.get().getRoutingConfig());
                 weights = opt.orElse(null);
             }
-            if ((System.currentTimeMillis()-startTime)>TimeUnit.SECONDS.toMillis(config.getCloudDriverRetrieveMaxValidateWeightsTimeSeconds())) {
+            if ((System.currentTimeMillis() - startTime) > TimeUnit.SECONDS.toMillis(config.getCloudDriverRetrieveMaxValidateWeightsTimeSeconds())) {
                 logger.warn("validateWeights function is taking too much time: " + TimeUnit.MILLISECONDS.toMinutes((System.currentTimeMillis()-startTime)) + " minutes plus" );
                 status = true;
             }
