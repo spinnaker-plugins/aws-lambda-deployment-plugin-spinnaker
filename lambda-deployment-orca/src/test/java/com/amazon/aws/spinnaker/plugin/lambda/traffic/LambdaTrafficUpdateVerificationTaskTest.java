@@ -9,6 +9,7 @@ import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverErro
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaCloudDriverTaskResults;
 import com.amazon.aws.spinnaker.plugin.lambda.verify.model.LambdaVerificationStatusOutput;
 import com.amazonaws.services.lambda.model.AliasConfiguration;
+import com.amazonaws.services.lambda.model.AliasRoutingConfiguration;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.common.collect.ImmutableList;
 import com.netflix.spinnaker.orca.api.pipeline.models.ExecutionStatus;
@@ -129,6 +130,37 @@ public class LambdaTrafficUpdateVerificationTaskTest {
                 .retrieveLambdaFromCache(stageExecution, false)).thenReturn(lambdaDefinition);
 
         assertEquals(ExecutionStatus.SUCCEEDED, lambdaTrafficUpdateVerificationTask.execute(stageExecution).getStatus());
+    }
+
+    @Test
+    public void execute_UpdateVerification_validateWeights_TERMINAL(){
+        List<AliasConfiguration> aliasConfigurationList = ImmutableList.of(new AliasConfiguration()
+                .withRoutingConfig(new AliasRoutingConfiguration())
+                .withName("develop"));
+
+        LambdaCloudDriverTaskResults lambdaCloudDriverTaskResults = LambdaCloudDriverTaskResults.builder()
+                .status(LambdaVerificationStatusOutput.builder()
+                        .status("RUNNING")
+                        .completed(true)
+                        .build())
+                .build();
+        Mockito.when(lambdaCloudDriverUtilsMock
+                .verifyStatus(Mockito.any())).thenReturn(lambdaCloudDriverTaskResults);
+        LambdaDefinition lambdaDefinition = LambdaDefinition.builder()
+                .aliasConfigurations(aliasConfigurationList)
+                .build();
+        Mockito.when(config
+                .getCloudDriverRetrieveNewPublishedLambdaWaitSeconds()).thenReturn(40);
+        Mockito.when(config
+                .getCacheRefreshRetryWaitTime()).thenReturn(15);
+        Mockito.when(config
+                .getCloudDriverRetrieveMaxValidateWeightsTimeSeconds()).thenReturn(60);
+        Mockito.when(lambdaCloudDriverUtilsMock
+                .retrieveLambdaFromCache(stageExecution, false)).thenReturn(lambdaDefinition);
+
+        assertEquals(ExecutionStatus.TERMINAL, lambdaTrafficUpdateVerificationTask.execute(stageExecution).getStatus());
+        assertEquals("Could not update weights in time - waited " + config.getCloudDriverRetrieveMaxValidateWeightsTimeSeconds() + " seconds"
+                , stageExecution.getOutputs().get("failureMessage"));
     }
 
 }
