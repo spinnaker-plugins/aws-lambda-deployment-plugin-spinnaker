@@ -17,6 +17,7 @@ package com.amazon.aws.spinnaker.plugin.lambda.upsert;
 
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaCloudOperationOutput;
 import com.amazon.aws.spinnaker.plugin.lambda.LambdaStageBaseTask;
+import com.amazon.aws.spinnaker.plugin.lambda.traffic.DeploymentStrategyEnum;
 import com.amazon.aws.spinnaker.plugin.lambda.upsert.model.LambdaConcurrencyInput;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverResponse;
 import com.amazon.aws.spinnaker.plugin.lambda.utils.LambdaCloudDriverUtils;
@@ -62,7 +63,8 @@ public class LambdaDeleteConcurrencyTask implements LambdaStageBaseTask {
         LambdaCloudOperationOutput output;
         if (stage.getType().equals("Aws.LambdaDeploymentStage") && inp.getReservedConcurrentExecutions() == null) {
             output = deleteReservedConcurrency(inp);
-        } else if (stage.getType().equals("Aws.LambdaTrafficRoutingStage") && Optional.ofNullable(inp.getProvisionedConcurrentExecutions()).orElse(0) == 0) {
+        } else if (stage.getType().equals("Aws.LambdaTrafficRoutingStage") && Optional.ofNullable(inp.getProvisionedConcurrentExecutions()).orElse(0) == 0
+                && !DeploymentStrategyEnum.$WEIGHTED.toString().equals(stage.getContext().get("deploymentStrategy"))) {
             output = deleteProvisionedConcurrency(inp);
         } else {
             addToOutput(stage, "LambdaDeleteConcurrencyTask" , "Lambda delete concurrency : nothing to delete");
@@ -103,4 +105,3 @@ public class LambdaDeleteConcurrencyTask implements LambdaStageBaseTask {
     public void onCancel(@Nonnull StageExecution stage) {
     }
 }
-
