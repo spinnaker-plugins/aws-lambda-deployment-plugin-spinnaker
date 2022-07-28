@@ -8,8 +8,8 @@ apply plugin: "io.spinnaker.plugin.service-extension"
 apply plugin: "maven-publish"
 apply plugin: "java"
 
-sourceCompatibility = 1.11
-targetCompatibility = 1.11
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
   mavenCentral()
@@ -41,8 +41,13 @@ dependencies {
   annotationProcessor platform("io.spinnaker.orca:orca-bom:${orcaVersion}")
   annotationProcessor ("org.projectlombok:lombok")
   annotationProcessor("org.pf4j:pf4j")
+  testAnnotationProcessor platform("io.spinnaker.orca:orca-bom:${orcaVersion}")
+  testAnnotationProcessor ("org.projectlombok:lombok")
 
   testImplementation group: 'io.spinnaker.orca', name: 'orca-api'
+  testImplementation group: 'io.spinnaker.orca', name: 'orca-api-tck'
+  testImplementation group: 'io.spinnaker.orca', name: 'orca-queue'
+  testImplementation group: 'io.spinnaker.kork', name: 'kork-plugins-tck'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
   testImplementation group: 'io.strikt', name: 'strikt-core'
   testImplementation group: 'dev.minutest', name: 'minutest'
@@ -52,6 +57,7 @@ dependencies {
   testCompile group: 'org.mockito', name: 'mockito-core'
   testCompile group: 'org.mockito', name: 'mockito-junit-jupiter'
   testCompile group: 'io.spinnaker.orca', name: 'orca-clouddriver'
+  testCompile group: 'org.projectlombok', name: 'lombok'
 
   testRuntime "org.junit.jupiter:junit-jupiter-engine"
   testRuntime "org.junit.platform:junit-platform-launcher"
