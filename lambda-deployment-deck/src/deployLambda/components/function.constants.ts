@@ -1,21 +1,23 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
-
+// https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
 export const availableRuntimes = [
-  'nodejs10.x',
   'nodejs12.x',
+  'nodejs14.x',
+  'nodejs16.x',
   'java8',
+  'java8.al2',
   'java11',
-  'python2.7',
-  'python3.6',
   'python3.7',
   'python3.8',
-  'dotnetcore2.1',
+  'python3.9',
   'dotnetcore3.1',
+  'dotnet6',
+  'dotnet5.0',
   'go1.x',
-  'ruby2.5',
   'ruby2.7',
   'provided',
+  'provided.al2',
 ];
 
 export const lambdaHelpFields = {
