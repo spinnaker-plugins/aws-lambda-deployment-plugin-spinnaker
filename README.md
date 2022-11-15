@@ -15,6 +15,9 @@ This plugin is currently only compatible with Spinnaker platform 1.23.x and up. 
 3. Checkout `master` branch for `spinnaker/clouddriver`
 4. Install the plugin
 
+## Major changes
+11/02/2022 - Release 1.1.0 - removes older versions of the runtime engine from the UI.  This means editing older pipelines will no longer let you use the unsupported lambda runtimes.  Please see https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html for questions/information.
+
 ### Requirements
 1. This plugin requires Java 11
 2. AWS Lambda functions must be enabled in your spinnaker environment and for all required AWS accounts. Find more information [here](https://aws.amazon.com/blogs/opensource/how-to-integrate-aws-lambda-with-spinnaker/) or within [samples](samples/README.md).
