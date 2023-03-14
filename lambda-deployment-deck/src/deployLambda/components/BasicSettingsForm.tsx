@@ -28,7 +28,7 @@ import {
 } from './function.constants';
 
 export function BasicSettingsForm( props: IFormikStageConfigInjectedProps ) { 
-  const { values, errors } = props.formik; 
+  const { values, errors } = props.formik;
 
   const setFunctionName = () => {
     const ns = NameUtils.getClusterName( props.application.applicationName, values.stackName, values.detailName );
@@ -173,6 +173,12 @@ export function BasicSettingsForm( props: IFormikStageConfigInjectedProps ) {
         help={<HelpField id="aws.function.publish" />}
         input={props => <CheckboxInput {...props} />}
       />
+      {values.runtime === "java11" && <FormikFormField
+        name="snapstart"
+        label="SnapStart"
+        help={<HelpField content="Create a snapshot of the initialized execution environment to improve startup performance." />}
+        input={props => <CheckboxInput {...props} />}
+      />}
 
     </div>
   );
