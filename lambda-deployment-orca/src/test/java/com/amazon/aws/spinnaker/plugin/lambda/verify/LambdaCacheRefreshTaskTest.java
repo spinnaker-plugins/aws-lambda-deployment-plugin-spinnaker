@@ -29,6 +29,7 @@ import com.netflix.spinnaker.orca.api.pipeline.models.PipelineExecution;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import okhttp3.Headers;
+import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +50,6 @@ public class LambdaCacheRefreshTaskTest {
 
     WireMockServer wireMockServer;
 
-    @InjectMocks
     private LambdaCacheRefreshTask lambdaCacheRefreshTask;
 
     @Mock
@@ -94,6 +94,7 @@ public class LambdaCacheRefreshTaskTest {
                 WireMock.post("/cache/aws/function")
                         .willReturn(mockResponse)
         );
+        lambdaCacheRefreshTask = new LambdaCacheRefreshTask(propsMock, lambdaCloudDriverUtilsMock, new OkHttpClient(), config);
     }
 
     @Test
