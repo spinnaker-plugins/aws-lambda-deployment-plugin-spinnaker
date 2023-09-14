@@ -40,7 +40,6 @@ import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.OortService;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import com.netflix.spinnaker.security.AuthenticatedRequest;
-
 import okhttp3.*;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -56,6 +55,7 @@ import java.io.InputStreamReader;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
@@ -69,11 +69,24 @@ public class LambdaCloudDriverUtils {
         objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
     }
 
-    @Autowired
+    //TODO: MOve all of this stuff to the OORT service in orca.  https://github.com/spinnaker/orca/blob/master/orca-clouddriver/src/main/java/com/netflix/spinnaker/orca/clouddriver/OortService.java or possibly the CloudDriverService.
+
+    final
     Config config;
 
-    @Autowired
+    final
     CloudDriverConfigurationProperties props;
+
+    //https://github.com/spinnaker/kork/blob/master/kork-web/src/main/java/com/netflix/spinnaker/config/okhttp3/RawOkHttpClientConfiguration.java#L45
+    final OkHttpClient client;
+
+    @Autowired
+    public LambdaCloudDriverUtils(Config config, CloudDriverConfigurationProperties props, OkHttpClient client, OortService oort) {
+        this.config = config;
+        this.props = props;
+        this.client = client;
+        this.oort = oort;
+    }
 
     public LambdaCloudDriverResponse postToCloudDriver(String endPointUrl, String jsonString) {
         return postToCloudDriver(endPointUrl, jsonString, config.getCloudDriverPostRequestRetries());
@@ -89,8 +102,8 @@ public class LambdaCloudDriverUtils {
         return new RetrySupport().retry(
                 () -> {
                     try {
-                        OkHttpClient client = new OkHttpClient();
-                        Call call = client.newCall(request);
+                        //Configurable time on POST response since certain operations are synchronous AND require longer times.
+                        Call call = client.newBuilder().readTimeout(config.getCloudDriverPostTimeoutSeconds(), TimeUnit.SECONDS).build().newCall(request);
                         Response response = call.execute();
                         String respString = response.body().string();
 
@@ -195,10 +208,6 @@ public class LambdaCloudDriverUtils {
                 .headers(buildHeaders())
                 .get()
                 .build();
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(Duration.ofSeconds(config.getCloudDriverConnectTimeout()))
-                .readTimeout(Duration.ofSeconds(config.getCloudDriverReadTimeout()))
-                .build();
         Call call = client.newCall(request);
         try {
             Response response = call.execute();
@@ -209,6 +218,7 @@ public class LambdaCloudDriverUtils {
             throw new RuntimeException(e);
         }
     }
+
 
     public Headers buildHeaders() {
         Headers.Builder headersBuilder = new Headers.Builder();
@@ -242,7 +252,6 @@ public class LambdaCloudDriverUtils {
                 .url(httpBuilder.build())
                 .headers(buildHeaders())
                 .build();
-        OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         try {
             Response response = call.execute();
@@ -462,7 +471,7 @@ public class LambdaCloudDriverUtils {
     }
 
 
-    @Autowired
+    final
     OortService oort;
 
     public String getPipelinesArtifactContent(LambdaPipelineArtifact pipelineArtifact) {

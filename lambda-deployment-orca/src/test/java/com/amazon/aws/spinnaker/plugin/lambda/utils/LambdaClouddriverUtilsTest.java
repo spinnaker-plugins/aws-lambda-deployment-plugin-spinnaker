@@ -24,9 +24,11 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.common.collect.ImmutableMap;
+import com.netflix.spinnaker.kork.exceptions.SpinnakerException;
 import com.netflix.spinnaker.orca.api.pipeline.models.PipelineExecution;
 import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
+import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,10 +38,13 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 import ru.lanwen.wiremock.ext.WiremockUriResolver;
+
+import java.net.SocketTimeoutException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith({WiremockResolver.class, WiremockUriResolver.class})
@@ -49,14 +54,11 @@ public class LambdaClouddriverUtilsTest {
 
     String CLOUDDRIVER_BASE_URL;
 
-    @InjectMocks
     private LambdaCloudDriverUtils lambdaCloudDriverUtils;
 
     @Mock
     private CloudDriverConfigurationProperties propsMock;
-
-    @Mock
-    private Config config;
+    private Config config = new Config();
 
     @BeforeEach
     void init(@WiremockResolver.Wiremock WireMockServer wireMockServer, @WiremockUriResolver.WiremockUri String uri) {
@@ -64,6 +66,7 @@ public class LambdaClouddriverUtilsTest {
         CLOUDDRIVER_BASE_URL = uri;
         MockitoAnnotations.initMocks(this);
         Mockito.when(propsMock.getCloudDriverBaseUrl()).thenReturn(uri);
+        lambdaCloudDriverUtils = new LambdaCloudDriverUtils(config, propsMock, new OkHttpClient(), null);
     }
 
     @Test
@@ -288,6 +291,23 @@ public class LambdaClouddriverUtilsTest {
     }
 
     @Test
+    public void handleTimeout() {
+
+        config.setCloudDriverPostTimeoutSeconds(1);
+        config.setCloudDriverPostRequestRetries(1);
+        this.wireMockServer.stubFor(
+                WireMock.post("/healthcheck")
+                        .willReturn(aResponse()
+                                .withStatus(200)
+                                .withFixedDelay(20000))
+        );
+        SpinnakerException exception = assertThrows(SpinnakerException.class, () -> {
+            lambdaCloudDriverUtils.postToCloudDriver(CLOUDDRIVER_BASE_URL.concat("/healthcheck"), "");
+        });
+        assertTrue(exception.getCause() instanceof SocketTimeoutException);
+    }
+
+    @Test
     public void retrieveLambdaFromCache_ShouldGetLambdaGetInput_NotNull() {
         ResponseDefinitionBuilder mockFunctionResponse = new ResponseDefinitionBuilder()
                 .withStatus(200)
@@ -417,7 +437,7 @@ public class LambdaClouddriverUtilsTest {
     }
 
     @Test
-    public void retrieveLambdaFromCache_ShouldNotBeNull(){
+    public void retrieveLambdaFromCache_ShouldNotBeNull() {
         ResponseDefinitionBuilder mockFunctionResponse = new ResponseDefinitionBuilder()
                 .withStatus(200)
                 .withBody("[{\"account\":\"account1\",\"aliasConfigurations\":[],\"code\":{\"location\":\"https:\\/\\/awslambda-us-west-2-tasks.s3.us-west-2.amazonaws.com\\/snapshots\\/569630529054\\/hello-world-9d719f9e\",\"repositoryType\":\"S3\"},\"codeSha256\":\"gEfN8j47XTW9VAGo6+dTbppFm3HZRnsOFI3\\/C6v05Xs=\",\"codeSize\":343,\"description\":\"A starter AWS Lambda function.\",\"eventSourceMappings\":[],\"fileSystemConfigs\":[],\"functionArn\":\"arn:aws:lambda:us-west-2:569630529054:function:hello-world\",\"functionName\":\"function-test\",\"handler\":\"lambda_function.lambda_handler\",\"lastModified\":\"2021-04-19T22:58:03.358+0000\",\"layers\":[],\"memorySize\":128,\"packageType\":\"Zip\",\"region\":\"us-west-2\",\"revisionId\":\"dc635189-fb73-4bd7-93d5-3b955568101e\",\"revisions\":{\"dc635189-fb73-4bd7-93d5-3b955568101e\":\"$LATEST\"},\"role\":\"arn:aws:iam::569630529054:role\\/service-role\\/hello-world-role-ff9v8sy0\",\"runtime\":\"python3.7\",\"state\":\"Active\",\"tags\":{\"lambda-console:blueprint\":\"hello-world-python\"},\"targetGroups\":[],\"timeout\":3,\"tracingConfig\":{\"mode\":\"PassThrough\"},\"version\":\"$LATEST\"}]");
@@ -437,7 +457,7 @@ public class LambdaClouddriverUtilsTest {
         Mockito.when(stageExecutionMock.getExecution()).thenReturn(pipelineExecutionMock);
         LambdaDefinition lambdaDefinition = lambdaCloudDriverUtils.retrieveLambdaFromCache(stageExecutionMock, false);
         assertNotNull(lambdaDefinition);
-        assertEquals("account1",lambdaDefinition.getAccount());
+        assertEquals("account1", lambdaDefinition.getAccount());
     }
 
 }

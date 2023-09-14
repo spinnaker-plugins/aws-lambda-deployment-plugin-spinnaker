@@ -5,16 +5,15 @@ import org.springframework.beans.factory.annotation.Value;
 
 @Data
 public class Config {
-    @Value("${lambdaPluginConfig.cloudDriverReadTimeout:60}")
-    private int cloudDriverReadTimeout;
-    @Value("${lambdaPluginConfig.cloudDriverConnectTimeout:15}")
-    private int cloudDriverConnectTimeout;
+
     @Value("${lambdaPluginConfig.cacheRefreshRetryWaitTime:15}")
     private int cacheRefreshRetryWaitTime;
     @Value("${lambdaPluginConfig.cacheOnDemandRetryWaitTime:15}")
     private int cacheOnDemandRetryWaitTime;
     @Value("${lambdaPluginConfig.cloudDriverPostRequestRetries:5}")
     private int cloudDriverPostRequestRetries;
+    @Value("${lambdaPluginConfig.cloudDriverPostTimeoutSeconds:120}")
+    private int cloudDriverPostTimeoutSeconds;
 
     //it’s the time the request for LambdaTrafficUpdateTask takes to show on aws
     //and start moving the weights around and the fastest average is 30-35 seconds
