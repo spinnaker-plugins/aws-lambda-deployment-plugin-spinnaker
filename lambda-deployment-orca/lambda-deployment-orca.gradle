@@ -26,9 +26,9 @@ spinnakerPlugin {
 dependencies {
   implementation(enforcedPlatform("io.spinnaker.orca:orca-bom:${orcaVersion}"))
   implementation("com.amazonaws:aws-java-sdk")
-  implementation("com.netflix.awsobjectmapper:awsobjectmapper")
-  implementation("org.apache.commons:commons-lang3")
-  implementation("com.squareup.okhttp3:okhttp")
+  compileOnly("com.netflix.awsobjectmapper:awsobjectmapper")
+  compileOnly("org.apache.commons:commons-lang3")
+  compileOnly("com.squareup.okhttp3:okhttp")
 
   compileOnly(group: 'org.pf4j', name: 'pf4j')
   compileOnly (group: 'io.spinnaker.orca', name: 'orca-api')
