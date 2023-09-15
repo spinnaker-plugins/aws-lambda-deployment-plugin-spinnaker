@@ -40,13 +40,19 @@ import com.netflix.spinnaker.orca.api.pipeline.models.StageExecution;
 import com.netflix.spinnaker.orca.clouddriver.OortService;
 import com.netflix.spinnaker.orca.clouddriver.config.CloudDriverConfigurationProperties;
 import com.netflix.spinnaker.security.AuthenticatedRequest;
-import okhttp3.*;
+import okhttp3.Call;
+import okhttp3.Headers;
+import okhttp3.HttpUrl;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.pf4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -57,6 +63,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
 
 @Component
 public class LambdaCloudDriverUtils {
@@ -80,7 +87,9 @@ public class LambdaCloudDriverUtils {
     //https://github.com/spinnaker/kork/blob/master/kork-web/src/main/java/com/netflix/spinnaker/config/okhttp3/RawOkHttpClientConfiguration.java#L45
     final OkHttpClient client;
 
-    @Autowired
+    final
+    OortService oort;
+
     public LambdaCloudDriverUtils(Config config, CloudDriverConfigurationProperties props, OkHttpClient client, OortService oort) {
         this.config = config;
         this.props = props;
@@ -356,8 +365,12 @@ public class LambdaCloudDriverUtils {
     public List<String> getSortedRevisions(LambdaDefinition lf) {
         List<String> revisions = lf.getRevisions().values().stream().collect(Collectors.toList());
         List<Integer> revInt = revisions.stream()
-                .filter(x -> { return NumberUtils.isCreatable(x); })
-                .map(x -> { return Integer.valueOf(x); })
+                .filter(x -> {
+                    return NumberUtils.isCreatable(x);
+                })
+                .map(x -> {
+                    return Integer.valueOf(x);
+                })
                 .collect(Collectors.toList());
         revInt = revInt.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
         List<String> answers = revInt.stream().map(x -> {
@@ -380,7 +393,7 @@ public class LambdaCloudDriverUtils {
     }
 
     public boolean validateUpsertLambdaInput(LambdaDeploymentInput inputLambda, List<String> errorMessages) {
-        if(validateBasicLambdaDeploymentInput(inputLambda, errorMessages)){
+        if (validateBasicLambdaDeploymentInput(inputLambda, errorMessages)) {
             if (ObjectUtils.defaultIfNull(inputLambda.getEnableLambdaAtEdge(), Boolean.FALSE)) {
                 return validateLambdaEdgeInput(inputLambda, errorMessages);
             }
@@ -470,9 +483,6 @@ public class LambdaCloudDriverUtils {
                 .build();
     }
 
-
-    final
-    OortService oort;
 
     public String getPipelinesArtifactContent(LambdaPipelineArtifact pipelineArtifact) {
         RetrySupport retrySupport = new RetrySupport();

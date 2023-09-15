@@ -2,8 +2,10 @@ package com.amazon.aws.spinnaker.plugin.lambda;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Data
+@Component// SHOULD be a config properties class.  Which it is when not in this plugin.
 public class Config {
 
     @Value("${lambdaPluginConfig.cacheRefreshRetryWaitTime:15}")
