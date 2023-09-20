@@ -23,7 +23,7 @@ spinnakerPlugin {
 
 dependencies {
   implementation(enforcedPlatform("io.spinnaker.clouddriver:clouddriver-bom:${clouddriverVersion}"))
-  implementation("com.amazonaws:aws-java-sdk")
+  compileOnly("com.amazonaws:aws-java-sdk")
   compileOnly("com.netflix.awsobjectmapper:awsobjectmapper")
   compileOnly("org.apache.commons:commons-lang3")
   compileOnly("com.squareup.okhttp3:okhttp")
