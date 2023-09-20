@@ -39,8 +39,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 @Log4j2
-@ExposeToApp
-@Component
 public class LambdaService {
 
   private final AmazonClientProvider amazonClientProvider;

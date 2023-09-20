@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.clouddriver.lambda.provider.agent;
+package com.amazon.aws.spinnaker.plugin.lambda.agent;
 
 import static com.netflix.spinnaker.cats.agent.AgentDataType.Authority.AUTHORITATIVE;
 import static com.netflix.spinnaker.clouddriver.lambda.cache.Keys.Namespace.IAM_ROLE;
@@ -43,6 +43,8 @@ import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import com.netflix.spinnaker.clouddriver.lambda.provider.agent.IamTrustRelationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

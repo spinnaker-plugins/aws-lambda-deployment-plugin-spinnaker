@@ -17,6 +17,7 @@
 
 package com.amazon.aws.spinnaker.plugin.lambda;
 
+import com.amazon.aws.spinnaker.plugin.lambda.agent.LambdaAgentProvider;
 import com.netflix.spinnaker.kork.plugins.api.spring.SpringLoaderPlugin;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.tuple.Pair;
@@ -37,7 +38,7 @@ public class LambdaClouddriverPlugin extends SpringLoaderPlugin {
     @Override
     public void registerBeanDefinitions(BeanDefinitionRegistry registry) {
         List<Pair<String, Class>> beanList =  Arrays.asList(
-                Pair.of("lambdaWaitForCacheCodeUpdateTask", com.netflix.spinnaker.clouddriver.lambda.service.LambdaService.class)
+                Pair.of("lambdaAgentProvider", LambdaAgentProvider.class)
         );
         beanList.forEach( curr -> {
             BeanDefinition lazyLoadCredentialsRepositoryDefinition = primaryBeanDefinitionFor(curr.getRight());

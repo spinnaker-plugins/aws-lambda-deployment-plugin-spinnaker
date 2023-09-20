@@ -25,9 +25,9 @@ import com.netflix.spinnaker.clouddriver.aws.security.AmazonClientProvider;
 import com.netflix.spinnaker.clouddriver.aws.security.AmazonCredentials;
 import com.netflix.spinnaker.clouddriver.aws.security.NetflixAmazonCredentials;
 import com.netflix.spinnaker.clouddriver.core.limits.ServiceLimitConfiguration;
-import com.netflix.spinnaker.clouddriver.lambda.provider.agent.IamRoleCachingAgent;
 import com.netflix.spinnaker.clouddriver.lambda.service.config.LambdaServiceConfig;
 import com.netflix.spinnaker.credentials.Credentials;
+import com.netflix.spinnaker.kork.plugins.api.spring.ExposeToApp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Component
+@ExposeToApp
 public class LambdaAgentProvider implements AgentProvider {
   private final ObjectMapper objectMapper;
   private final AmazonClientProvider amazonClientProvider;
