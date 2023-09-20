@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.amazon.aws.spinnaker.plugin.lambda.LambdaService;
 import com.amazonaws.services.lambda.AWSLambda;
 import com.amazonaws.services.lambda.model.FunctionConfiguration;
 import com.amazonaws.services.lambda.model.GetFunctionResult;
