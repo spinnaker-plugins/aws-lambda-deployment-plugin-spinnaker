@@ -1,22 +1,21 @@
 ## Spinnaker Plugin for AWS Lambda Deployment
 
-This plugin provides support for AWS Lambda Deployment via Pipelines in Spinnaker
+This plugin provides support for AWS Lambda Deployment via Pipelines in Spinnaker.  This repository is in transition
+from its current distribution as a plugin into to the core Spinnaker project. Updates will be less frequent until
+the migration is complete and feature parity is achieved in future Spinnaker releases.
 
 ### Version Compatibility
 | Plugin  | Spinnaker Platform |
-|:------------- | :--------- |
-| 1.0.5 <= |  1.23.x |
-| 1.0.6 >= |  1.26.x |
-| 1.0.11 >= |  1.29.x |
+|:------------- |:-------------------|
+| 1.0.11 >= | 1.29.x             |
+| 1.2.0 <= | 1.32.x             |
+| 1.2.0 >= | 1.30.x             |
 
-This plugin is currently only compatible with Spinnaker platform 1.23.x and up. It is possible to run the plugin in an environment running an earlier release by making the following changes to your environment:
-1. Checkout `master` branch for `spinnaker/orca`
-2. Checkout `master` branch for `spinnaker/deck`
-3. Checkout `master` branch for `spinnaker/clouddriver`
-4. Install the plugin
+This plugin is currently only compatible with Spinnaker platform 1.28.x and up.
 
 ## Major changes
 11/02/2022 - Release 1.1.0 - removes older versions of the runtime engine from the UI.  This means editing older pipelines will no longer let you use the unsupported lambda runtimes.  Please see https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html for questions/information.
+09/21/2023 - Release 1.2.0 - Adds the ability to override clouddriver native functionality and supports clouddriver plugin.  Removed references to unsupported spinnaker versions.
 
 ### Requirements
 1. This plugin requires Java 11
@@ -40,12 +39,13 @@ This plugin is currently only compatible with Spinnaker platform 1.23.x and up. 
           id: awsLambdaDeploymentPluginRepo
           url: https://raw.githubusercontent.com/spinnaker-plugins/aws-lambda-deployment-plugin-spinnaker/master/plugins.json
 
-  # you can also optionally configure cache refresh retries and timeouts
+  # you can also optionally configure cache refresh retries and timeouts.  Several settings are for 
+  # overall service communication timeouts should be set globally.   
+  # https://github.com/spinnaker/kork/blob/master/kork-web/src/main/groovy/com/netflix/spinnaker/okhttp/OkHttpClientConfigurationProperties.groovy#L29-L32
   lambdaPluginConfig:
-    cloudDriverReadTimeout: 60 # defaults to 60 secs
-    cloudDriverConnectTimeout: 15 # defaults to 15 secs
     cacheRefreshRetryWaitTime: 15 # defaults to 15 sec
     cacheOnDemandRetryWaitTime: 15 # defaults to 15 sec
+    cloudDriverPostRequestRetries: 5 # defaults to 5.  Disable if you don't want duplicates.
     cloudDriverRetrieveNewPublishedLambdaWaitSeconds: 40 # defaults to 40 sec
     cloudDriverRetrieveMaxValidateWeightsTimeSeconds: 240 # defaults to 240 sec
 ```
