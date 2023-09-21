@@ -8,8 +8,8 @@ the migration is complete and feature parity is achieved in future Spinnaker rel
 | Plugin  | Spinnaker Platform |
 |:------------- |:-------------------|
 | 1.0.11 >= | 1.29.x             |
-| 1.2.0 <= | 1.32.x             |
 | 1.2.0 >= | 1.30.x             |
+| 1.2.0 <= | 1.32.x             |
 
 This plugin is currently only compatible with Spinnaker platform 1.28.x and up.
 
