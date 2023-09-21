@@ -52,6 +52,7 @@ dependencies {
 
   testImplementation group: 'io.spinnaker.clouddriver', name: 'clouddriver-api'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
+  testCompile("com.netflix.awsobjectmapper:awsobjectmapper")
   testCompile group: 'com.github.tomakehurst', name: 'wiremock-jre8', version: '2.29.1'
   testCompile group: 'org.mockito', name: 'mockito-core'
   testCompile (group: 'io.spinnaker.clouddriver', name: 'clouddriver-lambda')
