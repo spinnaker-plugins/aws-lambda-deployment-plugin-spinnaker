@@ -1,0 +1,72 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+}
+
+apply plugin: "io.spinnaker.plugin.service-extension"
+apply plugin: "maven-publish"
+apply plugin: "java"
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+  mavenCentral()
+}
+
+spinnakerPlugin {
+  serviceName = "clouddriver"
+  pluginClass = "com.amazon.aws.spinnaker.plugin.lambda.LambdaClouddriverPlugin"
+  requires="clouddriver>=0.0.0"
+}
+
+dependencies {
+  implementation(enforcedPlatform("io.spinnaker.clouddriver:clouddriver-bom:${clouddriverVersion}"))
+  compileOnly("com.amazonaws:aws-java-sdk")
+  compileOnly("com.netflix.awsobjectmapper:awsobjectmapper")
+  compileOnly("org.apache.commons:commons-lang3")
+  compileOnly("com.squareup.okhttp3:okhttp")
+
+  compileOnly(group: 'org.pf4j', name: 'pf4j')
+  compileOnly (group: 'io.spinnaker.clouddriver', name: 'clouddriver-api')
+  compileOnly (group: 'io.spinnaker.clouddriver', name: 'cats-core')
+  compileOnly(group: 'com.google.guava', name: 'guava')
+  compileOnly (group: 'io.spinnaker.clouddriver', name: 'clouddriver-lambda')
+  compileOnly (group: 'io.spinnaker.clouddriver', name: 'clouddriver-security')
+  compileOnly (group: 'io.spinnaker.clouddriver', name: 'clouddriver-core')
+  compileOnly (group: 'io.spinnaker.clouddriver', name: 'clouddriver-aws')
+
+  compileOnly "com.netflix.spectator:spectator-api"
+  compileOnly "com.netflix.frigga:frigga"
+
+  compileOnly ("org.projectlombok:lombok")
+  compileOnly (group: 'io.spinnaker.kork', name: 'kork-plugins-spring-api')
+  compileOnly(group: 'io.spinnaker.kork', name: 'kork-exceptions')
+
+  annotationProcessor platform("io.spinnaker.clouddriver:clouddriver-bom:${clouddriverVersion}")
+  annotationProcessor ("org.projectlombok:lombok")
+  annotationProcessor("org.pf4j:pf4j")
+  testAnnotationProcessor platform("io.spinnaker.clouddriver:clouddriver-bom:${clouddriverVersion}")
+  testAnnotationProcessor ("org.projectlombok:lombok")
+
+  testImplementation group: 'io.spinnaker.clouddriver', name: 'clouddriver-api'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
+  testCompile("com.netflix.awsobjectmapper:awsobjectmapper")
+  testCompile group: 'com.github.tomakehurst', name: 'wiremock-jre8', version: '2.29.1'
+  testCompile group: 'org.mockito', name: 'mockito-core'
+  testCompile (group: 'io.spinnaker.clouddriver', name: 'clouddriver-lambda')
+  testCompile (group: 'io.spinnaker.clouddriver', name: 'clouddriver-aws')
+  testCompile (group: 'io.spinnaker.clouddriver', name: 'clouddriver-core')
+  testCompile (group: 'io.spinnaker.clouddriver', name: 'clouddriver-security')
+  testCompile group: 'org.mockito', name: 'mockito-junit-jupiter'
+  testCompile group: 'org.projectlombok', name: 'lombok'
+
+  testRuntime "org.junit.jupiter:junit-jupiter-engine"
+  testRuntime "org.junit.platform:junit-platform-launcher"
+  testRuntime "org.junit.platform:junit-platform-commons"
+}
+
+tasks.withType(Test) {
+  useJUnitPlatform()
+}

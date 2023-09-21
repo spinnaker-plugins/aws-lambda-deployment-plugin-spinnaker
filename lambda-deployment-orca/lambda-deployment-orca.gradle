@@ -13,8 +13,6 @@ targetCompatibility = 11
 
 repositories {
   mavenCentral()
-  jcenter()
-  maven { url "http://dl.bintray.com/spinnaker/spinnaker/" }
 }
 
 spinnakerPlugin {
