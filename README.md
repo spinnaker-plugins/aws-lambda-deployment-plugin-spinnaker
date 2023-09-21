@@ -14,8 +14,9 @@ the migration is complete and feature parity is achieved in future Spinnaker rel
 This plugin is currently only compatible with Spinnaker platform 1.28.x and up.
 
 ## Major changes
-11/02/2022 - Release 1.1.0 - removes older versions of the runtime engine from the UI.  This means editing older pipelines will no longer let you use the unsupported lambda runtimes.  Please see https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html for questions/information.
-09/21/2023 - Release 1.2.0 - Adds the ability to override clouddriver native functionality and supports clouddriver plugin.  Removed references to unsupported spinnaker versions.
+
+- 11/02/2022 - Release 1.1.0 - removes older versions of the runtime engine from the UI.  This means editing older pipelines will no longer let you use the unsupported lambda runtimes.  Please see https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html for questions/information.
+- 09/21/2023 - Release 1.2.0 - Adds the ability to override clouddriver native functionality and supports clouddriver plugin.  Removed references to unsupported spinnaker versions.
 
 ### Requirements
 1. This plugin requires Java 11
