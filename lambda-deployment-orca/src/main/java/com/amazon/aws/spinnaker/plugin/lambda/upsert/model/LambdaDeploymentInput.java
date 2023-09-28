@@ -31,6 +31,7 @@ public class LambdaDeploymentInput {
     int memorySize;
     int timeout;
     Boolean publish;
+    Boolean snapstart;
 
     HashMap<String, String> envVariables;
     HashMap<String, String> tags;
